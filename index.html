@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Try Local — Gresham, Oregon</title>
+  <meta name="description" content="Discover and support small businesses in Gresham, Oregon." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">TL</div>
+        <span class="brand-name">Try Local</span>
+        <span class="brand-subtle">Gresham, OR</span>
+      </div>
+      <nav class="nav">
+        <a href="#discover" class="nav-link">Discover</a>
+        <a href="#categories" class="nav-link">Categories</a>
+        <a href="#for-businesses" class="nav-link">For Businesses</a>
+        <button id="openAuth" class="btn btn-outline">Sign In</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" role="img" aria-label="City background: Gresham, Oregon">
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <h1>Shop Gresham.<br /><span class="accent">Support your neighbors.</span></h1>
+        <p class="lead">Find coffee, boutiques, services, and more — from the heart of Gresham.</p>
+        <div class="hero-actions">
+          <a href="#discover" class="btn btn-primary">Browse Businesses</a>
+          <a href="#for-businesses" class="btn btn-ghost">List Your Business</a>
+        </div>
+        <form id="searchForm" class="search-bar" role="search" aria-label="Search businesses">
+          <input id="searchInput" type="search" placeholder="Search by name or tag…" aria-label="Search by name or tag" />
+          <select id="categorySelect" aria-label="Filter by category">
+            <option value="">All Categories</option>
+          </select>
+          <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="discover" class="section container">
+      <div class="section-head">
+        <h2>Featured in Gresham</h2>
+        <div class="chip-row" id="chipRow" aria-label="Quick filters"></div>
+      </div>
+      <div id="results" class="grid cards"></div>
+      <div id="emptyState" class="empty-state" hidden>
+        <h3>No results</h3>
+        <p>Try a different search or category.</p>
+      </div>
+    </section>
+
+    <section id="categories" class="section container">
+      <h2>Popular Categories</h2>
+      <div id="categoryGrid" class="grid category-grid"></div>
+    </section>
+
+    <section id="for-businesses" class="section container for-biz">
+      <div class="for-biz-card">
+        <h2>For Businesses</h2>
+        <p>Create your profile, add products, update hours, and connect with local customers.</p>
+        <ul class="list">
+          <li>Dedicated store page with your branding</li>
+          <li>Tags, photos, hours, contact info</li>
+          <li>Optional pickup/delivery & order links</li>
+          <li>Customer favorites and reviews</li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#" id="btnJoin">Get Started</a>
+          <a class="btn btn-outline" href="#" id="btnDemo">View Demo Store</a>
+        </div>
+      </div>
+      <aside class="for-biz-aside">
+        <h3>Why Try Local?</h3>
+        <p>We help neighbors find you. Keep dollars circulating in Gresham.</p>
+        <div class="stat-row">
+          <div class="stat"><span class="stat-num" id="statBusinesses">0</span><span class="stat-label">Businesses</span></div>
+          <div class="stat"><span class="stat-num" id="statTags">0</span><span class="stat-label">Tags</span></div>
+          <div class="stat"><span class="stat-num" id="statNeighborhoods">0</span><span class="stat-label">Neighborhoods</span></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Try Local — Gresham</strong><br />
+        <small>Built for the community.</small>
+      </div>
+      <div class="footer-links">
+        <a href="#" aria-label="Terms">Terms</a>
+        <a href="#" aria-label="Privacy">Privacy</a>
+        <a href="#" aria-label="Contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <dialog id="authModal" class="modal">
+    <form method="dialog" class="modal-card">
+      <h3>Sign In</h3>
+      <p>This demo uses local storage. You can wire Firebase Auth later.</p>
+      <label>Email <input type="email" placeholder="you@example.com" required /></label>
+      <label>Password <input type="password" placeholder="••••••••" required /></label>
+      <menu class="modal-actions">
+        <button class="btn btn-ghost" value="cancel">Cancel</button>
+        <button class="btn btn-primary" value="confirm">Continue</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
