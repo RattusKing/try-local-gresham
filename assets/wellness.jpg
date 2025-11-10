@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#7CB9E8"/>
+  <circle cx="200" cy="150" r="80" fill="#ffffff" opacity="0.2"/>
+  <path d="M 200 110 C 180 110 170 120 170 135 C 170 155 200 175 200 175 C 200 175 230 155 230 135 C 230 120 220 110 200 110 Z" fill="#ffffff"/>
+  <circle cx="200" cy="190" r="8" fill="#ffffff"/>
+  <rect x="196" y="198" width="8" height="15" fill="#ffffff"/>
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">Wellness</text>
+</svg>

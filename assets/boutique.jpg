@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#E8B4B8"/>
+  <circle cx="200" cy="150" r="70" fill="#ffffff" opacity="0.2"/>
+  <path d="M 160 100 L 240 100 L 240 180 L 160 180 Z" fill="#ffffff" stroke="#ffffff" stroke-width="2"/>
+  <path d="M 200 100 L 200 180" stroke="#E8B4B8" stroke-width="2"/>
+  <circle cx="205" cy="140" r="3" fill="#E8B4B8"/>
+  <rect x="170" y="100" width="60" height="15" fill="#E8B4B8"/>
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">Boutique</text>
+</svg>

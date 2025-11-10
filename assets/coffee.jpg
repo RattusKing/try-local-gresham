@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#6F4E37"/>
+  <circle cx="200" cy="150" r="60" fill="#ffffff" opacity="0.2"/>
+  <path d="M 160 120 Q 160 100 180 100 Q 190 100 190 110 Q 190 100 200 100 Q 210 100 210 110 Q 210 100 220 100 Q 240 100 240 120 L 240 160 Q 240 180 220 180 L 180 180 Q 160 180 160 160 Z" fill="#ffffff"/>
+  <ellipse cx="200" cy="160" rx="40" ry="8" fill="#ffffff" opacity="0.5"/>
+  <rect x="245" y="140" width="20" height="30" rx="10" fill="#ffffff"/>
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">Coffee Shop</text>
+</svg>

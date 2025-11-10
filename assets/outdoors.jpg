@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#2D5016"/>
+  <circle cx="200" cy="150" r="80" fill="#ffffff" opacity="0.15"/>
+  <polygon points="200,80 160,160 240,160" fill="#4A7C2C"/>
+  <polygon points="200,100 170,160 230,160" fill="#5A9C3C"/>
+  <rect x="195" y="160" width="10" height="30" fill="#6F4E37"/>
+  <circle cx="280" cy="80" r="25" fill="#FFD700" opacity="0.8"/>
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">Outdoors</text>
+</svg>

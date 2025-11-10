@@ -52,6 +52,7 @@
         <h2>Featured in Gresham</h2>
         <div class="chip-row" id="chipRow" aria-label="Quick filters"></div>
       </div>
+      <div id="resultsCount" class="results-count" aria-live="polite"></div>
       <div id="results" class="grid cards"></div>
       <div id="emptyState" class="empty-state" hidden>
         <h3>No results</h3>
@@ -109,14 +110,23 @@
     <form method="dialog" class="modal-card">
       <h3>Sign In</h3>
       <p>This demo uses local storage. You can wire Firebase Auth later.</p>
-      <label>Email <input type="email" placeholder="you@example.com" required /></label>
-      <label>Password <input type="password" placeholder="••••••••" required /></label>
+      <label for="authEmail">Email</label>
+      <input id="authEmail" type="email" placeholder="you@example.com" required />
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" placeholder="••••••••" required />
       <menu class="modal-actions">
         <button class="btn btn-ghost" value="cancel">Cancel</button>
         <button class="btn btn-primary" value="confirm">Continue</button>
       </menu>
     </form>
   </dialog>
+
+  <div id="loader" class="loader" hidden>
+    <div class="loader-spinner"></div>
+    <p>Loading businesses...</p>
+  </div>
+
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
 
   <script src="app.js" defer></script>
 </body>
