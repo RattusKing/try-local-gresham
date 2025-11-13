@@ -1,0 +1,7 @@
+# robots.txt for Try Local Gresham
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: https://trylocalor.com/sitemap.xml

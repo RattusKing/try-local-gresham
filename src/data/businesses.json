@@ -1,0 +1,46 @@
+[
+  {
+    "id":"bg-coffee",
+    "name":"Blue Gorge Coffee",
+    "tags":["Coffee","Food","Bakery"],
+    "neighborhood":"Downtown",
+    "hours":"7am–6pm",
+    "phone":"+1-503-555-1088",
+    "website":"https://example.com/bluegorge",
+    "map":"https://maps.google.com/?q=Gresham+Downtown",
+    "cover":"assets/coffee.jpg"
+  },
+  {
+    "id":"spruce-boutique",
+    "name":"Spruce Boutique",
+    "tags":["Boutique","Fashion"],
+    "neighborhood":"Historic Downtown",
+    "hours":"11am–7pm",
+    "phone":"+1-503-555-2299",
+    "website":"https://example.com/spruce",
+    "map":"https://maps.google.com/?q=Gresham+Historic+Downtown",
+    "cover":"assets/boutique.jpg"
+  },
+  {
+    "id":"greenway-outdoors",
+    "name":"Greenway Outdoors",
+    "tags":["Outdoors","Sports","Family"],
+    "neighborhood":"Rockwood",
+    "hours":"10am–8pm",
+    "phone":"+1-503-555-7766",
+    "website":"https://example.com/greenway",
+    "map":"https://maps.google.com/?q=Gresham+Rockwood",
+    "cover":"assets/outdoors.jpg"
+  },
+  {
+    "id":"river-wellness",
+    "name":"River Wellness",
+    "tags":["Wellness","Services"],
+    "neighborhood":"North Gresham",
+    "hours":"9am–5pm",
+    "phone":"+1-503-555-3344",
+    "website":"https://example.com/riverwellness",
+    "map":"https://maps.google.com/?q=Gresham+Oregon",
+    "cover":"assets/wellness.jpg"
+  }
+]
