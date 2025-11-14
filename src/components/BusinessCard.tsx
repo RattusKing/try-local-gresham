@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import type { Business } from '@/lib/types'
 
 interface BusinessCardProps {
@@ -52,19 +53,17 @@ export default function BusinessCard({
           ))}
         </div>
         <div className="actions">
-          <a
-            className="btn btn-outline"
-            href={business.map}
-            target="_blank"
-            rel="noopener"
-          >
-            Map
-          </a>
-          <button
+          <Link
+            href={`/business/${business.id}`}
             className="btn btn-primary"
+          >
+            View Details
+          </Link>
+          <button
+            className="btn btn-outline"
             onClick={() => onFavorite(business.id)}
           >
-            Favorite
+            ❤️ Save
           </button>
         </div>
       </div>
