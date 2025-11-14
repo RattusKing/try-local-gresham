@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { db } from '@/lib/firebase/config'
-import { doc, getDoc } from 'firebase/firestore'
-import { Business } from '@/lib/types'
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import { Business, Product } from '@/lib/types'
 import { motion } from 'framer-motion'
 import './business-profile.css'
 
@@ -12,6 +12,7 @@ export default function BusinessProfilePage() {
   const params = useParams()
   const router = useRouter()
   const [business, setBusiness] = useState<Business | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -37,6 +38,9 @@ export default function BusinessProfilePage() {
         }
 
         setBusiness({ ...data, id: businessSnap.id })
+
+        // Load products for this business
+        await loadProducts(businessSnap.id)
       } else {
         setError('Business not found')
       }
@@ -44,6 +48,27 @@ export default function BusinessProfilePage() {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadProducts = async (businessId: string) => {
+    if (!db) return
+
+    try {
+      const productsQuery = query(
+        collection(db, 'products'),
+        where('businessId', '==', businessId),
+        where('inStock', '==', true)
+      )
+      const productsSnap = await getDocs(productsQuery)
+      const productsList = productsSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Product[]
+
+      setProducts(productsList)
+    } catch (err: any) {
+      console.error('Error loading products:', err)
     }
   }
 
@@ -126,7 +151,7 @@ export default function BusinessProfilePage() {
             </motion.section>
           )}
 
-          {/* Products/Services Section (Placeholder) */}
+          {/* Products/Services Section */}
           <motion.section
             className="business-section"
             initial={{ opacity: 0, y: 20 }}
@@ -134,9 +159,39 @@ export default function BusinessProfilePage() {
             transition={{ delay: 0.6 }}
           >
             <h2>Products & Services</h2>
-            <div className="products-placeholder">
-              <p>Coming soon! This business will be able to showcase their products and services here.</p>
-            </div>
+            {products.length === 0 ? (
+              <div className="products-placeholder">
+                <p>No products or services listed yet.</p>
+              </div>
+            ) : (
+              <div className="products-display">
+                {products.map((product) => (
+                  <div key={product.id} className="product-item">
+                    {product.image && (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="product-item-image"
+                      />
+                    )}
+                    <div className="product-item-content">
+                      <div className="product-item-header">
+                        <h4>{product.name}</h4>
+                        <span className="product-item-price">
+                          ${product.price.toFixed(2)}
+                        </span>
+                      </div>
+                      {product.category && (
+                        <span className="product-item-category">{product.category}</span>
+                      )}
+                      {product.description && (
+                        <p className="product-item-description">{product.description}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.section>
 
           {/* Reviews Section (Placeholder) */}

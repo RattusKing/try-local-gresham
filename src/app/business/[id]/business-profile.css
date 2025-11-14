@@ -147,6 +147,78 @@
   border-radius: 0.375rem;
 }
 
+/* Products Display */
+.products-display {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.product-item {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+
+.product-item:hover {
+  background: #f3f4f6;
+}
+
+.product-item-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+}
+
+.product-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.product-item-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--primary-black);
+  flex: 1;
+}
+
+.product-item-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+  white-space: nowrap;
+}
+
+.product-item-category {
+  display: inline-block;
+  background: #fef3e7;
+  color: var(--primary-orange);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.product-item-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
 /* Sidebar */
 .business-profile-sidebar {
   display: flex;
