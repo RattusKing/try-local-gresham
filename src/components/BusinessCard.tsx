@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import type { Business } from '@/lib/types'
+import StarRating from './StarRating'
 
 interface BusinessCardProps {
   business: Business
@@ -33,6 +34,14 @@ export default function BusinessCard({
       />
       <div className="content">
         <h3>{business.name}</h3>
+        {business.averageRating && business.reviewCount ? (
+          <div className="card-rating">
+            <StarRating rating={business.averageRating} readonly size="small" />
+            <span className="card-rating-text">
+              {business.averageRating.toFixed(1)} ({business.reviewCount})
+            </span>
+          </div>
+        ) : null}
         <div className="meta">
           📍 {business.neighborhood} &nbsp; • &nbsp; ⏰ {business.hours}
         </div>
