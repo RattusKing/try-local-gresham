@@ -8,4 +8,29 @@ export interface Business {
   website: string
   map: string
   cover: string
+  ownerId?: string
+  status?: 'pending' | 'approved' | 'rejected'
+  subscriptionTier?: 'free' | 'standard' | 'premium'
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export type UserRole = 'customer' | 'business_owner' | 'admin'
+
+export interface UserProfile {
+  uid: string
+  email: string
+  displayName?: string
+  role: UserRole
+  createdAt: Date
+  updatedAt: Date
+  businessId?: string // For business owners
+}
+
+export interface AuthUser {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+  role?: UserRole
 }
