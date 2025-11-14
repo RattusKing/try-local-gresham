@@ -1,0 +1,239 @@
+.admin-dashboard {
+  max-width: 1200px;
+}
+
+.admin-dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard-header h1 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  color: var(--primary-black);
+}
+
+.admin-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+}
+
+.admin-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.admin-tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+}
+
+.admin-tab:hover {
+  color: var(--primary-black);
+}
+
+.admin-tab.active {
+  color: var(--primary-orange);
+  border-bottom-color: var(--primary-orange);
+}
+
+.admin-businesses {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.business-card-admin {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 1.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.business-card-admin:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.business-card-admin.approved {
+  border-left: 4px solid var(--primary-green);
+}
+
+.business-card-image {
+  width: 200px;
+  height: 150px;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.business-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.business-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.business-card-content h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--primary-black);
+}
+
+.business-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.business-card-tags {
+  color: var(--primary-orange);
+  font-weight: 500;
+}
+
+.business-card-description {
+  color: #4b5563;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.business-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.business-card-details p {
+  margin: 0;
+}
+
+.business-card-details a {
+  color: var(--primary-orange);
+  text-decoration: none;
+}
+
+.business-card-details a:hover {
+  text-decoration: underline;
+}
+
+.business-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn-approve,
+.btn-reject,
+.btn-unapprove {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-approve {
+  background: var(--primary-green);
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #0f8a0c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-unapprove {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-unapprove:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 0.5rem;
+  color: #6b7280;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+@media (max-width: 968px) {
+  .business-card-admin {
+    grid-template-columns: 1fr;
+  }
+
+  .business-card-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .business-card-actions {
+    flex-direction: row;
+  }
+}

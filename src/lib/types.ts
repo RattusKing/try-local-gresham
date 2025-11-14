@@ -8,6 +8,7 @@ export interface Business {
   website: string
   map: string
   cover: string
+  description?: string
   ownerId?: string
   status?: 'pending' | 'approved' | 'rejected'
   subscriptionTier?: 'free' | 'standard' | 'premium'
