@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == 'admin';
+    }
+
+    function isBusinessOwner() {
+      return isSignedIn() && getUserRole() == 'business_owner';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      // Admins can read all profiles
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Users can create their own profile during signup
+      allow create: if isSignedIn() && isOwner(userId);
+
+      // Users can update their own profile
+      // Admins can update any profile
+      allow update: if isOwner(userId) || isAdmin();
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // Businesses collection
+    match /businesses/{businessId} {
+      // Everyone can read approved businesses
+      allow read: if resource.data.status == 'approved' || isAdmin() ||
+                     (isBusinessOwner() && resource.data.ownerId == request.auth.uid);
+
+      // Business owners can create their own business (requires admin approval)
+      allow create: if isBusinessOwner() &&
+                       request.resource.data.ownerId == request.auth.uid &&
+                       request.resource.data.status == 'pending';
+
+      // Business owners can update their own business
+      // Admins can update any business (including approval status)
+      allow update: if (isBusinessOwner() && resource.data.ownerId == request.auth.uid) ||
+                       isAdmin();
+
+      // Only admins can delete businesses
+      allow delete: if isAdmin();
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      // Customers can read their own orders
+      // Business owners can read orders for their business
+      // Admins can read all orders
+      allow read: if isSignedIn() &&
+                     (resource.data.customerId == request.auth.uid ||
+                      resource.data.businessOwnerId == request.auth.uid ||
+                      isAdmin());
+
+      // Customers can create orders
+      allow create: if isSignedIn() &&
+                       request.resource.data.customerId == request.auth.uid;
+
+      // Customers can update their own orders (for cancellation)
+      // Business owners can update orders for their business (for status updates)
+      // Admins can update any order
+      allow update: if isSignedIn() &&
+                       (resource.data.customerId == request.auth.uid ||
+                        resource.data.businessOwnerId == request.auth.uid ||
+                        isAdmin());
+
+      // Only admins can delete orders
+      allow delete: if isAdmin();
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Everyone can read approved reviews
+      allow read: if true;
+
+      // Signed-in users can create reviews
+      allow create: if isSignedIn() &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Users can update their own reviews
+      // Admins can update any review
+      allow update: if (isSignedIn() && resource.data.userId == request.auth.uid) ||
+                       isAdmin();
+
+      // Users can delete their own reviews
+      // Admins can delete any review
+      allow delete: if (isSignedIn() && resource.data.userId == request.auth.uid) ||
+                       isAdmin();
+    }
+
+    // Block all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
