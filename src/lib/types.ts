@@ -12,6 +12,8 @@ export interface Business {
   ownerId?: string
   status?: 'pending' | 'approved' | 'rejected'
   subscriptionTier?: 'free' | 'standard' | 'premium'
+  averageRating?: number
+  reviewCount?: number
   createdAt?: Date
   updatedAt?: Date
 }
@@ -34,4 +36,29 @@ export interface AuthUser {
   displayName: string | null
   photoURL: string | null
   role?: UserRole
+}
+
+export interface Product {
+  id: string
+  businessId: string
+  name: string
+  description?: string
+  price: number
+  image?: string
+  category?: string
+  inStock: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface Review {
+  id: string
+  businessId: string
+  userId: string
+  userName: string
+  userPhotoURL?: string
+  rating: number
+  comment: string
+  createdAt?: Date
+  updatedAt?: Date
 }

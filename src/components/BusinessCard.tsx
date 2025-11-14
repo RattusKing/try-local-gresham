@@ -1,7 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import type { Business } from '@/lib/types'
+import StarRating from './StarRating'
 
 interface BusinessCardProps {
   business: Business
@@ -32,6 +34,14 @@ export default function BusinessCard({
       />
       <div className="content">
         <h3>{business.name}</h3>
+        {business.averageRating && business.reviewCount ? (
+          <div className="card-rating">
+            <StarRating rating={business.averageRating} readonly size="small" />
+            <span className="card-rating-text">
+              {business.averageRating.toFixed(1)} ({business.reviewCount})
+            </span>
+          </div>
+        ) : null}
         <div className="meta">
           📍 {business.neighborhood} &nbsp; • &nbsp; ⏰ {business.hours}
         </div>
@@ -52,19 +62,17 @@ export default function BusinessCard({
           ))}
         </div>
         <div className="actions">
-          <a
-            className="btn btn-outline"
-            href={business.map}
-            target="_blank"
-            rel="noopener"
-          >
-            Map
-          </a>
-          <button
+          <Link
+            href={`/business/${business.id}`}
             className="btn btn-primary"
+          >
+            View Details
+          </Link>
+          <button
+            className="btn btn-outline"
             onClick={() => onFavorite(business.id)}
           >
-            Favorite
+            ❤️ Save
           </button>
         </div>
       </div>

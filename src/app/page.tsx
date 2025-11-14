@@ -8,6 +8,8 @@ import CategoryCard from '@/components/CategoryCard'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
+import { db } from '@/lib/firebase/config'
+import { collection, query, where, getDocs } from 'firebase/firestore'
 import type { Business } from '@/lib/types'
 
 const FILTER_CHIPS = [
@@ -27,21 +29,45 @@ export default function Home() {
   const [categories, setCategories] = useState<string[]>([])
   const [activeChips, setActiveChips] = useState<Set<string>>(new Set())
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  // Load data
+  // Load data from Firestore
   useEffect(() => {
-    fetch('/businesses.json')
-      .then((res) => res.json())
-      .then((data: Business[]) => {
-        setBusinesses(data)
-        setFilteredBusinesses(data)
-
-        // Extract unique categories
-        const cats = new Set<string>()
-        data.forEach((b) => b.tags.forEach((t) => cats.add(t)))
-        setCategories(Array.from(cats).sort())
-      })
+    loadBusinesses()
   }, [])
+
+  const loadBusinesses = async () => {
+    if (!db) {
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+      // Only fetch approved businesses
+      const businessesQuery = query(
+        collection(db, 'businesses'),
+        where('status', '==', 'approved')
+      )
+      const businessesSnap = await getDocs(businessesQuery)
+      const data = businessesSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Business[]
+
+      setBusinesses(data)
+      setFilteredBusinesses(data)
+
+      // Extract unique categories
+      const cats = new Set<string>()
+      data.forEach((b) => b.tags.forEach((t) => cats.add(t)))
+      setCategories(Array.from(cats).sort())
+    } catch (error) {
+      console.error('Error loading businesses:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Handle chip filtering
   const toggleChip = (chip: string) => {
@@ -135,20 +161,33 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="grid cards">
-            {filteredBusinesses.map((business) => (
-              <BusinessCard
-                key={business.id}
-                business={business}
-                onFavorite={handleFavorite}
-              />
-            ))}
-          </div>
-          {filteredBusinesses.length === 0 && (
+          {loading ? (
             <div className="empty-state">
-              <h3>No results</h3>
-              <p>Try a different search or category.</p>
+              <div className="spinner"></div>
+              <p>Loading businesses...</p>
             </div>
+          ) : (
+            <>
+              <div className="grid cards">
+                {filteredBusinesses.map((business) => (
+                  <BusinessCard
+                    key={business.id}
+                    business={business}
+                    onFavorite={handleFavorite}
+                  />
+                ))}
+              </div>
+              {filteredBusinesses.length === 0 && (
+                <div className="empty-state">
+                  <h3>No businesses yet</h3>
+                  <p>
+                    {businesses.length === 0
+                      ? 'Be the first business to join Try Local Gresham!'
+                      : 'Try a different search or category.'}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </section>
 
