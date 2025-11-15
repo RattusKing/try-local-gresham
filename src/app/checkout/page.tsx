@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { db } from '@/lib/firebase/config'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore'
 import { DeliveryMethod } from '@/lib/types'
 import './checkout.css'
 
@@ -106,7 +106,44 @@ export default function CheckoutPage() {
           updatedAt: new Date(),
         }
 
-        return addDoc(collection(firestore, 'orders'), orderData)
+        const orderRef = await addDoc(collection(firestore, 'orders'), orderData)
+
+        // Get business email for notifications
+        try {
+          const businessDoc = await getDoc(doc(firestore, 'businesses', group.businessId))
+          const businessData = businessDoc.data()
+          const businessEmail = businessData?.email || businessData?.website || ''
+
+          // Send email notifications (non-blocking)
+          if (businessEmail && user.email) {
+            fetch('/api/emails/order-confirmation', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customerEmail: user.email,
+                customerName: user.displayName || user.email,
+                businessEmail: businessEmail,
+                businessName: group.businessName,
+                orderId: orderRef.id,
+                items: group.items.map((item) => ({
+                  name: item.productName,
+                  quantity: item.quantity,
+                  price: item.price,
+                })),
+                total: groupTotal,
+                deliveryMethod: formData.deliveryMethod,
+                deliveryAddress: formData.deliveryAddress,
+                deliveryNotes: formData.deliveryNotes,
+                customerPhone: formData.phone,
+              }),
+            }).catch((err) => console.error('Email notification error:', err))
+          }
+        } catch (emailError) {
+          console.error('Error sending email notifications:', emailError)
+          // Continue even if email fails
+        }
+
+        return orderRef
       })
 
       await Promise.all(orderPromises)

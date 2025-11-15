@@ -135,7 +135,12 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <div className="admin-dashboard-header">
-        <h1>Business Approvals</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h1>Business Approvals</h1>
+          <a href="/dashboard/admin/applications" className="btn btn-primary">
+            View Applications
+          </a>
+        </div>
         <div className="admin-stats">
           <div className="admin-stat">
             <span className="admin-stat-value">{pendingBusinesses.length}</span>

@@ -100,6 +100,24 @@ export default function BusinessOrdersPage() {
         updatedAt: new Date(),
       })
 
+      // Get order details for email notification
+      const order = orders.find((o) => o.id === orderId)
+      if (order && (newStatus === 'confirmed' || newStatus === 'ready' || newStatus === 'completed' || newStatus === 'cancelled')) {
+        // Send status update email (non-blocking)
+        fetch('/api/emails/order-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: order.userEmail,
+            customerName: order.userName,
+            orderId: order.id,
+            businessName: order.businessName,
+            status: newStatus,
+            deliveryMethod: order.deliveryMethod,
+          }),
+        }).catch((err) => console.error('Email notification error:', err))
+      }
+
       // Reload orders
       if (businessId) {
         await loadOrders(businessId)

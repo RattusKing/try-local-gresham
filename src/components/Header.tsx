@@ -4,12 +4,14 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { useState, useRef, useEffect } from 'react'
 import CartModal from './CartModal'
+import BusinessApplicationModal from './BusinessApplicationModal'
 
 export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const { user, signOut } = useAuth()
   const { itemCount } = useCart()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showCart, setShowCart] = useState(false)
+  const [showBusinessApp, setShowBusinessApp] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -41,9 +43,9 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           <a href="#categories" className="nav-link">
             Categories
           </a>
-          <a href="#for-businesses" className="nav-link">
+          <button onClick={() => setShowBusinessApp(true)} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             For Businesses
-          </a>
+          </button>
 
           <button
             onClick={() => setShowCart(true)}
@@ -176,6 +178,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
       </div>
 
       <CartModal isOpen={showCart} onClose={() => setShowCart(false)} />
+      <BusinessApplicationModal isOpen={showBusinessApp} onClose={() => setShowBusinessApp(false)} />
     </header>
   )
 }
