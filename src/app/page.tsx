@@ -9,8 +9,9 @@ import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
 import PromoBanner from '@/components/PromoBanner'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
+import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import type { Business } from '@/lib/types'
 
 const FILTER_CHIPS = [
@@ -25,6 +26,7 @@ const FILTER_CHIPS = [
 ]
 
 export default function Home() {
+  const { user } = useAuth()
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -36,11 +38,21 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'newest'>('name')
+  const [favoritedBusinessIds, setFavoritedBusinessIds] = useState<Set<string>>(new Set())
 
   // Load data from Firestore
   useEffect(() => {
     loadBusinesses()
   }, [])
+
+  // Load user's favorites
+  useEffect(() => {
+    if (user) {
+      loadFavorites()
+    } else {
+      setFavoritedBusinessIds(new Set())
+    }
+  }, [user])
 
   const loadBusinesses = async () => {
     if (!db) {
@@ -162,18 +174,72 @@ export default function Home() {
     setActiveChips(new Set()) // Clear chip filters when searching
   }
 
-  // Handle favorite
-  const handleFavorite = (id: string) => {
-    const favs = new Set(
-      JSON.parse(localStorage.getItem('favs') || '[]') as string[]
-    )
-    if (favs.has(id)) {
-      favs.delete(id)
-    } else {
-      favs.add(id)
+  const loadFavorites = async () => {
+    if (!db || !user) return
+
+    try {
+      const favoritesRef = collection(db, 'favorites')
+      const q = query(
+        favoritesRef,
+        where('userId', '==', user.uid),
+        where('itemType', '==', 'business')
+      )
+      const snapshot = await getDocs(q)
+      const favoriteIds = new Set(snapshot.docs.map((doc) => doc.data().itemId))
+      setFavoritedBusinessIds(favoriteIds)
+    } catch (error) {
+      console.error('Error loading favorites:', error)
     }
-    localStorage.setItem('favs', JSON.stringify(Array.from(favs)))
-    alert('Updated favorites!')
+  }
+
+  // Handle favorite
+  const handleFavorite = async (businessId: string) => {
+    if (!user) {
+      setIsAuthOpen(true)
+      return
+    }
+
+    if (!db) return
+
+    const business = businesses.find((b) => b.id === businessId)
+    if (!business) return
+
+    try {
+      const favoritesRef = collection(db, 'favorites')
+
+      // Check if already favorited
+      const q = query(
+        favoritesRef,
+        where('userId', '==', user.uid),
+        where('itemId', '==', businessId),
+        where('itemType', '==', 'business')
+      )
+      const snapshot = await getDocs(q)
+
+      if (!snapshot.empty) {
+        // Remove from favorites
+        await deleteDoc(doc(db, 'favorites', snapshot.docs[0].id))
+        const newFavorites = new Set(favoritedBusinessIds)
+        newFavorites.delete(businessId)
+        setFavoritedBusinessIds(newFavorites)
+      } else {
+        // Add to favorites
+        await addDoc(favoritesRef, {
+          userId: user.uid,
+          itemId: businessId,
+          itemType: 'business',
+          itemName: business.name,
+          itemImage: business.cover,
+          createdAt: new Date(),
+        })
+        const newFavorites = new Set(favoritedBusinessIds)
+        newFavorites.add(businessId)
+        setFavoritedBusinessIds(newFavorites)
+      }
+    } catch (error) {
+      console.error('Error updating favorite:', error)
+      alert('Failed to update favorite. Please try again.')
+    }
   }
 
   // Calculate stats
@@ -437,6 +503,7 @@ export default function Home() {
                     key={business.id}
                     business={business}
                     onFavorite={handleFavorite}
+                    isFavorited={favoritedBusinessIds.has(business.id)}
                   />
                 ))}
               </div>

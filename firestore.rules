@@ -174,6 +174,21 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Favorites collection
+    match /favorites/{favoriteId} {
+      // Users can read their own favorites
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Users can create their own favorites
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+
+      // Users can delete their own favorites
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // No updates needed (favorites are add/remove only)
+      allow update: if false;
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
