@@ -62,3 +62,39 @@ export interface Review {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export interface CartItem {
+  productId: string
+  businessId: string
+  businessName: string
+  productName: string
+  productImage?: string
+  price: number
+  quantity: number
+}
+
+export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+
+export type DeliveryMethod = 'pickup' | 'delivery'
+
+export interface Order {
+  id: string
+  userId: string
+  userName: string
+  userEmail: string
+  userPhone?: string
+  businessId: string
+  businessName: string
+  items: CartItem[]
+  subtotal: number
+  platformFee: number // 2%
+  total: number
+  status: OrderStatus
+  deliveryMethod: DeliveryMethod
+  deliveryAddress?: string
+  deliveryNotes?: string
+  pickupTime?: string
+  paymentStatus: 'pending' | 'completed' | 'failed'
+  createdAt: Date
+  updatedAt: Date
+}

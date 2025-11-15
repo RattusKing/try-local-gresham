@@ -1,11 +1,15 @@
 'use client'
 
 import { useAuth } from '@/lib/firebase/auth-context'
+import { useCart } from '@/lib/cart-context'
 import { useState, useRef, useEffect } from 'react'
+import CartModal from './CartModal'
 
 export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const { user, signOut } = useAuth()
+  const { itemCount } = useCart()
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showCart, setShowCart] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -40,6 +44,36 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           <a href="#for-businesses" className="nav-link">
             For Businesses
           </a>
+
+          <button
+            onClick={() => setShowCart(true)}
+            className="btn btn-outline"
+            style={{ position: 'relative' }}
+            aria-label={`Shopping cart with ${itemCount} items`}
+          >
+            🛒 Cart
+            {itemCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  background: 'var(--primary-orange)',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                }}
+              >
+                {itemCount}
+              </span>
+            )}
+          </button>
 
           {user ? (
             <div ref={dropdownRef} style={{ position: 'relative' }}>
@@ -140,6 +174,8 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           )}
         </nav>
       </div>
+
+      <CartModal isOpen={showCart} onClose={() => setShowCart(false)} />
     </header>
   )
 }
