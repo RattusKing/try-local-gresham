@@ -1,0 +1,81 @@
+.application-modal {
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.application-intro {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.pricing-info {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  border-left: 4px solid var(--primary-orange);
+}
+
+.pricing-info h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  color: var(--primary-black);
+}
+
+.pricing-info p {
+  margin: 0.5rem 0;
+  font-size: 0.9375rem;
+}
+
+.pricing-info p strong {
+  color: var(--primary-black);
+}
+
+.pricing-note {
+  margin-top: 1rem !important;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.success-message {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.success-message h2 {
+  color: #16a34a;
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+}
+
+.success-message p {
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin: 0.5rem 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .application-modal {
+    max-height: 95vh;
+  }
+
+  .pricing-info {
+    padding: 1rem;
+  }
+}

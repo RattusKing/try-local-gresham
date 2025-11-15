@@ -131,6 +131,15 @@ service cloud.firestore {
                        isAdmin();
     }
 
+    // Business Applications collection
+    match /business_applications/{applicationId} {
+      // Anyone can create an application
+      allow create: if true;
+
+      // Only admins can read/update/delete applications
+      allow read, update, delete: if isAdmin();
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
