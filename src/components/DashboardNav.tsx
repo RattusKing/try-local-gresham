@@ -19,6 +19,7 @@ export default function DashboardNav() {
     { href: '/dashboard/business', label: 'My Business', icon: '🏪' },
     { href: '/dashboard/business/products', label: 'Products/Services', icon: '📦' },
     { href: '/dashboard/business/orders', label: 'Orders', icon: '🛒' },
+    { href: '/dashboard/business/analytics', label: 'Analytics', icon: '📊' },
   ]
 
   const customerLinks = [
