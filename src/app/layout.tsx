@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Analytics from '@/components/Analytics'
+import CookieConsent from '@/components/CookieConsent'
 import { Providers } from './providers'
 import './globals.css'
 
@@ -67,6 +68,7 @@ export default function RootLayout({
       <body>
         <Analytics />
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   )
