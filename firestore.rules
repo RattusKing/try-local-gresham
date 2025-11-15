@@ -140,6 +140,31 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Discount Codes collection
+    match /discountCodes/{discountId} {
+      // Signed-in users can read active discount codes (for checkout validation)
+      // Business owners can read their own discount codes
+      // Admins can read all discount codes
+      allow read: if isSignedIn() &&
+                     (resource.data.isActive == true ||
+                      (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                      isAdmin());
+
+      // Business owners can create discount codes for their own business
+      allow create: if isBusinessOwner() &&
+                       request.resource.data.businessId == request.auth.uid;
+
+      // Business owners can update their own discount codes
+      // Admins can update any discount code
+      allow update: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+
+      // Business owners can delete their own discount codes
+      // Admins can delete any discount code
+      allow delete: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
