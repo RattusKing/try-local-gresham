@@ -165,6 +165,15 @@ service cloud.firestore {
                        isAdmin();
     }
 
+    // Promotional Banners collection
+    match /promoBanners/{bannerId} {
+      // Anyone can read active banners (for display on site)
+      allow read: if true;
+
+      // Only admins can create, update, or delete banners
+      allow create, update, delete: if isAdmin();
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;

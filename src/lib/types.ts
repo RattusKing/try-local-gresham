@@ -123,3 +123,22 @@ export interface DiscountCode {
   createdAt: Date
   updatedAt: Date
 }
+
+export type BannerLocation = 'homepage' | 'all_pages' | 'business_pages'
+
+export interface PromoBanner {
+  id: string
+  title: string
+  message: string
+  ctaText?: string // Call to action button text
+  ctaLink?: string // Call to action link
+  backgroundColor?: string // Hex color code
+  textColor?: string // Hex color code
+  location: BannerLocation
+  isActive: boolean
+  validFrom: Date
+  validUntil?: Date // null = no expiration
+  displayOrder: number // Lower numbers display first
+  createdAt: Date
+  updatedAt: Date
+}

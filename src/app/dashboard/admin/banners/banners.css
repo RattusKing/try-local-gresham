@@ -1,0 +1,267 @@
+.banner-form-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.banner-form-card h2 {
+  margin: 0 0 1.5rem 0;
+  color: #111827;
+}
+
+.banner-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+}
+
+.form-group small {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.color-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.color-input-group input[type='color'] {
+  width: 60px;
+  height: 40px;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.color-input-group input[type='text'] {
+  flex: 1;
+  font-family: monospace;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.checkbox-label input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.banner-preview {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.banner-preview h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.preview-banner {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.banners-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.banner-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.banner-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.banner-card-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.banner-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+}
+
+.banner-location {
+  background: #f3f4f6;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #4b5563;
+  text-transform: capitalize;
+}
+
+.banner-order {
+  background: #f3f4f6;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.banner-status {
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.banner-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.banner-status.inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.banner-status.expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.banner-status.scheduled {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.banner-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.banner-preview-small {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.banner-preview-small p {
+  margin: 0;
+  font-size: 0.9375rem;
+  opacity: 0.95;
+}
+
+.preview-cta {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.banner-dates {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.btn-small {
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .banner-card-header {
+    flex-direction: column;
+  }
+
+  .banner-card-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .banner-dates {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import StarRating from '@/components/StarRating'
+import PromoBanner from '@/components/PromoBanner'
 import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
 import Head from 'next/head'
 import './business-profile.css'
@@ -291,6 +292,8 @@ export default function BusinessProfilePage() {
 
         <link rel="canonical" content={`https://trylocalor.com/business/${business.id}`} />
       </Head>
+
+      <PromoBanner location="business_pages" />
 
       <div className="business-profile">
         {/* Structured Data for SEO */}
