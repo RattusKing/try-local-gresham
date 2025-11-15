@@ -219,6 +219,12 @@
   line-height: 1.6;
 }
 
+.product-item-content .btn {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 200px;
+}
+
 /* Sidebar */
 .business-profile-sidebar {
   display: flex;

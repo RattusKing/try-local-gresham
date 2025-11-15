@@ -7,6 +7,7 @@ import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, dele
 import { Business, Product, Review } from '@/lib/types'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
+import { useCart } from '@/lib/cart-context'
 import StarRating from '@/components/StarRating'
 import './business-profile.css'
 
@@ -14,6 +15,7 @@ export default function BusinessProfilePage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useAuth()
+  const { addItem } = useCart()
   const [business, setBusiness] = useState<Business | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
@@ -23,6 +25,7 @@ export default function BusinessProfilePage() {
   const [reviewSuccess, setReviewSuccess] = useState('')
   const [submittingReview, setSubmittingReview] = useState(false)
   const [editingReview, setEditingReview] = useState<Review | null>(null)
+  const [addedToCart, setAddedToCart] = useState<string | null>(null)
 
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -217,6 +220,22 @@ export default function BusinessProfilePage() {
     }
   }
 
+  const handleAddToCart = (product: Product) => {
+    if (!business) return
+
+    addItem({
+      productId: product.id,
+      businessId: business.id,
+      businessName: business.name,
+      productName: product.name,
+      productImage: product.image,
+      price: product.price,
+    })
+
+    setAddedToCart(product.id)
+    setTimeout(() => setAddedToCart(null), 2000)
+  }
+
   if (loading) {
     return (
       <div className="business-profile-loading">
@@ -332,6 +351,13 @@ export default function BusinessProfilePage() {
                       {product.description && (
                         <p className="product-item-description">{product.description}</p>
                       )}
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleAddToCart(product)}
+                        disabled={addedToCart === product.id}
+                      >
+                        {addedToCart === product.id ? '✓ Added!' : '🛒 Add to Cart'}
+                      </button>
                     </div>
                   </div>
                 ))}
