@@ -29,6 +29,7 @@ export default function BusinessProfilePage() {
   const [submittingReview, setSubmittingReview] = useState(false)
   const [editingReview, setEditingReview] = useState<Review | null>(null)
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
+  const [favoritedProductIds, setFavoritedProductIds] = useState<Set<string>>(new Set())
 
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -38,6 +39,33 @@ export default function BusinessProfilePage() {
   useEffect(() => {
     loadBusiness()
   }, [params.id])
+
+  // Load user's product favorites
+  useEffect(() => {
+    if (user) {
+      loadProductFavorites()
+    } else {
+      setFavoritedProductIds(new Set())
+    }
+  }, [user])
+
+  const loadProductFavorites = async () => {
+    if (!db || !user) return
+
+    try {
+      const favoritesRef = collection(db, 'favorites')
+      const q = query(
+        favoritesRef,
+        where('userId', '==', user.uid),
+        where('itemType', '==', 'product')
+      )
+      const snapshot = await getDocs(q)
+      const favoriteIds = new Set(snapshot.docs.map((doc) => doc.data().itemId))
+      setFavoritedProductIds(favoriteIds)
+    } catch (error) {
+      console.error('Error loading product favorites:', error)
+    }
+  }
 
   const loadBusiness = async () => {
     if (!params.id || !db) return
@@ -245,6 +273,53 @@ export default function BusinessProfilePage() {
     setTimeout(() => setAddedToCart(null), 2000)
   }
 
+  const handleProductFavorite = async (product: Product) => {
+    if (!user) {
+      alert('Please sign in to save favorites')
+      return
+    }
+
+    if (!db || !business) return
+
+    try {
+      const favoritesRef = collection(db, 'favorites')
+
+      // Check if already favorited
+      const q = query(
+        favoritesRef,
+        where('userId', '==', user.uid),
+        where('itemId', '==', product.id),
+        where('itemType', '==', 'product')
+      )
+      const snapshot = await getDocs(q)
+
+      if (!snapshot.empty) {
+        // Remove from favorites
+        await deleteDoc(doc(db, 'favorites', snapshot.docs[0].id))
+        const newFavorites = new Set(favoritedProductIds)
+        newFavorites.delete(product.id)
+        setFavoritedProductIds(newFavorites)
+      } else {
+        // Add to favorites
+        await addDoc(favoritesRef, {
+          userId: user.uid,
+          itemId: product.id,
+          itemType: 'product',
+          itemName: product.name,
+          itemImage: product.image,
+          businessName: business.name,
+          createdAt: new Date(),
+        })
+        const newFavorites = new Set(favoritedProductIds)
+        newFavorites.add(product.id)
+        setFavoritedProductIds(newFavorites)
+      }
+    } catch (error) {
+      console.error('Error updating product favorite:', error)
+      alert('Failed to update favorite. Please try again.')
+    }
+  }
+
   if (loading) {
     return (
       <div className="business-profile-loading">
@@ -416,21 +491,31 @@ export default function BusinessProfilePage() {
                           }
                         </div>
                       )}
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleAddToCart(product)}
-                        disabled={addedToCart === product.id || (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)}
-                        style={{
-                          opacity: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 0.5 : 1,
-                          cursor: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 'not-allowed' : 'pointer'
-                        }}
-                      >
-                        {(product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)
-                          ? '✗ Out of Stock'
-                          : addedToCart === product.id
-                          ? '✓ Added!'
-                          : '🛒 Add to Cart'}
-                      </button>
+                      <div className="product-item-actions">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleAddToCart(product)}
+                          disabled={addedToCart === product.id || (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)}
+                          style={{
+                            opacity: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 0.5 : 1,
+                            cursor: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 'not-allowed' : 'pointer',
+                            flex: 1
+                          }}
+                        >
+                          {(product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)
+                            ? '✗ Out of Stock'
+                            : addedToCart === product.id
+                            ? '✓ Added!'
+                            : '🛒 Add to Cart'}
+                        </button>
+                        <button
+                          className={favoritedProductIds.has(product.id) ? 'btn btn-favorite-active' : 'btn btn-outline'}
+                          onClick={() => handleProductFavorite(product)}
+                          title={favoritedProductIds.has(product.id) ? 'Remove from favorites' : 'Save to favorites'}
+                        >
+                          {favoritedProductIds.has(product.id) ? '❤️' : '🤍'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
