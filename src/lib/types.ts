@@ -91,6 +91,8 @@ export interface Order {
   items: CartItem[]
   subtotal: number
   platformFee: number // 2%
+  discount?: number // Discount amount applied
+  discountCode?: string // Code used for discount
   total: number
   status: OrderStatus
   deliveryMethod: DeliveryMethod
@@ -98,6 +100,26 @@ export interface Order {
   deliveryNotes?: string
   pickupTime?: string
   paymentStatus: 'pending' | 'completed' | 'failed'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type DiscountType = 'percentage' | 'fixed'
+
+export interface DiscountCode {
+  id: string
+  businessId: string
+  code: string // Unique code (e.g., "SAVE20")
+  description: string
+  type: DiscountType
+  value: number // Percentage (20) or fixed amount ($10)
+  minPurchase?: number // Minimum purchase required
+  maxDiscount?: number // Max discount for percentage types
+  usageLimit?: number // Total uses allowed (null = unlimited)
+  usageCount: number // Times used so far
+  isActive: boolean
+  validFrom: Date
+  validUntil?: Date // null = no expiration
   createdAt: Date
   updatedAt: Date
 }
