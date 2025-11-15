@@ -9,6 +9,8 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import StarRating from '@/components/StarRating'
+import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
+import Head from 'next/head'
 import './business-profile.css'
 
 export default function BusinessProfilePage() {
@@ -264,8 +266,44 @@ export default function BusinessProfilePage() {
   }
 
   return (
-    <div className="business-profile">
-      {/* Hero Section */}
+    <>
+      <Head>
+        <title>{business.name} | Try Local Gresham</title>
+        <meta name="description" content={business.description || `${business.name} - Local business in Gresham, Oregon. ${business.tags.join(', ')}`} />
+        <meta name="keywords" content={`${business.name}, ${business.tags.join(', ')}, Gresham, Oregon, local business`} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={`${business.name} | Try Local Gresham`} />
+        <meta property="og:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
+        <meta property="og:image" content={business.cover || '/assets/gresham.jpg'} />
+        <meta property="og:url" content={`https://trylocalor.com/business/${business.id}`} />
+        <meta property="og:type" content="business.business" />
+        <meta property="business:contact_data:street_address" content={business.neighborhood || 'Gresham'} />
+        <meta property="business:contact_data:locality" content="Gresham" />
+        <meta property="business:contact_data:region" content="OR" />
+        <meta property="business:contact_data:country_name" content="USA" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${business.name} | Try Local Gresham`} />
+        <meta name="twitter:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
+        <meta name="twitter:image" content={business.cover || '/assets/gresham.jpg'} />
+
+        <link rel="canonical" content={`https://trylocalor.com/business/${business.id}`} />
+      </Head>
+
+      <div className="business-profile">
+        {/* Structured Data for SEO */}
+        <LocalBusinessSchema business={business} />
+        <BreadcrumbSchema items={[
+          { name: 'Home', url: '/' },
+          { name: business.name, url: `/business/${business.id}` },
+        ]} />
+        {products.map((product) => (
+          <ProductSchema key={product.id} product={product} business={business} />
+        ))}
+
+        {/* Hero Section */}
       <motion.div
         className="business-hero"
         initial={{ opacity: 0 }}
@@ -595,6 +633,7 @@ export default function BusinessProfilePage() {
           )}
         </motion.aside>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
