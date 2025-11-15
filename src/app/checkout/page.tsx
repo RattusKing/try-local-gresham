@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { db } from '@/lib/firebase/config'
-import { collection, addDoc, doc, getDoc } from 'firebase/firestore'
+import { collection, addDoc, doc, getDoc, updateDoc, increment } from 'firebase/firestore'
 import { DeliveryMethod } from '@/lib/types'
 import './checkout.css'
 
@@ -141,6 +141,29 @@ export default function CheckoutPage() {
         } catch (emailError) {
           console.error('Error sending email notifications:', emailError)
           // Continue even if email fails
+        }
+
+        // Deduct inventory for products that track inventory
+        try {
+          for (const item of group.items) {
+            const productRef = doc(firestore, 'products', item.productId)
+            const productDoc = await getDoc(productRef)
+
+            if (productDoc.exists()) {
+              const productData = productDoc.data()
+              // Only deduct if product tracks inventory and has stock quantity set
+              if (productData.trackInventory && productData.stockQuantity !== undefined) {
+                await updateDoc(productRef, {
+                  stockQuantity: increment(-item.quantity),
+                  // Auto-mark as out of stock if quantity reaches 0
+                  inStock: productData.stockQuantity - item.quantity > 0,
+                })
+              }
+            }
+          }
+        } catch (inventoryError) {
+          console.error('Error updating inventory:', inventoryError)
+          // Continue even if inventory update fails
         }
 
         return orderRef

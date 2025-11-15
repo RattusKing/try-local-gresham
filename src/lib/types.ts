@@ -47,6 +47,9 @@ export interface Product {
   image?: string
   category?: string
   inStock: boolean
+  trackInventory?: boolean // Whether to track inventory for this product
+  stockQuantity?: number // Current stock quantity (null/undefined = unlimited)
+  lowStockThreshold?: number // Alert when stock is below this number
   createdAt?: Date
   updatedAt?: Date
 }

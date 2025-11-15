@@ -223,6 +223,12 @@ export default function BusinessProfilePage() {
   const handleAddToCart = (product: Product) => {
     if (!business) return
 
+    // Check if product tracks inventory and is out of stock
+    if (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) {
+      alert('Sorry, this product is currently out of stock.')
+      return
+    }
+
     addItem({
       productId: product.id,
       businessId: business.id,
@@ -351,12 +357,38 @@ export default function BusinessProfilePage() {
                       {product.description && (
                         <p className="product-item-description">{product.description}</p>
                       )}
+                      {product.trackInventory && product.stockQuantity !== undefined && (
+                        <div style={{
+                          fontSize: '0.875rem',
+                          marginTop: '0.5rem',
+                          color: product.stockQuantity === 0
+                            ? '#dc2626'
+                            : product.lowStockThreshold && product.stockQuantity <= product.lowStockThreshold
+                            ? '#f59e0b'
+                            : '#059669'
+                        }}>
+                          {product.stockQuantity === 0
+                            ? '✗ Out of Stock'
+                            : product.lowStockThreshold && product.stockQuantity <= product.lowStockThreshold
+                            ? `⚠️ Only ${product.stockQuantity} left`
+                            : `✓ ${product.stockQuantity} in stock`
+                          }
+                        </div>
+                      )}
                       <button
                         className="btn btn-primary"
                         onClick={() => handleAddToCart(product)}
-                        disabled={addedToCart === product.id}
+                        disabled={addedToCart === product.id || (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)}
+                        style={{
+                          opacity: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 0.5 : 1,
+                          cursor: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 'not-allowed' : 'pointer'
+                        }}
                       >
-                        {addedToCart === product.id ? '✓ Added!' : '🛒 Add to Cart'}
+                        {(product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)
+                          ? '✗ Out of Stock'
+                          : addedToCart === product.id
+                          ? '✓ Added!'
+                          : '🛒 Add to Cart'}
                       </button>
                     </div>
                   </div>
