@@ -550,12 +550,6 @@ export default function Home() {
               >
                 Get Started
               </button>
-              <button
-                className="btn btn-outline"
-                onClick={() => alert('Demo store coming soon.')}
-              >
-                View Demo Store
-              </button>
             </div>
           </div>
           <aside className="for-biz-aside">
