@@ -16,6 +16,9 @@ export default function Footer() {
           <Link href="/privacy" aria-label="Privacy">
             Privacy
           </Link>
+          <Link href="/refund-policy" aria-label="Refund Policy">
+            Refund Policy
+          </Link>
           <Link href="/contact" aria-label="Contact">
             Contact
           </Link>
