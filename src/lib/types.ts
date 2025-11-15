@@ -47,6 +47,9 @@ export interface Product {
   image?: string
   category?: string
   inStock: boolean
+  trackInventory?: boolean // Whether to track inventory for this product
+  stockQuantity?: number // Current stock quantity (null/undefined = unlimited)
+  lowStockThreshold?: number // Alert when stock is below this number
   createdAt?: Date
   updatedAt?: Date
 }
@@ -88,6 +91,8 @@ export interface Order {
   items: CartItem[]
   subtotal: number
   platformFee: number // 2%
+  discount?: number // Discount amount applied
+  discountCode?: string // Code used for discount
   total: number
   status: OrderStatus
   deliveryMethod: DeliveryMethod
@@ -95,6 +100,45 @@ export interface Order {
   deliveryNotes?: string
   pickupTime?: string
   paymentStatus: 'pending' | 'completed' | 'failed'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type DiscountType = 'percentage' | 'fixed'
+
+export interface DiscountCode {
+  id: string
+  businessId: string
+  code: string // Unique code (e.g., "SAVE20")
+  description: string
+  type: DiscountType
+  value: number // Percentage (20) or fixed amount ($10)
+  minPurchase?: number // Minimum purchase required
+  maxDiscount?: number // Max discount for percentage types
+  usageLimit?: number // Total uses allowed (null = unlimited)
+  usageCount: number // Times used so far
+  isActive: boolean
+  validFrom: Date
+  validUntil?: Date // null = no expiration
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type BannerLocation = 'homepage' | 'all_pages' | 'business_pages'
+
+export interface PromoBanner {
+  id: string
+  title: string
+  message: string
+  ctaText?: string // Call to action button text
+  ctaLink?: string // Call to action link
+  backgroundColor?: string // Hex color code
+  textColor?: string // Hex color code
+  location: BannerLocation
+  isActive: boolean
+  validFrom: Date
+  validUntil?: Date // null = no expiration
+  displayOrder: number // Lower numbers display first
   createdAt: Date
   updatedAt: Date
 }

@@ -1,0 +1,154 @@
+.discount-form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.discount-form-container h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+}
+
+.discount-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.discount-form small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.discounts-section {
+  margin-bottom: 3rem;
+}
+
+.discounts-section h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.discounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.discount-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #ff7a00;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.discount-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.discount-card.inactive {
+  opacity: 0.6;
+  border-left-color: #9ca3af;
+}
+
+.discount-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.discount-code {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+.discount-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ff7a00;
+}
+
+.discount-description {
+  margin: 0 0 1rem 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.discount-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.detail-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.discount-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-toggle-small {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-toggle-small:hover {
+  background: #f3f4f6;
+}
+
+.btn-toggle-small.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.btn-toggle-small.active:hover {
+  background: #059669;
+}
+
+@media (max-width: 768px) {
+  .discounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .discount-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

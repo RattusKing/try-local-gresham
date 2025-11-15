@@ -10,6 +10,9 @@ export default function Footer() {
           <small>Built for the community.</small>
         </div>
         <div className="footer-links">
+          <Link href="/help" aria-label="Help Center">
+            Help
+          </Link>
           <Link href="/terms" aria-label="Terms">
             Terms
           </Link>

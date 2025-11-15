@@ -13,12 +13,15 @@ export default function DashboardNav() {
     { href: '/dashboard/admin', label: 'Business Approvals', icon: '✓' },
     { href: '/dashboard/admin/users', label: 'User Management', icon: '👥' },
     { href: '/dashboard/admin/orders', label: 'All Orders', icon: '📦' },
+    { href: '/dashboard/admin/banners', label: 'Promo Banners', icon: '📢' },
   ]
 
   const businessLinks = [
     { href: '/dashboard/business', label: 'My Business', icon: '🏪' },
     { href: '/dashboard/business/products', label: 'Products/Services', icon: '📦' },
     { href: '/dashboard/business/orders', label: 'Orders', icon: '🛒' },
+    { href: '/dashboard/business/analytics', label: 'Analytics', icon: '📊' },
+    { href: '/dashboard/business/discounts', label: 'Discount Codes', icon: '🎟️' },
   ]
 
   const customerLinks = [

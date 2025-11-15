@@ -218,6 +218,128 @@
   font-size: 0.8125rem !important;
 }
 
+/* Discount Code Styles */
+.discount-section {
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.discount-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.discount-input-group input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  font-family: monospace;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+
+.discount-input-group input:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+}
+
+.discount-input-group input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-orange);
+  border: 2px solid var(--primary-orange);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary-orange);
+  color: white;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+}
+
+.applied-discount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discount-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+}
+
+.discount-code-label {
+  font-weight: 600;
+  color: #166534;
+  font-size: 0.9375rem;
+  font-family: monospace;
+}
+
+.remove-discount {
+  background: transparent;
+  border: none;
+  color: #166534;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.remove-discount:hover {
+  background: rgba(22, 101, 52, 0.1);
+}
+
+.discount-description {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.discount-error {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.8125rem;
+  color: #dc2626;
+}
+
+.discount-row {
+  color: #166534;
+  font-weight: 600;
+}
+
+.discount-amount {
+  color: #166534 !important;
+}
+
 /* Mobile Responsive */
 @media (max-width: 968px) {
   .checkout-content {

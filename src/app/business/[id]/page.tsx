@@ -9,6 +9,9 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import StarRating from '@/components/StarRating'
+import PromoBanner from '@/components/PromoBanner'
+import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
+import Head from 'next/head'
 import './business-profile.css'
 
 export default function BusinessProfilePage() {
@@ -223,6 +226,12 @@ export default function BusinessProfilePage() {
   const handleAddToCart = (product: Product) => {
     if (!business) return
 
+    // Check if product tracks inventory and is out of stock
+    if (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) {
+      alert('Sorry, this product is currently out of stock.')
+      return
+    }
+
     addItem({
       productId: product.id,
       businessId: business.id,
@@ -258,8 +267,46 @@ export default function BusinessProfilePage() {
   }
 
   return (
-    <div className="business-profile">
-      {/* Hero Section */}
+    <>
+      <Head>
+        <title>{business.name} | Try Local Gresham</title>
+        <meta name="description" content={business.description || `${business.name} - Local business in Gresham, Oregon. ${business.tags.join(', ')}`} />
+        <meta name="keywords" content={`${business.name}, ${business.tags.join(', ')}, Gresham, Oregon, local business`} />
+
+        {/* Open Graph */}
+        <meta property="og:title" content={`${business.name} | Try Local Gresham`} />
+        <meta property="og:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
+        <meta property="og:image" content={business.cover || '/assets/gresham.jpg'} />
+        <meta property="og:url" content={`https://trylocalor.com/business/${business.id}`} />
+        <meta property="og:type" content="business.business" />
+        <meta property="business:contact_data:street_address" content={business.neighborhood || 'Gresham'} />
+        <meta property="business:contact_data:locality" content="Gresham" />
+        <meta property="business:contact_data:region" content="OR" />
+        <meta property="business:contact_data:country_name" content="USA" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${business.name} | Try Local Gresham`} />
+        <meta name="twitter:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
+        <meta name="twitter:image" content={business.cover || '/assets/gresham.jpg'} />
+
+        <link rel="canonical" content={`https://trylocalor.com/business/${business.id}`} />
+      </Head>
+
+      <PromoBanner location="business_pages" />
+
+      <div className="business-profile">
+        {/* Structured Data for SEO */}
+        <LocalBusinessSchema business={business} />
+        <BreadcrumbSchema items={[
+          { name: 'Home', url: '/' },
+          { name: business.name, url: `/business/${business.id}` },
+        ]} />
+        {products.map((product) => (
+          <ProductSchema key={product.id} product={product} business={business} />
+        ))}
+
+        {/* Hero Section */}
       <motion.div
         className="business-hero"
         initial={{ opacity: 0 }}
@@ -351,12 +398,38 @@ export default function BusinessProfilePage() {
                       {product.description && (
                         <p className="product-item-description">{product.description}</p>
                       )}
+                      {product.trackInventory && product.stockQuantity !== undefined && (
+                        <div style={{
+                          fontSize: '0.875rem',
+                          marginTop: '0.5rem',
+                          color: product.stockQuantity === 0
+                            ? '#dc2626'
+                            : product.lowStockThreshold && product.stockQuantity <= product.lowStockThreshold
+                            ? '#f59e0b'
+                            : '#059669'
+                        }}>
+                          {product.stockQuantity === 0
+                            ? '✗ Out of Stock'
+                            : product.lowStockThreshold && product.stockQuantity <= product.lowStockThreshold
+                            ? `⚠️ Only ${product.stockQuantity} left`
+                            : `✓ ${product.stockQuantity} in stock`
+                          }
+                        </div>
+                      )}
                       <button
                         className="btn btn-primary"
                         onClick={() => handleAddToCart(product)}
-                        disabled={addedToCart === product.id}
+                        disabled={addedToCart === product.id || (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)}
+                        style={{
+                          opacity: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 0.5 : 1,
+                          cursor: (product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0) ? 'not-allowed' : 'pointer'
+                        }}
                       >
-                        {addedToCart === product.id ? '✓ Added!' : '🛒 Add to Cart'}
+                        {(product.trackInventory && product.stockQuantity !== undefined && product.stockQuantity <= 0)
+                          ? '✗ Out of Stock'
+                          : addedToCart === product.id
+                          ? '✓ Added!'
+                          : '🛒 Add to Cart'}
                       </button>
                     </div>
                   </div>
@@ -563,6 +636,7 @@ export default function BusinessProfilePage() {
           )}
         </motion.aside>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

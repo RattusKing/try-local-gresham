@@ -7,6 +7,7 @@ import BusinessCard from '@/components/BusinessCard'
 import CategoryCard from '@/components/CategoryCard'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
+import PromoBanner from '@/components/PromoBanner'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs } from 'firebase/firestore'
@@ -199,6 +200,7 @@ export default function Home() {
       <OrganizationSchema />
 
       <Header onSignIn={() => setIsAuthOpen(true)} />
+      <PromoBanner location="homepage" />
 
       <main>
         <Hero onSearch={handleSearch} categories={categories} />

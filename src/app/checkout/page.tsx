@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { db } from '@/lib/firebase/config'
-import { collection, addDoc, doc, getDoc } from 'firebase/firestore'
-import { DeliveryMethod } from '@/lib/types'
+import { collection, addDoc, doc, getDoc, updateDoc, increment, query, where, getDocs } from 'firebase/firestore'
+import { DeliveryMethod, DiscountCode } from '@/lib/types'
 import './checkout.css'
 
 export default function CheckoutPage() {
@@ -15,6 +15,11 @@ export default function CheckoutPage() {
   const { items, subtotal, platformFee, total, clearCart } = useCart()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [discountCode, setDiscountCode] = useState('')
+  const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null)
+  const [discountAmount, setDiscountAmount] = useState(0)
+  const [discountError, setDiscountError] = useState('')
+  const [applyingDiscount, setApplyingDiscount] = useState(false)
 
   const [formData, setFormData] = useState({
     deliveryMethod: 'pickup' as DeliveryMethod,
@@ -37,6 +42,106 @@ export default function CheckoutPage() {
       router.push('/')
     }
   }, [user, router])
+
+  const applyDiscountCode = async () => {
+    if (!db || !discountCode.trim()) return
+
+    setApplyingDiscount(true)
+    setDiscountError('')
+
+    try {
+      // Query for the discount code
+      const discountsRef = collection(db, 'discountCodes')
+      const q = query(discountsRef, where('code', '==', discountCode.toUpperCase()))
+      const snapshot = await getDocs(q)
+
+      if (snapshot.empty) {
+        setDiscountError('Invalid discount code')
+        setApplyingDiscount(false)
+        return
+      }
+
+      const discountDoc = snapshot.docs[0]
+      const discount = { id: discountDoc.id, ...discountDoc.data() } as DiscountCode
+
+      // Validate discount code
+      if (!discount.isActive) {
+        setDiscountError('This discount code is no longer active')
+        setApplyingDiscount(false)
+        return
+      }
+
+      // Check expiration
+      const now = new Date()
+      const validFrom = discount.validFrom instanceof Date ? discount.validFrom : new Date(discount.validFrom)
+      const validUntil = discount.validUntil ?
+        (discount.validUntil instanceof Date ? discount.validUntil : new Date(discount.validUntil))
+        : null
+
+      if (now < validFrom) {
+        setDiscountError('This discount code is not yet valid')
+        setApplyingDiscount(false)
+        return
+      }
+
+      if (validUntil && now > validUntil) {
+        setDiscountError('This discount code has expired')
+        setApplyingDiscount(false)
+        return
+      }
+
+      // Check usage limit
+      if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
+        setDiscountError('This discount code has reached its usage limit')
+        setApplyingDiscount(false)
+        return
+      }
+
+      // Check minimum purchase
+      if (discount.minPurchase && subtotal < discount.minPurchase) {
+        setDiscountError(`Minimum purchase of $${discount.minPurchase.toFixed(2)} required`)
+        setApplyingDiscount(false)
+        return
+      }
+
+      // Calculate discount amount
+      let discountAmt = 0
+      if (discount.type === 'percentage') {
+        discountAmt = subtotal * (discount.value / 100)
+        // Apply max discount cap if set
+        if (discount.maxDiscount && discountAmt > discount.maxDiscount) {
+          discountAmt = discount.maxDiscount
+        }
+      } else {
+        // Fixed amount
+        discountAmt = discount.value
+      }
+
+      // Discount cannot exceed subtotal
+      if (discountAmt > subtotal) {
+        discountAmt = subtotal
+      }
+
+      setAppliedDiscount(discount)
+      setDiscountAmount(discountAmt)
+      setDiscountError('')
+    } catch (err) {
+      console.error('Error applying discount code:', err)
+      setDiscountError('Error applying discount code. Please try again.')
+    } finally {
+      setApplyingDiscount(false)
+    }
+  }
+
+  const removeDiscount = () => {
+    setAppliedDiscount(null)
+    setDiscountAmount(0)
+    setDiscountCode('')
+    setDiscountError('')
+  }
+
+  // Calculate final total with discount
+  const finalTotal = total - discountAmount
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,7 +188,16 @@ export default function CheckoutPage() {
           0
         )
         const groupPlatformFee = groupSubtotal * 0.02
-        const groupTotal = groupSubtotal + groupPlatformFee
+
+        // Calculate discount for this business group
+        let groupDiscount = 0
+        if (appliedDiscount && discountAmount > 0) {
+          // Proportionally apply discount based on this group's subtotal
+          const proportion = groupSubtotal / subtotal
+          groupDiscount = discountAmount * proportion
+        }
+
+        const groupTotal = groupSubtotal + groupPlatformFee - groupDiscount
 
         const orderData = {
           userId: user.uid,
@@ -95,6 +209,8 @@ export default function CheckoutPage() {
           items: group.items,
           subtotal: groupSubtotal,
           platformFee: groupPlatformFee,
+          discount: groupDiscount > 0 ? groupDiscount : undefined,
+          discountCode: appliedDiscount ? appliedDiscount.code : undefined,
           total: groupTotal,
           status: 'pending',
           deliveryMethod: formData.deliveryMethod,
@@ -143,10 +259,46 @@ export default function CheckoutPage() {
           // Continue even if email fails
         }
 
+        // Deduct inventory for products that track inventory
+        try {
+          for (const item of group.items) {
+            const productRef = doc(firestore, 'products', item.productId)
+            const productDoc = await getDoc(productRef)
+
+            if (productDoc.exists()) {
+              const productData = productDoc.data()
+              // Only deduct if product tracks inventory and has stock quantity set
+              if (productData.trackInventory && productData.stockQuantity !== undefined) {
+                await updateDoc(productRef, {
+                  stockQuantity: increment(-item.quantity),
+                  // Auto-mark as out of stock if quantity reaches 0
+                  inStock: productData.stockQuantity - item.quantity > 0,
+                })
+              }
+            }
+          }
+        } catch (inventoryError) {
+          console.error('Error updating inventory:', inventoryError)
+          // Continue even if inventory update fails
+        }
+
         return orderRef
       })
 
       await Promise.all(orderPromises)
+
+      // Increment discount code usage count if applied
+      if (appliedDiscount && appliedDiscount.id) {
+        try {
+          const discountRef = doc(firestore, 'discountCodes', appliedDiscount.id)
+          await updateDoc(discountRef, {
+            usageCount: increment(1),
+          })
+        } catch (discountErr) {
+          console.error('Error updating discount code usage:', discountErr)
+          // Don't block order completion if usage update fails
+        }
+      }
 
       // Clear cart
       clearCart()
@@ -323,9 +475,57 @@ export default function CheckoutPage() {
                 <span>Platform Fee (2%):</span>
                 <span>${platformFee.toFixed(2)}</span>
               </div>
+
+              {/* Discount Code Section */}
+              <div className="discount-section">
+                {!appliedDiscount ? (
+                  <div className="discount-input-group">
+                    <input
+                      type="text"
+                      placeholder="Discount code"
+                      value={discountCode}
+                      onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && applyDiscountCode()}
+                      disabled={applyingDiscount}
+                    />
+                    <button
+                      type="button"
+                      onClick={applyDiscountCode}
+                      disabled={applyingDiscount || !discountCode.trim()}
+                      className="btn btn-secondary btn-small"
+                    >
+                      {applyingDiscount ? 'Applying...' : 'Apply'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="applied-discount">
+                    <div className="discount-badge">
+                      <span className="discount-code-label">🎟️ {appliedDiscount.code}</span>
+                      <button
+                        type="button"
+                        onClick={removeDiscount}
+                        className="remove-discount"
+                        title="Remove discount"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <p className="discount-description">{appliedDiscount.description}</p>
+                  </div>
+                )}
+                {discountError && <p className="discount-error">{discountError}</p>}
+              </div>
+
+              {appliedDiscount && discountAmount > 0 && (
+                <div className="total-row discount-row">
+                  <span>Discount:</span>
+                  <span className="discount-amount">-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
               <div className="total-row total-final">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${finalTotal.toFixed(2)}</span>
               </div>
 
               <div className="payment-notice">

@@ -33,6 +33,9 @@ export default function BusinessProducts() {
     price: '',
     category: '',
     inStock: true,
+    trackInventory: false,
+    stockQuantity: '',
+    lowStockThreshold: '',
     image: '',
   })
 
@@ -113,6 +116,9 @@ export default function BusinessProducts() {
         price: parseFloat(formData.price),
         category: formData.category,
         inStock: formData.inStock,
+        trackInventory: formData.trackInventory,
+        stockQuantity: formData.trackInventory && formData.stockQuantity ? parseInt(formData.stockQuantity) : undefined,
+        lowStockThreshold: formData.trackInventory && formData.lowStockThreshold ? parseInt(formData.lowStockThreshold) : undefined,
         image: formData.image || undefined,
         updatedAt: new Date(),
       }
@@ -144,6 +150,9 @@ export default function BusinessProducts() {
       price: product.price.toString(),
       category: product.category || '',
       inStock: product.inStock,
+      trackInventory: product.trackInventory || false,
+      stockQuantity: product.stockQuantity?.toString() || '',
+      lowStockThreshold: product.lowStockThreshold?.toString() || '',
       image: product.image || '',
     })
     setShowForm(true)
@@ -169,6 +178,9 @@ export default function BusinessProducts() {
       price: '',
       category: '',
       inStock: true,
+      trackInventory: false,
+      stockQuantity: '',
+      lowStockThreshold: '',
       image: '',
     })
     setEditingProduct(null)
@@ -184,6 +196,23 @@ export default function BusinessProducts() {
     )
   }
 
+  // Calculate low stock and out of stock products
+  const lowStockProducts = products.filter(
+    (p) =>
+      p.trackInventory &&
+      p.stockQuantity !== undefined &&
+      p.lowStockThreshold !== undefined &&
+      p.stockQuantity > 0 &&
+      p.stockQuantity <= p.lowStockThreshold
+  )
+
+  const outOfStockProducts = products.filter(
+    (p) =>
+      p.trackInventory &&
+      p.stockQuantity !== undefined &&
+      p.stockQuantity === 0
+  )
+
   return (
     <div className="business-dashboard">
       <div className="business-dashboard-header">
@@ -198,6 +227,45 @@ export default function BusinessProducts() {
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      {/* Inventory Alerts */}
+      {(lowStockProducts.length > 0 || outOfStockProducts.length > 0) && (
+        <div style={{
+          background: '#fef3c7',
+          border: '1px solid #f59e0b',
+          borderRadius: '8px',
+          padding: '1rem',
+          marginBottom: '1.5rem'
+        }}>
+          <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1rem', color: '#92400e' }}>
+            ⚠️ Inventory Alerts
+          </h3>
+          {outOfStockProducts.length > 0 && (
+            <div style={{ marginBottom: lowStockProducts.length > 0 ? '0.75rem' : 0 }}>
+              <strong style={{ color: '#dc2626' }}>Out of Stock ({outOfStockProducts.length}):</strong>
+              <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.5rem' }}>
+                {outOfStockProducts.map((product) => (
+                  <li key={product.id} style={{ color: '#dc2626' }}>
+                    {product.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {lowStockProducts.length > 0 && (
+            <div>
+              <strong style={{ color: '#f59e0b' }}>Low Stock ({lowStockProducts.length}):</strong>
+              <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.5rem' }}>
+                {lowStockProducts.map((product) => (
+                  <li key={product.id} style={{ color: '#92400e' }}>
+                    {product.name} - {product.stockQuantity} left (threshold: {product.lowStockThreshold})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <div className="product-form-container">
@@ -289,6 +357,60 @@ export default function BusinessProducts() {
               </label>
             </div>
 
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={formData.trackInventory}
+                  onChange={(e) =>
+                    setFormData({ ...formData, trackInventory: e.target.checked })
+                  }
+                />
+                <span>Track Inventory (for physical products)</span>
+              </label>
+              <small style={{ display: 'block', marginTop: '0.5rem', color: '#6b7280' }}>
+                Enable this to track stock quantity and get low stock alerts
+              </small>
+            </div>
+
+            {formData.trackInventory && (
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="stockQuantity">Stock Quantity</label>
+                  <input
+                    type="number"
+                    id="stockQuantity"
+                    min="0"
+                    value={formData.stockQuantity}
+                    onChange={(e) =>
+                      setFormData({ ...formData, stockQuantity: e.target.value })
+                    }
+                    placeholder="Current stock"
+                  />
+                  <small style={{ display: 'block', marginTop: '0.25rem', color: '#6b7280' }}>
+                    How many units you currently have in stock
+                  </small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="lowStockThreshold">Low Stock Alert</label>
+                  <input
+                    type="number"
+                    id="lowStockThreshold"
+                    min="0"
+                    value={formData.lowStockThreshold}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lowStockThreshold: e.target.value })
+                    }
+                    placeholder="Alert threshold"
+                  />
+                  <small style={{ display: 'block', marginTop: '0.25rem', color: '#6b7280' }}>
+                    Alert when stock falls below this number
+                  </small>
+                </div>
+              </div>
+            )}
+
             <div className="form-actions">
               <button type="submit" className="btn-primary">
                 {editingProduct ? 'Update Product' : 'Add Product'}
@@ -344,6 +466,52 @@ export default function BusinessProducts() {
                     {product.inStock ? '✓ In Stock' : '✗ Out of Stock'}
                   </span>
                 </div>
+                {product.trackInventory && (
+                  <div className="product-inventory" style={{
+                    marginTop: '0.75rem',
+                    padding: '0.5rem',
+                    background: '#f9fafb',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                      <span style={{ fontWeight: 600 }}>Stock:</span>
+                      <span style={{
+                        color: product.lowStockThreshold && product.stockQuantity !== undefined && product.stockQuantity <= product.lowStockThreshold
+                          ? '#dc2626'
+                          : product.stockQuantity === 0
+                          ? '#dc2626'
+                          : '#059669'
+                      }}>
+                        {product.stockQuantity !== undefined ? `${product.stockQuantity} units` : 'Not set'}
+                      </span>
+                    </div>
+                    {product.lowStockThreshold !== undefined && product.stockQuantity !== undefined && product.stockQuantity <= product.lowStockThreshold && product.stockQuantity > 0 && (
+                      <div style={{
+                        marginTop: '0.5rem',
+                        padding: '0.5rem',
+                        background: '#fef3c7',
+                        borderLeft: '3px solid #f59e0b',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem'
+                      }}>
+                        ⚠️ Low stock alert (threshold: {product.lowStockThreshold})
+                      </div>
+                    )}
+                    {product.stockQuantity === 0 && (
+                      <div style={{
+                        marginTop: '0.5rem',
+                        padding: '0.5rem',
+                        background: '#fee2e2',
+                        borderLeft: '3px solid #dc2626',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem'
+                      }}>
+                        ⚠️ Out of stock!
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="product-actions">
                   <button
                     className="btn-edit-small"
