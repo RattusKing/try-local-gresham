@@ -100,9 +100,26 @@ export default function BusinessOrdersPage() {
         updatedAt: new Date(),
       })
 
-      // Get order details for email notification
+      // Get order details and business address for email notification
       const order = orders.find((o) => o.id === orderId)
       if (order && (newStatus === 'confirmed' || newStatus === 'ready' || newStatus === 'completed' || newStatus === 'cancelled')) {
+        // Map old status names to new ones for email template
+        const emailStatus = newStatus === 'confirmed' ? 'accepted' : newStatus === 'cancelled' ? 'rejected' : newStatus
+
+        // Get business address for pickup info
+        let pickupAddress = ''
+        if (user) {
+          try {
+            const businessDoc = await getDocs(query(collection(db, 'businesses'), where('ownerId', '==', user.uid)))
+            if (!businessDoc.empty) {
+              const businessData = businessDoc.docs[0].data()
+              pickupAddress = businessData.address || ''
+            }
+          } catch (err) {
+            console.error('Error fetching business address:', err)
+          }
+        }
+
         // Send status update email (non-blocking)
         fetch('/api/emails/order-status', {
           method: 'POST',
@@ -112,8 +129,10 @@ export default function BusinessOrdersPage() {
             customerName: order.userName,
             orderId: order.id,
             businessName: order.businessName,
-            status: newStatus,
+            status: emailStatus,
             deliveryMethod: order.deliveryMethod,
+            deliveryAddress: order.deliveryAddress,
+            pickupAddress,
           }),
         }).catch((err) => console.error('Email notification error:', err))
       }

@@ -1,4 +1,8 @@
 import { Resend } from 'resend'
+import { render } from '@react-email/components'
+import OrderConfirmationEmail from '@/emails/OrderConfirmationEmail'
+import NewOrderNotificationEmail from '@/emails/NewOrderNotificationEmail'
+import OrderStatusUpdateEmail from '@/emails/OrderStatusUpdateEmail'
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'Try Local Gresham <noreply@trylocalor.com>'
 const API_KEY = process.env.RESEND_API_KEY
@@ -47,77 +51,45 @@ export async function sendOrderConfirmation(params: {
   orderId: string
   businessName: string
   items: Array<{ name: string; quantity: number; price: number }>
+  subtotal?: number
+  platformFee?: number
+  discount?: number
   total: number
   deliveryMethod: 'pickup' | 'delivery'
   deliveryAddress?: string
+  pickupAddress?: string
 }) {
-  const itemsHtml = params.items
-    .map(
-      (item) => `
-    <tr>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;">
-        ${item.name} × ${item.quantity}
-      </td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
-        $${(item.price * item.quantity).toFixed(2)}
-      </td>
-    </tr>
-  `
-    )
-    .join('')
+  const orderItems = params.items.map((item) => ({
+    productName: item.name,
+    quantity: item.quantity,
+    price: item.price * item.quantity,
+  }))
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Order Confirmation</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #ff7a00;">Order Confirmation</h1>
-          <p>Hi ${params.customerName},</p>
-          <p>Thank you for your order! Your order has been received and is being processed.</p>
+  const subtotal = params.subtotal || params.total
+  const platformFee = params.platformFee || 0
 
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="margin-top: 0;">Order #${params.orderId.slice(-6).toUpperCase()}</h2>
-            <p><strong>Business:</strong> ${params.businessName}</p>
-            <p><strong>Method:</strong> ${params.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
-            ${params.deliveryAddress ? `<p><strong>Address:</strong> ${params.deliveryAddress}</p>` : ''}
-          </div>
-
-          <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
-            <thead>
-              <tr style="background: #f3f4f6;">
-                <th style="padding: 10px; text-align: left;">Item</th>
-                <th style="padding: 10px; text-align: right;">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td style="padding: 10px; font-weight: bold;">Total</td>
-                <td style="padding: 10px; text-align: right; font-weight: bold;">$${params.total.toFixed(2)}</td>
-              </tr>
-            </tfoot>
-          </table>
-
-          <p>The business will contact you soon to confirm your order and arrange ${params.deliveryMethod}.</p>
-
-          <p>You can view your order status at any time in your <a href="https://trylocalor.com/orders" style="color: #ff7a00;">order history</a>.</p>
-
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-          <p style="font-size: 12px; color: #666;">
-            Try Local Gresham<br>
-            Supporting local businesses in Gresham, Oregon<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
-          </p>
-        </div>
-      </body>
-    </html>
-  `
+  const html = await render(
+    OrderConfirmationEmail({
+      customerName: params.customerName,
+      orderId: params.orderId,
+      businessName: params.businessName,
+      items: orderItems,
+      subtotal,
+      platformFee,
+      discount: params.discount,
+      total: params.total,
+      deliveryMethod: params.deliveryMethod,
+      deliveryAddress: params.deliveryAddress,
+      pickupAddress: params.pickupAddress,
+      orderDate: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    })
+  )
 
   return sendEmail({
     to: params.customerEmail,
@@ -135,86 +107,52 @@ export async function sendNewOrderNotification(params: {
   customerEmail: string
   customerPhone?: string
   items: Array<{ name: string; quantity: number; price: number }>
+  subtotal?: number
+  platformFee?: number
+  discount?: number
   total: number
   deliveryMethod: 'pickup' | 'delivery'
   deliveryAddress?: string
   deliveryNotes?: string
 }) {
-  const itemsHtml = params.items
-    .map(
-      (item) => `
-    <tr>
-      <td style="padding: 10px; border-bottom: 1px solid #eee;">
-        ${item.name} × ${item.quantity}
-      </td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
-        $${(item.price * item.quantity).toFixed(2)}
-      </td>
-    </tr>
-  `
-    )
-    .join('')
+  const orderItems = params.items.map((item) => ({
+    productName: item.name,
+    quantity: item.quantity,
+    price: item.price * item.quantity,
+  }))
 
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Order</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #ff7a00;">New Order Received! 🎉</h1>
-          <p>You have a new order from Try Local Gresham.</p>
+  const subtotal = params.subtotal || params.total
+  const platformFee = params.platformFee || subtotal * 0.1
 
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="margin-top: 0;">Order #${params.orderId.slice(-6).toUpperCase()}</h2>
-            <p><strong>Customer:</strong> ${params.customerName}</p>
-            <p><strong>Email:</strong> ${params.customerEmail}</p>
-            ${params.customerPhone ? `<p><strong>Phone:</strong> ${params.customerPhone}</p>` : ''}
-            <p><strong>Method:</strong> ${params.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</p>
-            ${params.deliveryAddress ? `<p><strong>Address:</strong> ${params.deliveryAddress}</p>` : ''}
-            ${params.deliveryNotes ? `<p><strong>Notes:</strong> ${params.deliveryNotes}</p>` : ''}
-          </div>
+  const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business/orders`
+    : 'https://trylocalor.com/dashboard/business/orders'
 
-          <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
-            <thead>
-              <tr style="background: #f3f4f6;">
-                <th style="padding: 10px; text-align: left;">Item</th>
-                <th style="padding: 10px; text-align: right;">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td style="padding: 10px; font-weight: bold;">Total</td>
-                <td style="padding: 10px; text-align: right; font-weight: bold;">$${params.total.toFixed(2)}</td>
-              </tr>
-            </tfoot>
-          </table>
-
-          <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-            <strong>Action Required:</strong> Please log in to your dashboard to confirm or manage this order.
-          </div>
-
-          <p style="text-align: center;">
-            <a href="https://trylocalor.com/dashboard/business/orders"
-               style="display: inline-block; background: #ff7a00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-              View Order in Dashboard
-            </a>
-          </p>
-
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-          <p style="font-size: 12px; color: #666;">
-            Try Local Gresham<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
-          </p>
-        </div>
-      </body>
-    </html>
-  `
+  const html = await render(
+    NewOrderNotificationEmail({
+      businessName: params.businessName,
+      orderId: params.orderId,
+      customerName: params.customerName,
+      customerEmail: params.customerEmail,
+      customerPhone: params.customerPhone,
+      items: orderItems,
+      subtotal,
+      platformFee,
+      discount: params.discount,
+      total: params.total,
+      deliveryMethod: params.deliveryMethod,
+      deliveryAddress: params.deliveryAddress,
+      specialInstructions: params.deliveryNotes,
+      orderDate: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      dashboardUrl,
+    })
+  )
 
   return sendEmail({
     to: params.businessEmail,
@@ -229,74 +167,40 @@ export async function sendOrderStatusUpdate(params: {
   customerName: string
   orderId: string
   businessName: string
-  status: 'confirmed' | 'ready' | 'completed' | 'cancelled'
+  status: 'accepted' | 'ready' | 'completed' | 'rejected'
+  statusMessage?: string
   deliveryMethod: 'pickup' | 'delivery'
+  deliveryAddress?: string
+  pickupAddress?: string
 }) {
-  const statusMessages = {
-    confirmed: {
-      title: 'Order Confirmed',
-      message: 'Great news! Your order has been confirmed and is being prepared.',
-    },
-    ready: {
-      title: 'Order Ready',
-      message:
-        params.deliveryMethod === 'pickup'
-          ? 'Your order is ready for pickup!'
-          : 'Your order is ready for delivery!',
-    },
-    completed: {
-      title: 'Order Completed',
-      message: 'Your order has been completed. Thank you for supporting local!',
-    },
-    cancelled: {
-      title: 'Order Cancelled',
-      message:
-        'Your order has been cancelled. If you have questions, please contact the business directly.',
-    },
+  const orderUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/orders`
+    : 'https://trylocalor.com/orders'
+
+  const html = await render(
+    OrderStatusUpdateEmail({
+      customerName: params.customerName,
+      orderId: params.orderId,
+      businessName: params.businessName,
+      status: params.status,
+      statusMessage: params.statusMessage || '',
+      deliveryMethod: params.deliveryMethod,
+      deliveryAddress: params.deliveryAddress,
+      pickupAddress: params.pickupAddress,
+      orderUrl,
+    })
+  )
+
+  const statusTitles = {
+    accepted: 'Order Accepted',
+    ready: 'Order Ready',
+    completed: 'Order Completed',
+    rejected: 'Order Declined',
   }
-
-  const { title, message } = statusMessages[params.status]
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>${title}</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #ff7a00;">${title}</h1>
-          <p>Hi ${params.customerName},</p>
-          <p>${message}</p>
-
-          <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h2 style="margin-top: 0;">Order #${params.orderId.slice(-6).toUpperCase()}</h2>
-            <p><strong>Business:</strong> ${params.businessName}</p>
-            <p><strong>Status:</strong> ${params.status.charAt(0).toUpperCase() + params.status.slice(1)}</p>
-          </div>
-
-          <p style="text-align: center;">
-            <a href="https://trylocalor.com/orders"
-               style="display: inline-block; background: #ff7a00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-              View Order Details
-            </a>
-          </p>
-
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-          <p style="font-size: 12px; color: #666;">
-            Try Local Gresham<br>
-            Supporting local businesses in Gresham, Oregon<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
-          </p>
-        </div>
-      </body>
-    </html>
-  `
 
   return sendEmail({
     to: params.customerEmail,
-    subject: `${title} - ${params.businessName}`,
+    subject: `${statusTitles[params.status]} - ${params.businessName}`,
     html,
   })
 }

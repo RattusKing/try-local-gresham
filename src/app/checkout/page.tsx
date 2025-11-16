@@ -224,11 +224,12 @@ export default function CheckoutPage() {
 
         const orderRef = await addDoc(collection(firestore, 'orders'), orderData)
 
-        // Get business email for notifications
+        // Get business email and address for notifications
         try {
           const businessDoc = await getDoc(doc(firestore, 'businesses', group.businessId))
           const businessData = businessDoc.data()
           const businessEmail = businessData?.email || businessData?.website || ''
+          const businessAddress = businessData?.address || ''
 
           // Send email notifications (non-blocking)
           if (businessEmail && user.email) {
@@ -246,9 +247,13 @@ export default function CheckoutPage() {
                   quantity: item.quantity,
                   price: item.price,
                 })),
+                subtotal: groupSubtotal,
+                platformFee: groupPlatformFee,
+                discount: groupDiscount > 0 ? groupDiscount : undefined,
                 total: groupTotal,
                 deliveryMethod: formData.deliveryMethod,
                 deliveryAddress: formData.deliveryAddress,
+                pickupAddress: businessAddress,
                 deliveryNotes: formData.deliveryNotes,
                 customerPhone: formData.phone,
               }),

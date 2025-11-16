@@ -5,7 +5,17 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const { customerEmail, customerName, orderId, businessName, status, deliveryMethod } = body
+    const {
+      customerEmail,
+      customerName,
+      orderId,
+      businessName,
+      status,
+      statusMessage,
+      deliveryMethod,
+      deliveryAddress,
+      pickupAddress,
+    } = body
 
     const result = await sendOrderStatusUpdate({
       customerEmail,
@@ -13,7 +23,10 @@ export async function POST(request: NextRequest) {
       orderId,
       businessName,
       status,
+      statusMessage,
       deliveryMethod,
+      deliveryAddress,
+      pickupAddress,
     })
 
     if (result.success) {
