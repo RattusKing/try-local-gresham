@@ -11,13 +11,33 @@ Add these environment variables to your Vercel project:
 
 Copy and paste each of these:
 
-### Google Analytics
+### Application URL (Required)
+```
+Name: NEXT_PUBLIC_APP_URL
+Value: https://your-domain.vercel.app
+```
+**Important**: Replace `your-domain.vercel.app` with your actual Vercel domain or custom domain
+
+### Email Service (Optional but Recommended)
+```
+Name: RESEND_API_KEY
+Value: re_your_resend_api_key_here
+```
+Get your API key from https://resend.com/api-keys
+
+```
+Name: EMAIL_FROM
+Value: Try Local Gresham <noreply@yourdomain.com>
+```
+Use your verified domain email
+
+### Google Analytics (Optional)
 ```
 Name: NEXT_PUBLIC_GA_ID
 Value: G-HJK5MY2G2H
 ```
 
-### Firebase Configuration
+### Firebase Configuration (Required)
 ```
 Name: NEXT_PUBLIC_FIREBASE_API_KEY
 Value: AIzaSyD0APzjW3laEnnPiJ2l7lvxzEbrSlKW3Bo
@@ -79,19 +99,25 @@ Once deployed, you need to enable Firebase features:
 3. Choose location: **us-central** (or closest to you)
 4. Click **Enable**
 
-### 3. Deploy Security Rules
+### 3. Enable Firebase Storage
+1. Click **Storage** → **Get Started**
+2. Review security rules → **Next**
+3. Choose same location as Firestore: **us-central**
+4. Click **Done**
+
+### 4. Deploy Security Rules
 In your project directory:
 ```bash
 npm install -g firebase-tools
 firebase login
-firebase init firestore
+firebase init
+# Select: Firestore and Storage
 # Select: try-local-f0c44
-# Use default files: firestore.rules and firestore.indexes.json
-firebase deploy --only firestore:rules
-firebase deploy --only firestore:indexes
+# Use default files: firestore.rules, firestore.indexes.json, storage.rules
+firebase deploy --only firestore:rules,firestore:indexes,storage
 ```
 
-### 4. Authorize Domain
+### 5. Authorize Domain
 1. In Firebase Console → **Authentication** → **Settings** tab
 2. Scroll to **Authorized domains**
 3. Add your Vercel domain (e.g., `try-local-gresham.vercel.app`)
