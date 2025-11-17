@@ -1,16 +1,19 @@
 /* Try Local — Gresham
-   Color palette: orange #FF7A00, green #13A10E, black #0B0B0B, off-white #F7F7F5
+   Professional Color Scheme: Lavender #c2aff0, Mint #99edc3, Charcoal #373737
 */
 :root{
-  --orange:#FF7A00;
-  --green:#13A10E;
-  --black:#0B0B0B;
-  --ink:#1a1a1a;
+  --orange:#c2aff0;
+  --green:#99edc3;
+  --black:#373737;
+  --ink:#373737;
   --muted:#6b7280;
   --bg:#F7F7F5;
   --card:#ffffff;
   --radius:18px;
   --shadow:0 10px 30px rgba(0,0,0,0.08);
+  --primary-orange:#c2aff0;
+  --primary-green:#99edc3;
+  --primary-black:#373737;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -32,7 +35,7 @@ body{
 .brand-mark{
   width:34px;height:34px;border-radius:10px;
   display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--orange),#ffb36b);
+  background:linear-gradient(135deg,var(--orange),#d4c5f5);
   color:#000;font-weight:800;
   box-shadow:var(--shadow);
 }
@@ -55,11 +58,11 @@ body{
 }
 .hero-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(11,11,11,.55), rgba(11,11,11,.35) 30%, rgba(247,247,245,.9) 75%, rgba(247,247,245,1) 100%);
+  background:linear-gradient(to bottom, rgba(55,55,55,.55), rgba(55,55,55,.35) 30%, rgba(247,247,245,.9) 75%, rgba(247,247,245,1) 100%);
 }
 .hero-content{position:relative;padding:80px 0 30px 0;color:#111}
 .hero h1{font-size:48px;line-height:1.1;margin:0 0 10px}
-.accent{background:linear-gradient(135deg,var(--green),#7ee081);-webkit-background-clip:text;background-clip:text;color:transparent}
+.accent{background:linear-gradient(135deg,var(--green),#b3f4d0);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lead{font-size:18px;color:#222;margin:8px 0 18px}
 .hero-actions{display:flex;gap:12px;margin-bottom:20px}
 .search-bar{
@@ -80,8 +83,8 @@ body{
 .card .content{padding:14px}
 .card h3{margin:0 0 8px;font-size:18px}
 .tag{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:#f1f1f1;margin-right:6px;margin-bottom:6px}
-.tag.is-green{background:#e7f7e7;color:#0a6e09}
-.tag.is-orange{background:#fff0e5;color:#8a3a00}
+.tag.is-green{background:#e6f9f0;color:#2d7a5b}
+.tag.is-orange{background:#f3ecfd;color:#6d4d9e}
 .card .meta{display:flex;gap:8px;align-items:center;color:#444;font-size:13px;margin-top:6px}
 .card .actions{display:flex;gap:8px;margin-top:12px}
 .card .btn{box-shadow:none}
