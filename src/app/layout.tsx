@@ -58,6 +58,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preload critical assets for better performance */}
+        <link rel="preload" href="/assets/gresham.jpg" as="image" />
+
+        {/* Font optimization */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
