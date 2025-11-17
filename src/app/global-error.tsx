@@ -14,6 +14,18 @@ export default function GlobalError({
     if (process.env.NODE_ENV === 'development') {
       console.error('Global error:', error)
     }
+
+    // Send to Sentry if configured
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      import('@sentry/nextjs').then((Sentry) => {
+        Sentry.captureException(error, {
+          tags: {
+            errorBoundary: 'global',
+          },
+          level: 'fatal',
+        })
+      })
+    }
   }, [error])
 
   return (
