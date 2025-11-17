@@ -63,12 +63,11 @@ service cloud.firestore {
     // Orders collection
     match /orders/{orderId} {
       // Customers can read their own orders
-      // Business owners can read orders for their business
+      // Business owners can read orders for their business (businessId matches their uid)
       // Admins can read all orders
       allow read: if isSignedIn() &&
                      (resource.data.userId == request.auth.uid ||
-                      (isBusinessOwner() &&
-                       get(/databases/$(database)/documents/businesses/$(resource.data.businessId)).data.ownerId == request.auth.uid) ||
+                      resource.data.businessId == request.auth.uid ||
                       isAdmin());
 
       // Customers can create orders
@@ -76,12 +75,11 @@ service cloud.firestore {
                        request.resource.data.userId == request.auth.uid;
 
       // Customers can update their own orders (for cancellation)
-      // Business owners can update orders for their business (for status updates)
+      // Business owners can update orders for their business (status updates)
       // Admins can update any order
       allow update: if isSignedIn() &&
                        (resource.data.userId == request.auth.uid ||
-                        (isBusinessOwner() &&
-                         get(/databases/$(database)/documents/businesses/$(resource.data.businessId)).data.ownerId == request.auth.uid) ||
+                        resource.data.businessId == request.auth.uid ||
                         isAdmin());
 
       // Only admins can delete orders
