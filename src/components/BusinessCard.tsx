@@ -8,11 +8,13 @@ import StarRating from './StarRating'
 interface BusinessCardProps {
   business: Business
   onFavorite: (id: string) => void
+  isFavorited?: boolean
 }
 
 export default function BusinessCard({
   business,
   onFavorite,
+  isFavorited = false,
 }: BusinessCardProps) {
   const bg = business.cover || '/assets/placeholder.jpg'
 
@@ -69,10 +71,11 @@ export default function BusinessCard({
             View Details
           </Link>
           <button
-            className="btn btn-outline"
+            className={isFavorited ? 'btn btn-favorite-active' : 'btn btn-outline'}
             onClick={() => onFavorite(business.id)}
+            title={isFavorited ? 'Remove from favorites' : 'Save to favorites'}
           >
-            ❤️ Save
+            {isFavorited ? '❤️ Saved' : '🤍 Save'}
           </button>
         </div>
       </div>

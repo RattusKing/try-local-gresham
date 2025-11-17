@@ -142,3 +142,16 @@ export interface PromoBanner {
   createdAt: Date
   updatedAt: Date
 }
+
+export type FavoriteType = 'business' | 'product'
+
+export interface Favorite {
+  id: string
+  userId: string
+  itemId: string // Business ID or Product ID
+  itemType: FavoriteType
+  itemName: string // For display purposes
+  itemImage?: string // For display purposes
+  businessName?: string // For products, store the business name
+  createdAt: Date
+}
