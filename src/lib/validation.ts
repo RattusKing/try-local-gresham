@@ -36,9 +36,9 @@ export const orderStatusUpdateSchema = z.object({
   customerName: z.string().min(1).max(100),
   orderId: z.string().min(1, 'Order ID is required'),
   businessName: z.string().min(1).max(100),
-  status: z.enum(['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled']),
+  status: z.enum(['accepted', 'ready', 'completed', 'rejected']),
   statusMessage: z.string().optional(),
-  deliveryMethod: z.enum(['pickup', 'delivery']).optional(),
+  deliveryMethod: z.enum(['pickup', 'delivery']),
   deliveryAddress: z.string().optional(),
   pickupAddress: z.string().optional(),
 })

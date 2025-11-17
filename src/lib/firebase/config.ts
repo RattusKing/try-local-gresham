@@ -35,5 +35,8 @@ if (typeof window !== 'undefined' && isConfigValid()) {
   storage = getStorage(app)
 }
 
+// Export firestore alias for backwards compatibility
+export const firestore = db
+
 export { app, auth, db, storage }
 export default app

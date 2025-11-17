@@ -25,10 +25,15 @@ export interface InventoryCheckResult {
 export async function checkInventoryAvailability(
   items: InventoryItem[]
 ): Promise<InventoryCheckResult> {
+  if (!firestore) {
+    throw new Error('Firestore is not initialized')
+  }
+
+  const db = firestore
   const insufficientStock: InventoryCheckResult['insufficientStock'] = []
 
   for (const item of items) {
-    const productRef = doc(firestore, 'products', item.productId)
+    const productRef = doc(db, 'products', item.productId)
     const productDoc = await getDoc(productRef)
 
     if (!productDoc.exists()) {
@@ -76,13 +81,18 @@ export async function checkInventoryAvailability(
  * @throws Error if insufficient inventory or transaction fails
  */
 export async function reserveInventory(items: InventoryItem[]): Promise<void> {
-  await runTransaction(firestore, async (transaction) => {
+  if (!firestore) {
+    throw new Error('Firestore is not initialized')
+  }
+
+  const db = firestore
+  await runTransaction(db, async (transaction) => {
     const insufficientStock: InventoryCheckResult['insufficientStock'] = []
 
     // First, read all product docs and check inventory
     const productChecks = await Promise.all(
       items.map(async (item) => {
-        const productRef = doc(firestore, 'products', item.productId)
+        const productRef = doc(db, 'products', item.productId)
         const productDoc = await transaction.get(productRef)
 
         if (!productDoc.exists()) {
@@ -148,8 +158,13 @@ export async function reserveInventory(items: InventoryItem[]): Promise<void> {
  * @param items - Array of items to release
  */
 export async function releaseInventory(items: InventoryItem[]): Promise<void> {
+  if (!firestore) {
+    throw new Error('Firestore is not initialized')
+  }
+
+  const db = firestore
   const updates = items.map(async (item) => {
-    const productRef = doc(firestore, 'products', item.productId)
+    const productRef = doc(db, 'products', item.productId)
     const productDoc = await getDoc(productRef)
 
     if (productDoc.exists()) {
