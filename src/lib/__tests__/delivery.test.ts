@@ -93,8 +93,12 @@ describe('Pickup Time Validation', () => {
   }
 
   it('should reject pickup on closed days', () => {
-    // Create a Sunday date
-    const sunday = new Date('2024-01-07T12:00:00') // A Sunday
+    // Create a future Sunday date
+    const sunday = new Date()
+    // Find next Sunday (day 0)
+    const daysUntilSunday = (7 - sunday.getDay()) % 7 || 7
+    sunday.setDate(sunday.getDate() + daysUntilSunday)
+    sunday.setHours(12, 0, 0, 0)
 
     const result = isValidPickupTime(sunday, testHours)
 
@@ -103,8 +107,10 @@ describe('Pickup Time Validation', () => {
   })
 
   it('should reject pickup times before opening', () => {
-    // Create a Monday at 8:00 AM (before 9:00 AM opening)
-    const early = new Date('2024-01-08T08:00:00')
+    // Create a future date at 8:00 AM (before 9:00 AM opening)
+    const early = new Date()
+    early.setDate(early.getDate() + 2) // Day after tomorrow
+    early.setHours(8, 0, 0, 0)
 
     const result = isValidPickupTime(early, testHours)
 
@@ -113,8 +119,10 @@ describe('Pickup Time Validation', () => {
   })
 
   it('should reject pickup times after closing', () => {
-    // Create a Monday at 7:00 PM (after 6:00 PM closing)
-    const late = new Date('2024-01-08T19:00:00')
+    // Create a future date at 7:00 PM (after 6:00 PM closing)
+    const late = new Date()
+    late.setDate(late.getDate() + 2) // Day after tomorrow
+    late.setHours(19, 0, 0, 0)
 
     const result = isValidPickupTime(late, testHours)
 

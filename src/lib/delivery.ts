@@ -190,6 +190,19 @@ export function isValidPickupTime(
   pickupDateTime: Date,
   hours: BusinessHours
 ): { valid: boolean; reason?: string } {
+  // Check time requirements first (more specific)
+  // Must be at least 30 minutes in the future
+  const now = new Date()
+  const minPickupTime = new Date(now.getTime() + 30 * 60 * 1000)
+
+  if (pickupDateTime < minPickupTime) {
+    return {
+      valid: false,
+      reason: 'Pickup time must be at least 30 minutes from now',
+    }
+  }
+
+  // Then check business hours
   const dayName = [
     'sunday',
     'monday',
@@ -215,17 +228,6 @@ export function isValidPickupTime(
     return {
       valid: false,
       reason: `Business hours are ${formatTime(dayHours.open)} - ${formatTime(dayHours.close)}`,
-    }
-  }
-
-  // Must be at least 30 minutes in the future
-  const now = new Date()
-  const minPickupTime = new Date(now.getTime() + 30 * 60 * 1000)
-
-  if (pickupDateTime < minPickupTime) {
-    return {
-      valid: false,
-      reason: 'Pickup time must be at least 30 minutes from now',
     }
   }
 

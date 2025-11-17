@@ -64,8 +64,11 @@ export function validateSchema<T>(schema: z.ZodSchema<T>, data: unknown): T {
     return schema.parse(data)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')
-      throw new Error(`Validation failed: ${errors}`)
+      // In Zod 4.x, the property is 'issues' not 'errors'
+      const errorMessages = error.issues
+        ?.map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(', ')
+      throw new Error(`Validation failed: ${errorMessages || 'Invalid data'}`)
     }
     throw error
   }
