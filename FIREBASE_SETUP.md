@@ -163,16 +163,29 @@ Your database will use these collections:
 }
 ```
 
-### `orders` (Phase 5)
+### `orders`
 ```javascript
 {
-  customerId: string
-  businessId: string
-  businessOwnerId: string
+  userId: string              // Customer user ID
+  userName: string
+  userEmail: string
+  userPhone: string
+  businessId: string          // Business document ID (same as business owner's uid)
+  businessName: string
   items: array
+  subtotal: number
+  platformFee: number
+  discount?: number
+  discountCode?: string
   total: number
-  status: string
+  status: 'pending' | 'accepted' | 'ready' | 'completed' | 'cancelled' | 'rejected'
+  deliveryMethod: 'pickup' | 'delivery'
+  deliveryAddress?: string
+  deliveryNotes?: string
+  pickupTime?: string
+  paymentStatus: 'pending' | 'paid' | 'refunded'
   createdAt: timestamp
+  updatedAt: timestamp
 }
 ```
 
