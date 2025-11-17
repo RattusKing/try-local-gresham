@@ -24,24 +24,45 @@ This guide will help you configure your Firebase project for Try Local.
 4. Choose a location (e.g., `us-central` for USA)
 5. Click **Enable**
 
+## Step 3.5: Enable Firebase Storage
+
+1. In Firebase Console, click **Storage** in the left sidebar
+2. Click **Get started**
+3. Review the security rules prompt → Click **Next**
+4. Choose the same location as your Firestore (e.g., `us-central`)
+5. Click **Done**
+
 ## Step 4: Deploy Security Rules
 
 1. In your project directory, run:
    ```bash
    npm install -g firebase-tools
    firebase login
-   firebase init firestore
+   firebase init
    ```
 
-2. When prompted:
-   - Select your existing project: **try local**
+2. When prompted, select:
+   - **Firestore**: Configure security rules and indexes files
+   - **Storage**: Configure security rules file
+   - Use arrow keys and spacebar to select both, then press Enter
+
+3. For Firestore configuration:
    - Firestore rules file: Press Enter (uses `firestore.rules`)
    - Firestore indexes file: Press Enter (uses `firestore.indexes.json`)
 
-3. Deploy the rules:
+4. For Storage configuration:
+   - Storage rules file: Press Enter (uses `storage.rules`)
+
+5. Deploy all rules:
+   ```bash
+   firebase deploy --only firestore:rules,firestore:indexes,storage
+   ```
+
+   Or deploy individually:
    ```bash
    firebase deploy --only firestore:rules
    firebase deploy --only firestore:indexes
+   firebase deploy --only storage
    ```
 
 ## Step 5: Get Firebase Configuration
@@ -157,7 +178,8 @@ Your database will use these collections:
 
 ## Security Rules Explained
 
-The deployed `firestore.rules` file ensures:
+### Firestore Rules (`firestore.rules`)
+The deployed Firestore rules ensure:
 
 - ✅ Users can only edit their own profiles
 - ✅ Business owners must wait for admin approval
@@ -165,6 +187,20 @@ The deployed `firestore.rules` file ensures:
 - ✅ Customers can only see their own orders
 - ✅ Business owners can only see orders for their business
 - ✅ Admins have full access to moderate content
+
+### Storage Rules (`storage.rules`)
+The deployed Storage rules ensure:
+
+- ✅ Anyone can view/read images (public access)
+- ✅ Business owners can only upload to their own folders
+- ✅ Image files must be under 10MB
+- ✅ Only valid image file types are accepted
+- ✅ Users can only delete their own images
+- ✅ Admins have full access to all files
+
+**Storage Structure:**
+- `businesses/{userId}/{filename}` - Business cover photos
+- `products/{userId}/{filename}` - Product images
 
 ## Troubleshooting
 
@@ -181,6 +217,12 @@ The deployed `firestore.rules` file ensures:
 - Make sure you've added your authorized domains:
   - `localhost` (for local development)
   - Your Vercel domain (e.g., `try-local-gresham.vercel.app`)
+
+### Image upload failing
+- Check that Firebase Storage is enabled in your Firebase Console
+- Verify storage rules are deployed: `firebase deploy --only storage`
+- Make sure image file is under 10MB and is a valid image format
+- Check browser console for specific error messages
 
 ## Next Steps
 

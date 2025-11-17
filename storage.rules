@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for Try Local Gresham
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isBusinessOwner() {
+      return isSignedIn() &&
+             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'business_owner';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Valid image file types
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+
+    // Business cover photos: businesses/{userId}/{filename}
+    match /businesses/{userId}/{filename} {
+      // Anyone can read (public images)
+      allow read: if true;
+
+      // Business owners can upload to their own folder
+      allow create: if isOwner(userId) && isBusinessOwner() && isValidImage();
+
+      // Business owners can update/delete their own images
+      // Admins can update/delete any image
+      allow update, delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Product images: products/{userId}/{filename}
+    match /products/{userId}/{filename} {
+      // Anyone can read (public images)
+      allow read: if true;
+
+      // Business owners can upload to their own folder
+      allow create: if isOwner(userId) && isBusinessOwner() && isValidImage();
+
+      // Business owners can update/delete their own images
+      // Admins can update/delete any image
+      allow update, delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Block all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
