@@ -7,6 +7,7 @@ import { useCart } from '@/lib/cart-context'
 import { db } from '@/lib/firebase/config'
 import { collection, addDoc, doc, getDoc, updateDoc, increment, query, where, getDocs } from 'firebase/firestore'
 import { DeliveryMethod, DiscountCode } from '@/lib/types'
+import { reserveInventory } from '@/lib/inventory'
 import './checkout.css'
 
 export default function CheckoutPage() {
@@ -126,7 +127,9 @@ export default function CheckoutPage() {
       setDiscountAmount(discountAmt)
       setDiscountError('')
     } catch (err) {
-      console.error('Error applying discount code:', err)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error applying discount code:', err)
+      }
       setDiscountError('Error applying discount code. Please try again.')
     } finally {
       setApplyingDiscount(false)
@@ -199,6 +202,24 @@ export default function CheckoutPage() {
 
         const groupTotal = groupSubtotal + groupPlatformFee - groupDiscount
 
+        // CRITICAL: Reserve inventory BEFORE creating order to prevent race conditions
+        try {
+          await reserveInventory(
+            group.items.map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              quantity: item.quantity,
+            }))
+          )
+        } catch (inventoryError) {
+          // Inventory reservation failed - throw error to abort order creation
+          throw new Error(
+            inventoryError instanceof Error
+              ? inventoryError.message
+              : 'Failed to reserve inventory'
+          )
+        }
+
         const orderData = {
           userId: user.uid,
           userName: user.displayName || user.email || 'Anonymous',
@@ -257,35 +278,21 @@ export default function CheckoutPage() {
                 deliveryNotes: formData.deliveryNotes,
                 customerPhone: formData.phone,
               }),
-            }).catch((err) => console.error('Email notification error:', err))
+            }).catch((err) => {
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Email notification error:', err)
+              }
+            })
           }
         } catch (emailError) {
-          console.error('Error sending email notifications:', emailError)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error sending email notifications:', emailError)
+          }
           // Continue even if email fails
         }
 
-        // Deduct inventory for products that track inventory
-        try {
-          for (const item of group.items) {
-            const productRef = doc(firestore, 'products', item.productId)
-            const productDoc = await getDoc(productRef)
-
-            if (productDoc.exists()) {
-              const productData = productDoc.data()
-              // Only deduct if product tracks inventory and has stock quantity set
-              if (productData.trackInventory && productData.stockQuantity !== undefined) {
-                await updateDoc(productRef, {
-                  stockQuantity: increment(-item.quantity),
-                  // Auto-mark as out of stock if quantity reaches 0
-                  inStock: productData.stockQuantity - item.quantity > 0,
-                })
-              }
-            }
-          }
-        } catch (inventoryError) {
-          console.error('Error updating inventory:', inventoryError)
-          // Continue even if inventory update fails
-        }
+        // Note: Inventory was already reserved BEFORE order creation (see line 203)
+        // This prevents race conditions and overselling
 
         return orderRef
       })
@@ -300,7 +307,9 @@ export default function CheckoutPage() {
             usageCount: increment(1),
           })
         } catch (discountErr) {
-          console.error('Error updating discount code usage:', discountErr)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error updating discount code usage:', discountErr)
+          }
           // Don't block order completion if usage update fails
         }
       }
@@ -311,8 +320,18 @@ export default function CheckoutPage() {
       // Redirect to order confirmation
       router.push('/orders')
     } catch (err: any) {
-      console.error('Error creating order:', err)
-      setError(err.message || 'Failed to create order. Please try again.')
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating order:', err)
+      }
+
+      // Provide specific error messages for inventory issues
+      if (err.message && err.message.includes('Insufficient inventory:')) {
+        setError(err.message)
+      } else if (err.message && err.message.includes('inventory')) {
+        setError('Some items are no longer available. Please review your cart.')
+      } else {
+        setError(err.message || 'Failed to create order. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }

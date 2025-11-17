@@ -1,33 +1,19 @@
-# robots.txt for Try Local Gresham
+# Robots.txt for Try Local Gresham
+
+# Allow all search engines
 User-agent: *
-Allow: /
-Allow: /business/
-Allow: /assets/
 
-# Disallow private/admin areas
+# Disallow access to private/sensitive areas
+Disallow: /dashboard
+Disallow: /admin
 Disallow: /api/
-Disallow: /dashboard/
-Disallow: /admin/
-Disallow: /checkout
-Disallow: /orders
 
-# Disallow auth pages
-Disallow: /*?sign-in
-Disallow: /*?sign-up
+# Allow public pages
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /help
+Allow: /business/
 
-# Allow crawling of public business and product pages
-Allow: /business/*
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.webp$
-
-# Sitemap
+# Sitemap location
 Sitemap: https://trylocalor.com/sitemap.xml
-
-# Crawl-delay for specific bots (optional)
-User-agent: Googlebot
-Crawl-delay: 0
-
-User-agent: Bingbot
-Crawl-delay: 1
