@@ -9,11 +9,17 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          orange: '#FF7A00',
-          green: '#13A10E',
-          black: '#0B0B0B',
+          DEFAULT: '#99edc3',
+          dark: '#7dd4ab',
+          mint: '#99edc3',
         },
-        background: '#F7F7F5',
+        secondary: {
+          DEFAULT: '#c2aff0',
+          dark: '#ab96dd',
+          lavender: '#c2aff0',
+        },
+        dark: '#373737',
+        background: '#f8fafb',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
