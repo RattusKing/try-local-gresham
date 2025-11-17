@@ -70,9 +70,9 @@ A professional digital marketplace and community platform connecting local resid
 - **Firebase Authentication** - Email/password and Google OAuth
 - **Firestore** - NoSQL cloud database
 - **Firebase Storage** - File upload and hosting
+- **Resend** - Email notification service (optional for local dev)
 - **Stripe Connect** (Phase 5) - Payment processing and marketplace payments
 - **Uber Direct API** (Phase 7) - Delivery integration
-- **SendGrid/Mailgun** (Phase 5) - Email notifications
 
 ## 📦 Getting Started
 
@@ -94,13 +94,16 @@ A professional digital marketplace and community platform connecting local resid
 
 3. **Set up environment variables**
    ```bash
-   cp .env.local.example .env.local
+   cp .env.example .env
    ```
 
-   Edit `.env.local` and add your credentials:
-   - Google Analytics ID
-   - Firebase config (Phase 2)
-   - Stripe keys (Phase 5)
+   Edit `.env` and add your credentials:
+   - **Firebase config** - Required for authentication and database
+   - **Resend API key** - Optional (use placeholder `re_placeholder_for_local_build` for local dev)
+   - **Google Analytics ID** - Optional for local development
+   - **Stripe keys** - Coming in Phase 5
+
+   For local development, you can use placeholder values. The app will work without real API keys - features like email will be logged but not sent.
 
 4. **Run development server**
    ```bash
@@ -142,13 +145,20 @@ vercel
 
 ### Environment Variables Required
 Set these in your hosting platform:
-- `NEXT_PUBLIC_GA_ID` - Google Analytics
+
+**Required:**
 - `NEXT_PUBLIC_FIREBASE_API_KEY` - Firebase API Key
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` - Firebase Auth Domain
 - `NEXT_PUBLIC_FIREBASE_PROJECT_ID` - Firebase Project ID
 - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` - Firebase Storage Bucket
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` - Firebase Messaging Sender ID
 - `NEXT_PUBLIC_FIREBASE_APP_ID` - Firebase App ID
+- `NEXT_PUBLIC_APP_URL` - Your production URL (e.g., https://trylocalor.com)
+
+**Optional:**
+- `NEXT_PUBLIC_GA_ID` - Google Analytics
+- `RESEND_API_KEY` - Email service (get from https://resend.com/api-keys)
+- `EMAIL_FROM` - Sender email address for notifications
 
 See `VERCEL_ENV_SETUP.md` for detailed Vercel deployment instructions.
 
