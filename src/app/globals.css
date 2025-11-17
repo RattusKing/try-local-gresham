@@ -3,22 +3,38 @@
 @tailwind utilities;
 
 /* Try Local — Gresham
-   Color palette: orange #FF7A00, green #13A10E, black #0B0B0B, off-white #F7F7F5
+   Professional Color Scheme: Lavender #c2aff0, Mint #99edc3, Charcoal #373737
 */
 :root {
-  --orange: #FF7A00;
-  --green: #13A10E;
-  --black: #0B0B0B;
-  --ink: #1a1a1a;
+  --orange: #c2aff0;
+  --green: #99edc3;
+  --black: #373737;
+  --ink: #373737;
   --muted: #6b7280;
   --bg: #F7F7F5;
   --card: #ffffff;
   --radius: 18px;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+  /* Primary color aliases for consistency */
+  --primary-orange: #c2aff0;
+  --primary-green: #99edc3;
+  --primary-black: #373737;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Accessibility: Focus indicators */
+*:focus-visible {
+  outline: 3px solid var(--primary-orange);
+  outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users, keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 html,
@@ -70,7 +86,7 @@ body {
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--orange), #ffb36b);
+  background: linear-gradient(135deg, var(--orange), #d4c5f5);
   color: #000;
   font-weight: 800;
   box-shadow: var(--shadow);
@@ -159,8 +175,8 @@ body {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(11, 11, 11, 0.55),
-    rgba(11, 11, 11, 0.35) 30%,
+    rgba(55, 55, 55, 0.55),
+    rgba(55, 55, 55, 0.35) 30%,
     rgba(247, 247, 245, 0.9) 75%,
     rgba(247, 247, 245, 1) 100%
   );
@@ -179,7 +195,7 @@ body {
 }
 
 .accent {
-  background: linear-gradient(135deg, var(--green), #7ee081);
+  background: linear-gradient(135deg, var(--green), #b3f4d0);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -292,13 +308,13 @@ body {
 }
 
 .tag.is-green {
-  background: #e7f7e7;
-  color: #0a6e09;
+  background: #e6f9f0;
+  color: #2d7a5b;
 }
 
 .tag.is-orange {
-  background: #fff0e5;
-  color: #8a3a00;
+  background: #f3ecfd;
+  color: #6d4d9e;
 }
 
 .card .meta {

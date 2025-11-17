@@ -133,8 +133,8 @@ service cloud.firestore {
 
     // Business Applications collection
     match /business_applications/{applicationId} {
-      // Anyone can create an application
-      allow create: if true;
+      // Only authenticated users can create an application
+      allow create: if isSignedIn();
 
       // Only admins can read/update/delete applications
       allow read, update, delete: if isAdmin();

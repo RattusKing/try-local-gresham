@@ -18,6 +18,15 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+const MAX_CART_ITEMS = 100 // Maximum number of items in cart
+const CART_TTL = 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
+const MAX_CART_SIZE = 1000000 // 1MB limit for cart data
+
+interface CartData {
+  items: CartItem[]
+  savedAt: number
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [mounted, setMounted] = useState(false)
@@ -28,9 +37,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const savedCart = localStorage.getItem('cart')
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart))
+        const cartData: CartData = JSON.parse(savedCart)
+
+        // Check if cart has expired
+        const now = Date.now()
+        const age = now - (cartData.savedAt || 0)
+
+        if (age > CART_TTL) {
+          // Cart expired, clear it
+          localStorage.removeItem('cart')
+          setItems([])
+        } else {
+          // Cart is still valid
+          setItems(cartData.items || [])
+        }
       } catch (error) {
-        console.error('Error loading cart:', error)
+        // Cart data is corrupted, clear it
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading cart, clearing corrupted data:', error)
+        }
+        localStorage.removeItem('cart')
+        setItems([])
       }
     }
   }, [])
@@ -38,7 +65,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('cart', JSON.stringify(items))
+      try {
+        const cartData: CartData = {
+          items,
+          savedAt: Date.now(),
+        }
+        const json = JSON.stringify(cartData)
+
+        // Check if cart data is too large
+        if (json.length > MAX_CART_SIZE) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Cart data exceeds size limit')
+          }
+          return
+        }
+
+        localStorage.setItem('cart', json)
+      } catch (error) {
+        // localStorage quota exceeded or other error
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error saving cart:', error)
+        }
+      }
     }
   }, [items, mounted])
 
@@ -52,7 +100,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((currentItems) => {
       const existingItem = currentItems.find((i) => i.productId === item.productId)
 
+      // Calculate total item count
+      const currentTotalItems = currentItems.reduce((sum, i) => sum + i.quantity, 0)
+
       if (existingItem) {
+        // Check if adding would exceed limit
+        if (currentTotalItems + quantity > MAX_CART_ITEMS) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
+          }
+          return currentItems
+        }
+
         // Update quantity if item already exists
         return currentItems.map((i) =>
           i.productId === item.productId
@@ -60,6 +119,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : i
         )
       } else {
+        // Check if adding new item would exceed limit
+        if (currentTotalItems + quantity > MAX_CART_ITEMS) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
+          }
+          return currentItems
+        }
+
         // Add new item
         return [...currentItems, { ...item, quantity }]
       }
