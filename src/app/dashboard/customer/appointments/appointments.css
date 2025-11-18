@@ -1,0 +1,255 @@
+.appointments-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.filter-btn.active {
+  background: var(--primary-green);
+  color: white;
+  border-color: var(--primary-green);
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appointment-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-left: 4px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.appointment-card.status-pending {
+  border-left-color: #f59e0b;
+}
+
+.appointment-card.status-confirmed {
+  border-left-color: #3b82f6;
+}
+
+.appointment-card.status-completed {
+  border-left-color: var(--primary-green);
+}
+
+.appointment-card.status-cancelled {
+  border-left-color: #ef4444;
+  opacity: 0.7;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.appointment-service {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appointment-service h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--primary-black);
+}
+
+.business-name {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  align-self: flex-start;
+}
+
+.status-badge.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-confirmed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.appointment-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-orange);
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.detail-icon {
+  font-size: 1rem;
+}
+
+.detail-label {
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.detail-value {
+  color: var(--primary-black);
+  font-weight: 600;
+}
+
+.customer-notes {
+  background: #f9fafb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.customer-notes strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+.customer-notes p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.appointment-status-info {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.appointment-status-info.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.appointment-status-info.confirmed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.appointment-status-info.completed {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.appointment-status-info.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.appointment-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-cancel {
+  padding: 0.625rem 1.25rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #991b1b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #fecaca;
+  border-color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .appointment-header {
+    flex-direction: column;
+  }
+
+  .appointment-price {
+    align-self: flex-start;
+  }
+
+  .detail-row {
+    flex-wrap: wrap;
+  }
+
+  .detail-label {
+    min-width: auto;
+  }
+
+  .appointment-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel {
+    width: 100%;
+  }
+}
