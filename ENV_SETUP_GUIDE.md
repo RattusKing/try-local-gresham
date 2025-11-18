@@ -67,7 +67,7 @@ This is just YOUR email address where you want to receive messages.
 
 **Add to Vercel:**
 ```bash
-CONTACT_EMAIL=support@trylocalor.com
+CONTACT_EMAIL=support@try-local.com
 # Or use your personal email:
 # CONTACT_EMAIL=your.name@gmail.com
 ```

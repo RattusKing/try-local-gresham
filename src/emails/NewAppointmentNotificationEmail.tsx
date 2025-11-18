@@ -95,7 +95,7 @@ export default function NewAppointmentNotificationEmail({
           </Section>
 
           <Section style={buttonSection}>
-            <Button style={button} href="https://trylocalor.com/dashboard/business/appointments">
+            <Button style={button} href="https://try-local.com/dashboard/business/appointments">
               Manage Appointments
             </Button>
           </Section>

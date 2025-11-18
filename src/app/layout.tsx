@@ -12,11 +12,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Try Local' }],
   creator: 'Try Local',
   publisher: 'Try Local',
-  metadataBase: new URL('https://trylocalor.com'),
+  metadataBase: new URL('https://try-local.com'),
   openGraph: {
     title: 'Try Local — Gresham, Oregon',
     description: 'Shop Gresham. Support your neighbors. Find coffee, boutiques, services, and more.',
-    url: 'https://trylocalor.com',
+    url: 'https://try-local.com',
     siteName: 'Try Local Gresham',
     images: [
       {

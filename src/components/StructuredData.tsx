@@ -8,12 +8,12 @@ export function WebsiteSchema() {
     name: 'Try Local Gresham',
     description:
       'A digital marketplace connecting local people with local businesses in Gresham, Oregon.',
-    url: 'https://trylocalor.com',
+    url: 'https://try-local.com',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://trylocalor.com/?search={search_term_string}',
+        urlTemplate: 'https://try-local.com/?search={search_term_string}',
       },
       'query-input': 'required name=search_term_string',
     },
@@ -35,8 +35,8 @@ export function OrganizationSchema() {
     name: 'Try Local',
     description:
       'Building a stronger Gresham, one local business at a time. A community platform connecting residents with local businesses.',
-    url: 'https://trylocalor.com',
-    logo: 'https://trylocalor.com/logo.png',
+    url: 'https://try-local.com',
+    logo: 'https://try-local.com/logo.png',
     sameAs: [
       // Add social media links here when available
       // 'https://facebook.com/trylocalgresham',
@@ -73,7 +73,7 @@ export function LocalBusinessSchema({ business }: { business: Business }) {
     description: business.description || `${business.name} - Local business in Gresham, Oregon`,
     image: business.cover || '/assets/gresham.jpg',
     telephone: business.phone,
-    url: business.website || `https://trylocalor.com/business/${business.id}`,
+    url: business.website || `https://try-local.com/business/${business.id}`,
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Gresham',
@@ -166,7 +166,7 @@ export function BreadcrumbSchema({ items }: { items: Array<{ name: string; url: 
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: `https://trylocalor.com${item.url}`,
+      item: `https://try-local.com${item.url}`,
     })),
   }
 

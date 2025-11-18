@@ -379,7 +379,7 @@ export default function BusinessProfilePage() {
         <meta property="og:title" content={`${business.name} | Try Local Gresham`} />
         <meta property="og:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
         <meta property="og:image" content={business.cover || '/assets/gresham.jpg'} />
-        <meta property="og:url" content={`https://trylocalor.com/business/${business.id}`} />
+        <meta property="og:url" content={`https://try-local.com/business/${business.id}`} />
         <meta property="og:type" content="business.business" />
         <meta property="business:contact_data:street_address" content={business.neighborhood || 'Gresham'} />
         <meta property="business:contact_data:locality" content="Gresham" />
@@ -392,7 +392,7 @@ export default function BusinessProfilePage() {
         <meta name="twitter:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
         <meta name="twitter:image" content={business.cover || '/assets/gresham.jpg'} />
 
-        <link rel="canonical" content={`https://trylocalor.com/business/${business.id}`} />
+        <link rel="canonical" content={`https://try-local.com/business/${business.id}`} />
       </Head>
 
       <PromoBanner location="business_pages" />

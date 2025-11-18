@@ -41,7 +41,7 @@ For production use, you need to verify your domain:
 
 1. In Resend dashboard, go to **Domains**
 2. Click **Add Domain**
-3. Enter your domain (e.g., `trylocalor.com`)
+3. Enter your domain (e.g., `try-local.com`)
 4. Add the provided DNS records to your domain registrar
 5. Wait for verification (usually takes a few minutes)
 
@@ -61,7 +61,7 @@ EMAIL_FROM=Try Local Gresham <noreply@yourdomain.com>
 
 # Application URL (used for email links)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-# For production: https://trylocalor.com
+# For production: https://try-local.com
 ```
 
 ### 5. Test Email Notifications
@@ -201,8 +201,8 @@ Make sure to set these in your production environment (Vercel, etc.):
 
 ```bash
 RESEND_API_KEY=re_your_production_api_key
-EMAIL_FROM=Try Local Gresham <noreply@trylocalor.com>
-NEXT_PUBLIC_APP_URL=https://trylocalor.com
+EMAIL_FROM=Try Local Gresham <noreply@try-local.com>
+NEXT_PUBLIC_APP_URL=https://try-local.com
 ```
 
 ### Domain Verification

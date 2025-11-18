@@ -4,7 +4,7 @@ import OrderConfirmationEmail from '@/emails/OrderConfirmationEmail'
 import NewOrderNotificationEmail from '@/emails/NewOrderNotificationEmail'
 import OrderStatusUpdateEmail from '@/emails/OrderStatusUpdateEmail'
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Try Local Gresham <noreply@trylocalor.com>'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Try Local Gresham <noreply@try-local.com>'
 const API_KEY = process.env.RESEND_API_KEY
 
 // Initialize Resend only if API key is available
@@ -126,7 +126,7 @@ export async function sendNewOrderNotification(params: {
 
   const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business/orders`
-    : 'https://trylocalor.com/dashboard/business/orders'
+    : 'https://try-local.com/dashboard/business/orders'
 
   const html = await render(
     NewOrderNotificationEmail({
@@ -175,7 +175,7 @@ export async function sendOrderStatusUpdate(params: {
 }) {
   const orderUrl = process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/orders`
-    : 'https://trylocalor.com/orders'
+    : 'https://try-local.com/orders'
 
   const html = await render(
     OrderStatusUpdateEmail({
@@ -237,13 +237,13 @@ export async function sendBusinessApplicationReceived(params: {
             <li>Start adding products and connecting with local customers!</li>
           </ol>
 
-          <p>Questions? Reply to this email or visit our <a href="https://trylocalor.com/contact" style="color: #ff7a00;">contact page</a>.</p>
+          <p>Questions? Reply to this email or visit our <a href="https://try-local.com/contact" style="color: #ff7a00;">contact page</a>.</p>
 
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           <p style="font-size: 12px; color: #666;">
             Try Local Gresham<br>
             Supporting local businesses in Gresham, Oregon<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
+            <a href="https://try-local.com" style="color: #ff7a00;">try-local.com</a>
           </p>
         </div>
       </body>
@@ -297,7 +297,7 @@ export async function sendBusinessApproved(params: {
 
           <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Need Help?</h3>
-            <p>Check out our <a href="https://trylocalor.com/help" style="color: #ff7a00;">Help Center</a> for guides on:</p>
+            <p>Check out our <a href="https://try-local.com/help" style="color: #ff7a00;">Help Center</a> for guides on:</p>
             <ul>
               <li>Adding products</li>
               <li>Managing orders</li>
@@ -311,7 +311,7 @@ export async function sendBusinessApproved(params: {
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           <p style="font-size: 12px; color: #666;">
             Try Local Gresham<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
+            <a href="https://try-local.com" style="color: #ff7a00;">try-local.com</a>
           </p>
         </div>
       </body>
@@ -358,12 +358,12 @@ export async function sendBusinessRejected(params: {
               : ''
           }
 
-          <p>If you have questions or would like to discuss this decision, please don't hesitate to <a href="https://trylocalor.com/contact" style="color: #ff7a00;">contact us</a>.</p>
+          <p>If you have questions or would like to discuss this decision, please don't hesitate to <a href="https://try-local.com/contact" style="color: #ff7a00;">contact us</a>.</p>
 
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
           <p style="font-size: 12px; color: #666;">
             Try Local Gresham<br>
-            <a href="https://trylocalor.com" style="color: #ff7a00;">trylocalor.com</a>
+            <a href="https://try-local.com" style="color: #ff7a00;">try-local.com</a>
           </p>
         </div>
       </body>
@@ -433,7 +433,7 @@ export async function sendNewAppointmentNotification(params: {
 
   const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL
     ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business/appointments`
-    : 'https://trylocalor.com/dashboard/business/appointments'
+    : 'https://try-local.com/dashboard/business/appointments'
 
   const html = await render(
     NewAppointmentNotification({

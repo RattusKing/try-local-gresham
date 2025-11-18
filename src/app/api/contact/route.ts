@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
 
     // Send contact form email to support team
     const result = await resend.emails.send({
-      from: 'Try Local Gresham <noreply@trylocalor.com>',
-      to: process.env.CONTACT_EMAIL || 'support@trylocalor.com',
+      from: 'Try Local Gresham <noreply@try-local.com>',
+      to: process.env.CONTACT_EMAIL || 'support@try-local.com',
       replyTo: email,
       subject: `Contact Form: ${subject}`,
       html: `

@@ -196,7 +196,7 @@ export default function TermsPage() {
             Questions about these Terms? Contact us at:
           </p>
           <p style={{ lineHeight: '1.8' }}>
-            <strong>Email:</strong> legal@trylocalor.com
+            <strong>Email:</strong> legal@try-local.com
             <br />
             <strong>Address:</strong> Gresham, Oregon
           </p>

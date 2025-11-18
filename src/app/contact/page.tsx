@@ -77,8 +77,8 @@ export default function ContactPage() {
           <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: 'var(--shadow)' }}>
             <h3 style={{ fontSize: '18px', marginBottom: '10px' }}>Email</h3>
             <p style={{ color: '#666' }}>
-              <a href="mailto:hello@trylocalor.com" style={{ color: 'var(--orange)' }}>
-                hello@trylocalor.com
+              <a href="mailto:hello@try-local.com" style={{ color: 'var(--orange)' }}>
+                hello@try-local.com
               </a>
             </p>
           </div>
@@ -248,14 +248,14 @@ export default function ContactPage() {
         <div style={{ marginTop: '40px', textAlign: 'center', color: '#666' }}>
           <p>
             <strong>Business Inquiries:</strong>{' '}
-            <a href="mailto:business@trylocalor.com" style={{ color: 'var(--orange)' }}>
-              business@trylocalor.com
+            <a href="mailto:business@try-local.com" style={{ color: 'var(--orange)' }}>
+              business@try-local.com
             </a>
           </p>
           <p style={{ marginTop: '10px' }}>
             <strong>Support:</strong>{' '}
-            <a href="mailto:support@trylocalor.com" style={{ color: 'var(--orange)' }}>
-              support@trylocalor.com
+            <a href="mailto:support@try-local.com" style={{ color: 'var(--orange)' }}>
+              support@try-local.com
             </a>
           </p>
         </div>

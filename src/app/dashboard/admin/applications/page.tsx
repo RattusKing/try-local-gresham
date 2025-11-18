@@ -127,7 +127,7 @@ export default function BusinessApplicationsPage() {
           businessEmail: application.email,
           businessName: application.businessName,
           ownerName: application.ownerName,
-          dashboardUrl: 'https://trylocalor.com/dashboard/business',
+          dashboardUrl: 'https://try-local.com/dashboard/business',
         }),
       }).catch((err) => console.error('Email error:', err))
 
