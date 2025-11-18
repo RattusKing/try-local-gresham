@@ -1,5 +1,8 @@
 # Vercel Environment Variables Setup
 
+⚠️ **SECURITY WARNING**: Never commit actual API keys or secrets to version control!
+The values below are PLACEHOLDERS. Replace them with your actual credentials in Vercel dashboard only.
+
 Add these environment variables to your Vercel project:
 
 ## Step 1: Go to Vercel Dashboard
@@ -9,7 +12,7 @@ Add these environment variables to your Vercel project:
 
 ## Step 2: Add These Variables
 
-Copy and paste each of these:
+Copy and paste each of these (REPLACE WITH YOUR ACTUAL VALUES):
 
 ### Application URL (Required)
 ```
@@ -34,38 +37,44 @@ Use your verified domain email
 ### Google Analytics (Optional)
 ```
 Name: NEXT_PUBLIC_GA_ID
-Value: G-HJK5MY2G2H
+Value: G-XXXXXXXXXX (replace with your GA4 measurement ID)
 ```
 
 ### Firebase Configuration (Required)
 ```
 Name: NEXT_PUBLIC_FIREBASE_API_KEY
-Value: AIzaSyD0APzjW3laEnnPiJ2l7lvxzEbrSlKW3Bo
+Value: AIzaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (get from Firebase Console)
 ```
 
 ```
 Name: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-Value: try-local-f0c44.firebaseapp.com
+Value: your-project-id.firebaseapp.com
 ```
 
 ```
 Name: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-Value: try-local-f0c44
+Value: your-project-id
 ```
 
 ```
 Name: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-Value: try-local-f0c44.firebasestorage.app
+Value: your-project-id.firebasestorage.app
 ```
 
 ```
 Name: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-Value: 178136427645
+Value: YOUR_SENDER_ID
 ```
 
 ```
 Name: NEXT_PUBLIC_FIREBASE_APP_ID
-Value: 1:178136427645:web:086f63ac76fc5e868f9514
+Value: 1:XXXXXXXXXX:web:XXXXXXXXXXXXXXXXXX
+```
+
+### Resend API (for email notifications)
+```
+Name: RESEND_API_KEY
+Value: re_XXXXXXXXXXXXXXXXXXXXXXXX (get from resend.com dashboard)
 ```
 
 ## Step 3: Apply to All Environments

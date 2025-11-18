@@ -29,6 +29,17 @@
   box-sizing: border-box;
 }
 
+/* Accessibility: Focus indicators */
+*:focus-visible {
+  outline: 3px solid var(--primary-orange);
+  outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users, keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
 html,
 body {
   height: 100%;

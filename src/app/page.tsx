@@ -265,10 +265,34 @@ export default function Home() {
       <WebsiteSchema />
       <OrganizationSchema />
 
+      {/* Skip to main content link for keyboard accessibility */}
+      <a
+        href="#main-content"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          zIndex: 999,
+          padding: '1rem',
+          background: 'var(--primary-orange)',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '4px',
+        }}
+        onFocus={(e) => {
+          e.target.style.left = '1rem'
+          e.target.style.top = '1rem'
+        }}
+        onBlur={(e) => {
+          e.target.style.left = '-9999px'
+        }}
+      >
+        Skip to main content
+      </a>
+
       <Header onSignIn={() => setIsAuthOpen(true)} />
       <PromoBanner location="homepage" />
 
-      <main>
+      <main id="main-content">
         <Hero onSearch={handleSearch} categories={categories} />
 
         <section id="discover" className="section container">
@@ -289,6 +313,7 @@ export default function Home() {
                   placeholder="Search businesses, products, or tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search businesses"
                   style={{
                     flex: '1',
                     minWidth: '250px',
@@ -305,6 +330,7 @@ export default function Home() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
+                  aria-label="Filter by category"
                   style={{
                     padding: '0.75rem 1rem',
                     border: '2px solid #e5e7eb',
@@ -324,6 +350,7 @@ export default function Home() {
                 <select
                   value={selectedNeighborhood}
                   onChange={(e) => setSelectedNeighborhood(e.target.value)}
+                  aria-label="Filter by neighborhood"
                   style={{
                     padding: '0.75rem 1rem',
                     border: '2px solid #e5e7eb',
@@ -343,6 +370,7 @@ export default function Home() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'newest')}
+                  aria-label="Sort businesses"
                   style={{
                     padding: '0.75rem 1rem',
                     border: '2px solid #e5e7eb',
@@ -385,6 +413,7 @@ export default function Home() {
                       Search: "{searchQuery}"
                       <button
                         onClick={() => setSearchQuery('')}
+                        aria-label="Clear search filter"
                         style={{
                           background: 'none',
                           border: 'none',
@@ -412,6 +441,7 @@ export default function Home() {
                       Category: {selectedCategory}
                       <button
                         onClick={() => setSelectedCategory('')}
+                        aria-label="Clear category filter"
                         style={{
                           background: 'none',
                           border: 'none',
@@ -439,6 +469,7 @@ export default function Home() {
                       Neighborhood: {selectedNeighborhood}
                       <button
                         onClick={() => setSelectedNeighborhood('')}
+                        aria-label="Clear neighborhood filter"
                         style={{
                           background: 'none',
                           border: 'none',
@@ -491,8 +522,8 @@ export default function Home() {
             </div>
           </div>
           {loading ? (
-            <div className="empty-state">
-              <div className="spinner"></div>
+            <div className="empty-state" role="status" aria-live="polite">
+              <div className="spinner" aria-hidden="true"></div>
               <p>Loading businesses...</p>
             </div>
           ) : (
