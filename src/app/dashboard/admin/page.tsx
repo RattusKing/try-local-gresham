@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
-import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore'
+import { collection, query, where, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { Business } from '@/lib/types'
 import './admin.css'
@@ -107,6 +107,22 @@ export default function AdminDashboard() {
         status: 'pending',
         updatedAt: new Date(),
       })
+      await loadBusinesses()
+    } catch (err: any) {
+      setError(err.message)
+    }
+  }
+
+  const handleDelete = async (businessId: string) => {
+    if (!db) return
+
+    if (!confirm('⚠️ PERMANENTLY DELETE this business?\n\nThis will remove:\n- The business listing\n- All their products\n- All their services\n- All their appointments\n\nThis action CANNOT be undone!')) {
+      return
+    }
+
+    try {
+      const businessRef = doc(db, 'businesses', businessId)
+      await deleteDoc(businessRef)
       await loadBusinesses()
     } catch (err: any) {
       setError(err.message)
@@ -269,6 +285,12 @@ export default function AdminDashboard() {
                       onClick={() => handleUnapprove(business.id)}
                     >
                       Unapprove
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(business.id)}
+                    >
+                      🗑️ Delete
                     </button>
                   </div>
                 </div>
