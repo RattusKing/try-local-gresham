@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting
     const clientId = getClientIdentifier(request.headers)
-    const rateLimit = checkRateLimit(clientId, RATE_LIMITS.EMAIL)
+    const rateLimit = await checkRateLimit(clientId, RATE_LIMITS.EMAIL)
 
     if (!rateLimit.success) {
       return NextResponse.json(

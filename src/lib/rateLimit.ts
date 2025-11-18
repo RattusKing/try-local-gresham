@@ -1,7 +1,10 @@
 /**
- * Simple in-memory rate limiter
- * For production with multiple servers, use Redis (Upstash, etc.)
+ * Hybrid rate limiter supporting both in-memory and Redis
+ * - Development: Uses in-memory Map
+ * - Production: Uses Vercel KV (Redis) for horizontal scaling
  */
+
+import { kv } from '@vercel/kv'
 
 interface RateLimitRecord {
   count: number
@@ -10,15 +13,27 @@ interface RateLimitRecord {
 
 const rateLimitMap = new Map<string, RateLimitRecord>()
 
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, record] of rateLimitMap.entries()) {
-    if (now > record.resetTime) {
-      rateLimitMap.delete(key)
+// Check if Redis is available
+const isRedisAvailable = () => {
+  return !!(
+    process.env.KV_REST_API_URL &&
+    process.env.KV_REST_API_TOKEN
+  )
+}
+
+// Clean up old entries every 5 minutes (only for in-memory)
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    if (!isRedisAvailable()) {
+      const now = Date.now()
+      for (const [key, record] of rateLimitMap.entries()) {
+        if (now > record.resetTime) {
+          rateLimitMap.delete(key)
+        }
+      }
     }
-  }
-}, 5 * 60 * 1000)
+  }, 5 * 60 * 1000)
+}
 
 export interface RateLimitConfig {
   /** Maximum number of requests allowed */
@@ -34,12 +49,78 @@ export interface RateLimitResult {
 }
 
 /**
- * Check if a request should be rate limited
- * @param identifier - Unique identifier (IP address, user ID, etc.)
- * @param config - Rate limit configuration
- * @returns Rate limit result
+ * Check rate limit using Redis (production)
  */
-export function checkRateLimit(
+async function checkRateLimitRedis(
+  identifier: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  const now = Date.now()
+  const key = `ratelimit:${identifier}`
+
+  try {
+    // Get current record
+    const record = await kv.get<RateLimitRecord>(key)
+
+    // No record exists or it has expired
+    if (!record || now > record.resetTime) {
+      const resetTime = now + config.window
+      const newRecord = {
+        count: 1,
+        resetTime,
+      }
+
+      // Set with TTL (time to live) in seconds
+      await kv.set(key, newRecord, {
+        ex: Math.ceil(config.window / 1000),
+      })
+
+      return {
+        success: true,
+        remaining: config.limit - 1,
+        resetTime,
+      }
+    }
+
+    // Record exists and limit exceeded
+    if (record.count >= config.limit) {
+      return {
+        success: false,
+        remaining: 0,
+        resetTime: record.resetTime,
+      }
+    }
+
+    // Increment count
+    const updatedRecord = {
+      count: record.count + 1,
+      resetTime: record.resetTime,
+    }
+
+    await kv.set(key, updatedRecord, {
+      ex: Math.ceil((record.resetTime - now) / 1000),
+    })
+
+    return {
+      success: true,
+      remaining: config.limit - updatedRecord.count,
+      resetTime: record.resetTime,
+    }
+  } catch (error) {
+    console.error('Redis rate limit error, falling back to allow:', error)
+    // On Redis error, allow the request (fail open)
+    return {
+      success: true,
+      remaining: config.limit,
+      resetTime: now + config.window,
+    }
+  }
+}
+
+/**
+ * Check rate limit using in-memory Map (development)
+ */
+function checkRateLimitMemory(
   identifier: string,
   config: RateLimitConfig
 ): RateLimitResult {
@@ -78,6 +159,23 @@ export function checkRateLimit(
     remaining: config.limit - record.count,
     resetTime: record.resetTime,
   }
+}
+
+/**
+ * Check if a request should be rate limited
+ * Automatically uses Redis if available, falls back to in-memory
+ * @param identifier - Unique identifier (IP address, user ID, etc.)
+ * @param config - Rate limit configuration
+ * @returns Rate limit result
+ */
+export async function checkRateLimit(
+  identifier: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  if (isRedisAvailable()) {
+    return checkRateLimitRedis(identifier, config)
+  }
+  return checkRateLimitMemory(identifier, config)
 }
 
 /**
