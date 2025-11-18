@@ -12,7 +12,7 @@ import {
   doc,
   getDoc,
 } from 'firebase/firestore'
-import { Service, BusinessAvailability, Appointment, Business } from '@/lib/types'
+import { Service, BusinessAvailability, Appointment, Business, DayOfWeek } from '@/lib/types'
 import { getAvailableTimeSlots, formatTime, getNextDays } from '@/lib/appointments'
 import './AppointmentBookingModal.css'
 
@@ -225,7 +225,7 @@ export default function AppointmentBookingModal({
               <h3>2. Select Date</h3>
               <div className="dates-list">
                 {nextDays.slice(0, 14).map((date) => {
-                  const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()] as any
+                  const dayOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()] as DayOfWeek
                   const isAvailable = availability[dayOfWeek]?.isOpen
 
                   return (
