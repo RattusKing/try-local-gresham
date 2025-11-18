@@ -18,14 +18,18 @@ export default function DashboardNav() {
 
   const businessLinks = [
     { href: '/dashboard/business', label: 'My Business', icon: '🏪' },
-    { href: '/dashboard/business/products', label: 'Products/Services', icon: '📦' },
+    { href: '/dashboard/business/products', label: 'Products', icon: '📦' },
+    { href: '/dashboard/business/services', label: 'Services', icon: '📅' },
+    { href: '/dashboard/business/appointments', label: 'Appointments', icon: '🗓️' },
     { href: '/dashboard/business/orders', label: 'Orders', icon: '🛒' },
     { href: '/dashboard/business/analytics', label: 'Analytics', icon: '📊' },
     { href: '/dashboard/business/discounts', label: 'Discount Codes', icon: '🎟️' },
+    { href: '/dashboard/business/settings', label: 'Settings', icon: '⚙️' },
   ]
 
   const customerLinks = [
     { href: '/dashboard/customer', label: 'My Profile', icon: '👤' },
+    { href: '/dashboard/customer/appointments', label: 'My Appointments', icon: '📅' },
     { href: '/dashboard/customer/orders', label: 'Order History', icon: '📦' },
     { href: '/dashboard/customer/favorites', label: 'Favorites', icon: '❤️' },
   ]
