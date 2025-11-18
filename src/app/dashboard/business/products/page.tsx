@@ -11,10 +11,13 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  writeBatch,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useEffect, useState } from 'react'
 import { Product } from '@/lib/types'
+import { exportProductsToCSV } from '@/lib/csv-import'
+import CSVImportModal from '@/components/CSVImportModal'
 import './products.css'
 
 export default function BusinessProducts() {
@@ -26,6 +29,7 @@ export default function BusinessProducts() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [showCSVImport, setShowCSVImport] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -187,6 +191,44 @@ export default function BusinessProducts() {
     setShowForm(false)
   }
 
+  const handleBulkImport = async (productsToImport: any[]) => {
+    if (!db) return
+
+    try {
+      setError('')
+      setSuccess('')
+
+      // Use Firestore batch write for better performance
+      const batch = writeBatch(db)
+      const productsRef = collection(db, 'products')
+
+      productsToImport.forEach((product) => {
+        const newDocRef = doc(productsRef)
+        batch.set(newDocRef, product)
+      })
+
+      await batch.commit()
+
+      setSuccess(`Successfully imported ${productsToImport.length} products!`)
+      await loadProducts()
+    } catch (err: any) {
+      setError(`Failed to import products: ${err.message}`)
+      throw err
+    }
+  }
+
+  const handleExportCSV = () => {
+    const csv = exportProductsToCSV(products)
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `products-export-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+    setSuccess('Products exported successfully!')
+  }
+
   if (loading) {
     return (
       <div className="dashboard-loading">
@@ -217,12 +259,28 @@ export default function BusinessProducts() {
     <div className="business-dashboard">
       <div className="business-dashboard-header">
         <h1>Products & Services</h1>
-        <button
-          className="btn-primary"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? 'Cancel' : '+ Add Product'}
-        </button>
+        <div className="header-actions">
+          <button
+            className="btn-secondary"
+            onClick={handleExportCSV}
+            disabled={products.length === 0}
+            title={products.length === 0 ? 'No products to export' : 'Export products to CSV'}
+          >
+            📤 Export CSV
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => setShowCSVImport(true)}
+          >
+            📥 Import CSV
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => setShowForm(!showForm)}
+          >
+            {showForm ? 'Cancel' : '+ Add Product'}
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -531,6 +589,14 @@ export default function BusinessProducts() {
           ))
         )}
       </div>
+
+      {showCSVImport && user && (
+        <CSVImportModal
+          businessId={user.uid}
+          onImport={handleBulkImport}
+          onClose={() => setShowCSVImport(false)}
+        />
+      )}
     </div>
   )
 }

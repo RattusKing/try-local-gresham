@@ -155,3 +155,102 @@ export interface Favorite {
   businessName?: string // For products, store the business name
   createdAt: Date
 }
+
+// Appointment Scheduling Types
+
+export interface Service {
+  id: string
+  businessId: string
+  name: string
+  description?: string
+  duration: number // Duration in minutes
+  price: number
+  category?: string
+  isActive: boolean
+  requiresDeposit?: boolean
+  depositAmount?: number
+  bufferTime?: number // Minutes before/after for prep/cleanup
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+
+export interface TimeSlot {
+  start: string // Format: "HH:MM" (24-hour)
+  end: string // Format: "HH:MM" (24-hour)
+}
+
+export interface DayAvailability {
+  isOpen: boolean
+  slots: TimeSlot[] // Can have multiple slots for breaks (e.g., 9-12, 1-5)
+}
+
+export interface BusinessAvailability {
+  id: string
+  businessId: string
+  monday: DayAvailability
+  tuesday: DayAvailability
+  wednesday: DayAvailability
+  thursday: DayAvailability
+  friday: DayAvailability
+  saturday: DayAvailability
+  sunday: DayAvailability
+  timezone: string // e.g., "America/Los_Angeles"
+  advanceBookingDays: number // How far in advance customers can book (default 30)
+  minAdvanceHours: number // Minimum hours in advance required (default 2)
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show'
+
+export interface Appointment {
+  id: string
+  serviceId: string
+  serviceName: string
+  businessId: string
+  businessName: string
+  customerId: string
+  customerName: string
+  customerEmail: string
+  customerPhone?: string
+  scheduledDate: string // ISO date string YYYY-MM-DD
+  scheduledTime: string // Format: "HH:MM" (24-hour)
+  duration: number // Minutes (copied from service)
+  price: number // Price at time of booking
+  status: AppointmentStatus
+  notes?: string // Customer notes
+  businessNotes?: string // Internal business notes
+  reminderSent?: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// CSV Import Types
+
+export interface CSVProductRow {
+  name: string
+  description?: string
+  price: string | number
+  category?: string
+  inStock?: string | boolean
+  trackInventory?: string | boolean
+  stockQuantity?: string | number
+  lowStockThreshold?: string | number
+  image?: string
+}
+
+export interface CSVImportResult {
+  success: boolean
+  imported: number
+  failed: number
+  errors: CSVImportError[]
+}
+
+export interface CSVImportError {
+  row: number
+  field?: string
+  message: string
+  data?: CSVProductRow
+}

@@ -187,6 +187,80 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // Services collection (for appointment scheduling)
+    match /services/{serviceId} {
+      // Everyone can read active services
+      // Business owners can read their own services (including inactive)
+      allow read: if resource.data.isActive == true ||
+                     (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                     isAdmin();
+
+      // Business owners can create services for their own business
+      allow create: if isBusinessOwner() &&
+                       request.resource.data.businessId == request.auth.uid;
+
+      // Business owners can update their own services
+      // Admins can update any service
+      allow update: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+
+      // Business owners can delete their own services
+      // Admins can delete any service
+      allow delete: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+    }
+
+    // Business Availability collection (for appointment scheduling)
+    match /businessAvailability/{availabilityId} {
+      // Everyone can read business availability (to see available time slots)
+      allow read: if true;
+
+      // Business owners can create availability for their own business
+      allow create: if isBusinessOwner() &&
+                       request.resource.data.businessId == request.auth.uid;
+
+      // Business owners can update their own availability
+      // Admins can update any availability
+      allow update: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+
+      // Business owners can delete their own availability
+      // Admins can delete any availability
+      allow delete: if (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                       isAdmin();
+    }
+
+    // Appointments collection
+    match /appointments/{appointmentId} {
+      // Customers can read their own appointments
+      // Business owners can read appointments for their business
+      // Admins can read all appointments
+      allow read: if isSignedIn() &&
+                     (resource.data.customerId == request.auth.uid ||
+                      resource.data.businessId == request.auth.uid ||
+                      isAdmin());
+
+      // Customers can create appointments (must be signed in)
+      allow create: if isSignedIn() &&
+                       request.resource.data.customerId == request.auth.uid;
+
+      // Customers can update their own appointments (for cancellation, notes)
+      // Business owners can update appointments for their business (status, notes)
+      // Admins can update any appointment
+      allow update: if isSignedIn() &&
+                       (resource.data.customerId == request.auth.uid ||
+                        resource.data.businessId == request.auth.uid ||
+                        isAdmin());
+
+      // Customers can cancel (delete) their own appointments
+      // Business owners can delete appointments for their business
+      // Admins can delete any appointment
+      allow delete: if isSignedIn() &&
+                       (resource.data.customerId == request.auth.uid ||
+                        resource.data.businessId == request.auth.uid ||
+                        isAdmin());
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
