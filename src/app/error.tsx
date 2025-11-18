@@ -11,26 +11,8 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log error to monitoring service
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error boundary caught:', error)
-    }
-
-    // Send to Sentry if configured
-    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      import('@sentry/nextjs').then((Sentry) => {
-        Sentry.captureException(error, {
-          tags: {
-            errorBoundary: 'root',
-          },
-          contexts: {
-            errorInfo: {
-              digest: error.digest,
-            },
-          },
-        })
-      })
-    }
+    // Log error to console
+    console.error('Error boundary caught:', error)
   }, [error])
 
   return (

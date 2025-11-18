@@ -11,22 +11,8 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log to error monitoring service
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Global error:', error)
-    }
-
-    // Send to Sentry if configured
-    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      import('@sentry/nextjs').then((Sentry) => {
-        Sentry.captureException(error, {
-          tags: {
-            errorBoundary: 'global',
-          },
-          level: 'fatal',
-        })
-      })
-    }
+    // Log to console
+    console.error('Global error:', error)
   }, [error])
 
   return (
