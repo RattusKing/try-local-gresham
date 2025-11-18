@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { db } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
-import { Business, Product, Review } from '@/lib/types'
+import { Business, Product, Review, Service } from '@/lib/types'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import StarRating from '@/components/StarRating'
 import PromoBanner from '@/components/PromoBanner'
 import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
+import AppointmentBookingModal from '@/components/AppointmentBookingModal'
 import Head from 'next/head'
 import './business-profile.css'
 
@@ -21,6 +22,7 @@ export default function BusinessProfilePage() {
   const { addItem } = useCart()
   const [business, setBusiness] = useState<Business | null>(null)
   const [products, setProducts] = useState<Product[]>([])
+  const [services, setServices] = useState<Service[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -30,6 +32,7 @@ export default function BusinessProfilePage() {
   const [editingReview, setEditingReview] = useState<Review | null>(null)
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
   const [favoritedProductIds, setFavoritedProductIds] = useState<Set<string>>(new Set())
+  const [showBookingModal, setShowBookingModal] = useState(false)
 
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -89,6 +92,9 @@ export default function BusinessProfilePage() {
         // Load products for this business
         await loadProducts(businessSnap.id)
 
+        // Load services for this business
+        await loadServices(businessSnap.id)
+
         // Load reviews for this business
         await loadReviews(businessSnap.id)
       } else {
@@ -119,6 +125,27 @@ export default function BusinessProfilePage() {
       setProducts(productsList)
     } catch (err: any) {
       console.error('Error loading products:', err)
+    }
+  }
+
+  const loadServices = async (businessId: string) => {
+    if (!db) return
+
+    try {
+      const servicesQuery = query(
+        collection(db, 'services'),
+        where('businessId', '==', businessId),
+        where('isActive', '==', true)
+      )
+      const servicesSnap = await getDocs(servicesQuery)
+      const servicesList = servicesSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as Service[]
+
+      setServices(servicesList)
+    } catch (err: any) {
+      console.error('Error loading services:', err)
     }
   }
 
@@ -651,6 +678,23 @@ export default function BusinessProfilePage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
         >
+          {/* Book Appointment Button */}
+          {services.length > 0 && (
+            <div className="business-info-card booking-cta">
+              <h3>Book an Appointment</h3>
+              <p style={{ margin: '0.5rem 0 1rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                This business offers {services.length} {services.length === 1 ? 'service' : 'services'} available for booking
+              </p>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowBookingModal(true)}
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                📅 Book Appointment
+              </button>
+            </div>
+          )}
+
           {/* Contact Info */}
           <div className="business-info-card">
             <h3>Contact Information</h3>
@@ -722,6 +766,18 @@ export default function BusinessProfilePage() {
         </motion.aside>
       </div>
       </div>
+
+      {/* Appointment Booking Modal */}
+      {showBookingModal && business && (
+        <AppointmentBookingModal
+          businessId={business.id}
+          onClose={() => setShowBookingModal(false)}
+          onSuccess={() => {
+            alert('Appointment booked successfully! The business will confirm your appointment soon.')
+            setShowBookingModal(false)
+          }}
+        />
+      )}
     </>
   )
 }
