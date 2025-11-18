@@ -16,6 +16,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from './config'
@@ -85,6 +86,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password
     )
+
+    // Send email verification
+    try {
+      await sendEmailVerification(userCredential.user)
+      console.log('Verification email sent successfully')
+    } catch (error) {
+      console.error('Failed to send verification email:', error)
+      // Don't fail signup if verification email fails
+    }
 
     // Create user profile in Firestore
     const userProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {

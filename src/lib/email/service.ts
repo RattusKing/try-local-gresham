@@ -376,3 +376,126 @@ export async function sendBusinessRejected(params: {
     html,
   })
 }
+
+// Appointment confirmation email to customer
+export async function sendAppointmentConfirmation(params: {
+  customerEmail: string
+  customerName: string
+  appointmentId: string
+  businessName: string
+  serviceName: string
+  scheduledDate: string
+  scheduledTime: string
+  duration: number
+  price: number
+  notes?: string
+}) {
+  const AppointmentConfirmation = (await import('@/emails/AppointmentConfirmationEmail')).default
+
+  const html = await render(
+    AppointmentConfirmation({
+      customerName: params.customerName,
+      appointmentId: params.appointmentId,
+      businessName: params.businessName,
+      serviceName: params.serviceName,
+      scheduledDate: params.scheduledDate,
+      scheduledTime: params.scheduledTime,
+      duration: params.duration,
+      price: params.price,
+      notes: params.notes,
+    })
+  )
+
+  return sendEmail({
+    to: params.customerEmail,
+    subject: `Appointment Confirmed - ${params.businessName}`,
+    html,
+  })
+}
+
+// New appointment notification to business
+export async function sendNewAppointmentNotification(params: {
+  businessEmail: string
+  businessName: string
+  appointmentId: string
+  customerName: string
+  customerEmail: string
+  customerPhone?: string
+  serviceName: string
+  scheduledDate: string
+  scheduledTime: string
+  duration: number
+  price: number
+  notes?: string
+}) {
+  const NewAppointmentNotification = (await import('@/emails/NewAppointmentNotificationEmail'))
+    .default
+
+  const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business/appointments`
+    : 'https://trylocalor.com/dashboard/business/appointments'
+
+  const html = await render(
+    NewAppointmentNotification({
+      businessName: params.businessName,
+      appointmentId: params.appointmentId,
+      customerName: params.customerName,
+      customerEmail: params.customerEmail,
+      customerPhone: params.customerPhone,
+      serviceName: params.serviceName,
+      scheduledDate: params.scheduledDate,
+      scheduledTime: params.scheduledTime,
+      duration: params.duration,
+      price: params.price,
+      notes: params.notes,
+      dashboardUrl,
+    })
+  )
+
+  return sendEmail({
+    to: params.businessEmail,
+    subject: `New Appointment - ${params.customerName}`,
+    html,
+  })
+}
+
+// Appointment status update notification
+export async function sendAppointmentStatusUpdate(params: {
+  customerEmail: string
+  customerName: string
+  appointmentId: string
+  businessName: string
+  serviceName: string
+  status: 'confirmed' | 'cancelled' | 'completed' | 'no-show'
+  scheduledDate: string
+  scheduledTime: string
+  cancellationReason?: string
+}) {
+  const AppointmentStatusUpdate = (await import('@/emails/AppointmentStatusUpdateEmail')).default
+
+  const html = await render(
+    AppointmentStatusUpdate({
+      customerName: params.customerName,
+      appointmentId: params.appointmentId,
+      businessName: params.businessName,
+      serviceName: params.serviceName,
+      status: params.status,
+      scheduledDate: params.scheduledDate,
+      scheduledTime: params.scheduledTime,
+      cancellationReason: params.cancellationReason,
+    })
+  )
+
+  const statusTitles = {
+    confirmed: 'Appointment Confirmed',
+    cancelled: 'Appointment Cancelled',
+    completed: 'Appointment Completed',
+    'no-show': 'Missed Appointment',
+  }
+
+  return sendEmail({
+    to: params.customerEmail,
+    subject: `${statusTitles[params.status]} - ${params.businessName}`,
+    html,
+  })
+}
