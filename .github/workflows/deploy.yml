@@ -51,7 +51,7 @@ jobs:
   deploy-firebase-rules:
     name: Deploy Firebase Rules
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: false  # Disabled - deploy Firebase rules manually via Firebase Console
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
