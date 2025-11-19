@@ -162,7 +162,7 @@ describe('Order Integration Tests', () => {
       } as any)
 
       const docSnap = await getDoc({} as any)
-      const data = docSnap.data()
+      const data = docSnap.data() as typeof orderData | undefined
 
       expect(data?.userId).toBe('customer-123')
     })
@@ -180,7 +180,7 @@ describe('Order Integration Tests', () => {
       } as any)
 
       const docSnap = await getDoc({} as any)
-      const data = docSnap.data()
+      const data = docSnap.data() as typeof orderData | undefined
 
       expect(data?.businessId).toBe('business-456')
     })
