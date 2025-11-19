@@ -31,7 +31,16 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
       <div className="container header-inner">
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">
-            TL
+            <img
+              src="/logo.jpeg"
+              alt="Try Local Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                padding: '2px'
+              }}
+            />
           </div>
           <span className="brand-name">Try Local</span>
           <span className="brand-subtle">Gresham, OR</span>
