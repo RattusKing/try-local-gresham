@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
-import { collection, query, getDocs, doc, deleteDoc, addDoc, setDoc, orderBy } from 'firebase/firestore'
+import { collection, query, getDocs, doc, deleteDoc, addDoc, setDoc, getDoc, orderBy } from 'firebase/firestore'
 import { motion } from 'framer-motion'
 import '../admin.css'
 
@@ -105,18 +105,24 @@ export default function BusinessApplicationsPage() {
 
       const businessRef = await addDoc(collection(db, 'businesses'), businessData)
 
-      // If user already exists, update their role to business_owner
+      // If user already exists, update their businessId and role (only if not admin)
       if (application.userId) {
         const userRef = doc(db, 'users', application.userId)
-        await setDoc(
-          userRef,
-          {
-            role: 'business_owner',
-            businessId: businessRef.id,
-            updatedAt: new Date(),
-          },
-          { merge: true }
-        )
+        const userSnap = await getDoc(userRef)
+        const currentUserData = userSnap.data()
+
+        // Only update role if user is not an admin
+        // Admins should keep their admin role even if they own a business
+        const updateData: any = {
+          businessId: businessRef.id,
+          updatedAt: new Date(),
+        }
+
+        if (currentUserData?.role !== 'admin') {
+          updateData.role = 'business_owner'
+        }
+
+        await setDoc(userRef, updateData, { merge: true })
       }
 
       // Send approval email
