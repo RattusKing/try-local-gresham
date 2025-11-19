@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore'
+import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
 
 interface User {
@@ -72,6 +72,40 @@ export default function AdminUsers() {
     } catch (error) {
       console.error('Error updating user role:', error)
       alert('Failed to update user role. Please try again.')
+    } finally {
+      setUpdatingUserId(null)
+    }
+  }
+
+  async function deleteUser(userId: string, userEmail: string) {
+    const confirmMessage = `⚠️ WARNING: This will permanently delete the user account for ${userEmail}.\n\nThis action CANNOT be undone. Are you absolutely sure?`
+
+    if (!confirm(confirmMessage)) {
+      return
+    }
+
+    // Double confirmation for safety
+    const doubleConfirm = confirm('Click OK to confirm deletion, or Cancel to abort.')
+    if (!doubleConfirm) {
+      return
+    }
+
+    if (!db) {
+      alert('Firebase not initialized. Please refresh the page.')
+      return
+    }
+
+    try {
+      setUpdatingUserId(userId)
+      const userRef = doc(db, 'users', userId)
+      await deleteDoc(userRef)
+
+      // Update local state
+      setUsers(users.filter(u => u.uid !== userId))
+      alert('User deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      alert('Failed to delete user. Please try again.')
     } finally {
       setUpdatingUserId(null)
     }
@@ -362,9 +396,34 @@ export default function AdminUsers() {
                       </div>
                     </td>
                     <td style={{ padding: '16px', textAlign: 'right' }}>
-                      <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                        {updatingUserId === user.uid ? 'Updating...' : 'Select role to change'}
-                      </div>
+                      <button
+                        onClick={() => deleteUser(user.uid, user.email)}
+                        disabled={updatingUserId === user.uid}
+                        style={{
+                          padding: '8px 16px',
+                          background: updatingUserId === user.uid ? '#e5e7eb' : '#fee2e2',
+                          color: updatingUserId === user.uid ? '#9ca3af' : '#dc2626',
+                          border: '1px solid',
+                          borderColor: updatingUserId === user.uid ? '#d1d5db' : '#fecaca',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          cursor: updatingUserId === user.uid ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (updatingUserId !== user.uid) {
+                            e.currentTarget.style.background = '#fecaca'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (updatingUserId !== user.uid) {
+                            e.currentTarget.style.background = '#fee2e2'
+                          }
+                        }}
+                      >
+                        {updatingUserId === user.uid ? 'Processing...' : '🗑️ Delete'}
+                      </button>
                     </td>
                   </tr>
                 ))}
