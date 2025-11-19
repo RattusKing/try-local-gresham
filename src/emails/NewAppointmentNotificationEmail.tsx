@@ -22,6 +22,7 @@ interface NewAppointmentNotificationEmailProps {
   duration: number
   price: number
   notes?: string
+  dashboardUrl?: string
 }
 
 export default function NewAppointmentNotificationEmail({
@@ -36,6 +37,7 @@ export default function NewAppointmentNotificationEmail({
   duration,
   price,
   notes,
+  dashboardUrl = 'https://try-local.com/dashboard/business/appointments',
 }: NewAppointmentNotificationEmailProps) {
   return (
     <Html>
@@ -95,7 +97,7 @@ export default function NewAppointmentNotificationEmail({
           </Section>
 
           <Section style={buttonSection}>
-            <Button style={button} href="https://try-local.com/dashboard/business/appointments">
+            <Button style={button} href={dashboardUrl}>
               Manage Appointments
             </Button>
           </Section>
