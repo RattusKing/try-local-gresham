@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Analytics from '@/components/Analytics'
 import CookieConsent from '@/components/CookieConsent'
 import { Providers } from './providers'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,11 +12,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Try Local' }],
   creator: 'Try Local',
   publisher: 'Try Local',
-  metadataBase: new URL('https://trylocalor.com'),
+  metadataBase: new URL('https://try-local.com'),
   openGraph: {
     title: 'Try Local — Gresham, Oregon',
     description: 'Shop Gresham. Support your neighbors. Find coffee, boutiques, services, and more.',
-    url: 'https://trylocalor.com',
+    url: 'https://try-local.com',
     siteName: 'Try Local Gresham',
     images: [
       {
@@ -58,6 +59,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ff7a00" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+
         {/* Preload critical assets for better performance */}
         <link rel="preload" href="/assets/gresham.jpg" as="image" />
 
@@ -71,6 +77,7 @@ export default function RootLayout({
       </head>
       <body>
         <Analytics />
+        <SpeedInsights />
         <Providers>{children}</Providers>
         <CookieConsent />
       </body>

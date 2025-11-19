@@ -48,7 +48,7 @@ Go to Firebase Console → Authentication → Settings → Authorized domains
 
 Add your domains:
 - [x] `localhost` (for local development)
-- [ ] Your production domain (e.g., `trylocalor.com`)
+- [ ] Your production domain (e.g., `try-local.com`)
 - [ ] Your Vercel domain (e.g., `try-local-gresham.vercel.app`)
 
 ### 4. Email Service Setup (Resend)

@@ -153,7 +153,7 @@ Set these in your hosting platform:
 - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` - Firebase Storage Bucket
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` - Firebase Messaging Sender ID
 - `NEXT_PUBLIC_FIREBASE_APP_ID` - Firebase App ID
-- `NEXT_PUBLIC_APP_URL` - Your production URL (e.g., https://trylocalor.com)
+- `NEXT_PUBLIC_APP_URL` - Your production URL (e.g., https://try-local.com)
 
 **Optional:**
 - `NEXT_PUBLIC_GA_ID` - Google Analytics
@@ -218,9 +218,9 @@ See `VERCEL_ENV_SETUP.md` for detailed Vercel deployment instructions.
 
 ## 📞 Contact
 
-- **Email:** hello@trylocalor.com
-- **Business Inquiries:** business@trylocalor.com
-- **Support:** support@trylocalor.com
+- **Email:** hello@try-local.com
+- **Business Inquiries:** business@try-local.com
+- **Support:** support@try-local.com
 
 ---
 

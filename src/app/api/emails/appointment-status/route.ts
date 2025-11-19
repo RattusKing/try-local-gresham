@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendOrderStatusUpdate } from '@/lib/email/service'
-import { orderStatusUpdateSchema, validateSchema } from '@/lib/validation'
+import { sendAppointmentStatusUpdate } from '@/lib/email/service'
+import { validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
+import { z } from 'zod'
+
+const appointmentStatusUpdateSchema = z.object({
+  customerEmail: z.string().email(),
+  customerName: z.string().min(1),
+  appointmentId: z.string().min(1),
+  businessName: z.string().min(1),
+  serviceName: z.string().min(1),
+  status: z.enum(['confirmed', 'cancelled', 'completed', 'no-show']),
+  scheduledDate: z.string().min(1),
+  scheduledTime: z.string().min(1),
+  cancellationReason: z.string().optional(),
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,52 +36,53 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate request data
-    const validatedData = validateSchema(orderStatusUpdateSchema, body)
+    const validatedData = validateSchema(appointmentStatusUpdateSchema, body)
 
     const {
       customerEmail,
       customerName,
-      orderId,
+      appointmentId,
       businessName,
+      serviceName,
       status,
-      statusMessage,
-      deliveryMethod,
-      deliveryAddress,
-      pickupAddress,
+      scheduledDate,
+      scheduledTime,
+      cancellationReason,
     } = validatedData
 
-    const result = await sendOrderStatusUpdate({
+    // Send status update email
+    const result = await sendAppointmentStatusUpdate({
       customerEmail,
       customerName,
-      orderId,
+      appointmentId,
       businessName,
+      serviceName,
       status,
-      statusMessage,
-      deliveryMethod,
-      deliveryAddress,
-      pickupAddress,
+      scheduledDate,
+      scheduledTime,
+      cancellationReason,
     })
 
-    if (result.success) {
-      return NextResponse.json({ success: true })
-    } else {
+    if (!result.success) {
       return NextResponse.json(
-        { success: false, error: 'Failed to send email' },
+        { success: false, error: 'Failed to send status update email' },
         { status: 500 }
       )
     }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Status update email sent successfully',
+    })
   } catch (error) {
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error in order status email API:', error)
+      console.error('Error in appointment status update API:', error)
     }
 
     // Return validation errors to client
     if (error instanceof Error && error.message.startsWith('Validation failed:')) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 })
     }
 
     // Generic error for other failures

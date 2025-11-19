@@ -76,7 +76,7 @@ export default function AppointmentConfirmationEmail({
           </Section>
 
           <Section style={buttonSection}>
-            <Button style={button} href="https://trylocalor.com/dashboard/customer/appointments">
+            <Button style={button} href="https://try-local.com/dashboard/customer/appointments">
               View My Appointments
             </Button>
           </Section>

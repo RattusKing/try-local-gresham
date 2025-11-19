@@ -31,7 +31,7 @@ const faqs: FAQItem[] = [
   {
     category: 'customer',
     question: 'How do refunds work?',
-    answer: 'Refund policies are set by individual businesses. If you have an issue with an order, contact the business first. If unresolved, email support@trylocalor.com and we\'ll help mediate. See our Refund Policy page for details.'
+    answer: 'Refund policies are set by individual businesses. If you have an issue with an order, contact the business first. If unresolved, email support@try-local.com and we\'ll help mediate. See our Refund Policy page for details.'
   },
   {
     category: 'customer',
@@ -110,12 +110,12 @@ const faqs: FAQItem[] = [
   {
     category: 'general',
     question: 'Is there a mobile app?',
-    answer: 'Currently, Try Local Gresham is a web application optimized for mobile browsers. Simply visit trylocalor.com on any device. A native mobile app may be available in the future.'
+    answer: 'Currently, Try Local Gresham is a web application optimized for mobile browsers. Simply visit try-local.com on any device. A native mobile app may be available in the future.'
   },
   {
     category: 'general',
     question: 'How do I contact support?',
-    answer: 'Email support@trylocalor.com or use the Contact form. We typically respond within 1-2 business days (Monday-Friday, 9am-5pm PST).'
+    answer: 'Email support@try-local.com or use the Contact form. We typically respond within 1-2 business days (Monday-Friday, 9am-5pm PST).'
   },
   {
     category: 'general',
@@ -326,7 +326,7 @@ export default function HelpPage() {
               <div className="support-option">
                 <h3>📧 Email Support</h3>
                 <p>Get help via email</p>
-                <a href="mailto:support@trylocalor.com" className="btn btn-primary">
+                <a href="mailto:support@try-local.com" className="btn btn-primary">
                   Email Us
                 </a>
               </div>

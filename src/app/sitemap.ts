@@ -17,7 +17,7 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const db = getFirestore(app)
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://trylocalor.com'
+  const baseUrl = 'https://try-local.com'
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

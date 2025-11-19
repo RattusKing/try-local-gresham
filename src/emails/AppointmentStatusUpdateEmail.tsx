@@ -16,8 +16,10 @@ interface AppointmentStatusUpdateEmailProps {
   serviceName: string
   scheduledDate: string
   scheduledTime: string
-  status: 'confirmed' | 'cancelled' | 'completed'
+  status: 'confirmed' | 'cancelled' | 'completed' | 'no-show'
   businessNotes?: string
+  appointmentId?: string
+  cancellationReason?: string
 }
 
 export default function AppointmentStatusUpdateEmail({
@@ -28,6 +30,8 @@ export default function AppointmentStatusUpdateEmail({
   scheduledTime,
   status,
   businessNotes,
+  appointmentId,
+  cancellationReason,
 }: AppointmentStatusUpdateEmailProps) {
   const getStatusConfig = () => {
     switch (status) {
@@ -57,6 +61,24 @@ export default function AppointmentStatusUpdateEmail({
           sectionBg: '#dbeafe',
           sectionBorder: '#bfdbfe',
           statusColor: '#1e40af',
+        }
+      case 'no-show':
+        return {
+          emoji: '⚠️',
+          title: 'Missed Appointment',
+          message: `You missed your scheduled appointment at ${businessName}.`,
+          sectionBg: '#fef3c7',
+          sectionBorder: '#fde68a',
+          statusColor: '#92400e',
+        }
+      default:
+        return {
+          emoji: '📅',
+          title: 'Appointment Update',
+          message: `Your appointment status at ${businessName} has been updated.`,
+          sectionBg: '#f3f4f6',
+          sectionBorder: '#d1d5db',
+          statusColor: '#374151',
         }
     }
   }
@@ -104,7 +126,7 @@ export default function AppointmentStatusUpdateEmail({
                 Please arrive on time for your appointment. If you need to cancel or reschedule, please do so at least 24 hours in advance.
               </Text>
               <Section style={buttonSection}>
-                <Button style={button} href="https://trylocalor.com/dashboard/customer/appointments">
+                <Button style={button} href="https://try-local.com/dashboard/customer/appointments">
                   View My Appointments
                 </Button>
               </Section>

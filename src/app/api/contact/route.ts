@@ -3,13 +3,14 @@ import { Resend } from 'resend'
 import { contactFormSchema, validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend only if API key is available (for build-time safety)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting
     const clientId = getClientIdentifier(request.headers)
-    const rateLimit = checkRateLimit(clientId, RATE_LIMITS.CONTACT)
+    const rateLimit = await checkRateLimit(clientId, RATE_LIMITS.CONTACT)
 
     if (!rateLimit.success) {
       return NextResponse.json(
@@ -29,10 +30,19 @@ export async function POST(request: NextRequest) {
 
     const { name, email, subject, message } = validatedData
 
+    // Check if Resend is configured
+    if (!resend) {
+      console.error('RESEND_API_KEY is not configured')
+      return NextResponse.json(
+        { success: false, error: 'Email service is not configured' },
+        { status: 503 }
+      )
+    }
+
     // Send contact form email to support team
     const result = await resend.emails.send({
-      from: 'Try Local Gresham <noreply@trylocalor.com>',
-      to: process.env.CONTACT_EMAIL || 'support@trylocalor.com',
+      from: 'Try Local Gresham <noreply@try-local.com>',
+      to: process.env.CONTACT_EMAIL || 'support@try-local.com',
       replyTo: email,
       subject: `Contact Form: ${subject}`,
       html: `

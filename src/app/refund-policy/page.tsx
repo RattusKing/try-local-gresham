@@ -128,7 +128,7 @@ export default function RefundPolicyPage() {
           </p>
           <ol style={{ lineHeight: '1.8', marginBottom: '15px', marginLeft: '20px' }}>
             <li>Contact the business directly to resolve the issue</li>
-            <li>If unresolved after 48 hours, email support@trylocalor.com</li>
+            <li>If unresolved after 48 hours, email support@try-local.com</li>
             <li>Provide order details, communication history, and desired resolution</li>
             <li>Our team will review and mediate between you and the business</li>
             <li>We aim to resolve disputes within 5-7 business days</li>
@@ -206,7 +206,7 @@ export default function RefundPolicyPage() {
             For questions about refunds, returns, or to request assistance with a dispute:
           </p>
           <p style={{ lineHeight: '1.8', marginBottom: '15px' }}>
-            <strong>Email:</strong> support@trylocalor.com
+            <strong>Email:</strong> support@try-local.com
             <br />
             <strong>Business Hours:</strong> Monday-Friday, 9am-5pm PST
             <br />

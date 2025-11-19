@@ -140,7 +140,7 @@ export default function PrivacyPage() {
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
           <p style={{ lineHeight: '1.8' }}>
-            <strong>Email:</strong> privacy@trylocalor.com
+            <strong>Email:</strong> privacy@try-local.com
             <br />
             <strong>Address:</strong> Gresham, Oregon
           </p>
