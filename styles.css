@@ -35,9 +35,10 @@ body{
 .brand-mark{
   width:34px;height:34px;border-radius:10px;
   display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--orange),#d4c5f5);
+  background:linear-gradient(135deg,var(--green),var(--orange));
   color:#000;font-weight:800;
   box-shadow:var(--shadow);
+  overflow:hidden;
 }
 .brand-name{font-size:18px}
 .brand-subtle{color:var(--muted);font-weight:600;margin-left:6px}
@@ -53,12 +54,19 @@ body{
 .btn-ghost{background:#fff; border:2px dashed #111}
 .hero{
   position:relative;min-height:62vh;
-  background:url('assets/gresham.jpg') center/cover no-repeat fixed;
+  background:url('/logo.jpeg') center/cover no-repeat fixed;
   display:grid;align-items:end;
 }
 .hero-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(55,55,55,.55), rgba(55,55,55,.35) 30%, rgba(247,247,245,.9) 75%, rgba(247,247,245,1) 100%);
+  background:linear-gradient(
+    135deg,
+    rgba(194, 175, 240, 0.85) 0%,
+    rgba(153, 237, 195, 0.75) 50%,
+    rgba(247, 247, 245, 0.95) 75%,
+    rgba(247, 247, 245, 1) 100%
+  );
+  backdrop-filter:blur(2px);
 }
 .hero-content{position:relative;padding:80px 0 30px 0;color:#111}
 .hero h1{font-size:48px;line-height:1.1;margin:0 0 10px}
