@@ -206,7 +206,7 @@ describe('Appointment Integration Tests', () => {
       } as any)
 
       const docSnap = await getDoc({} as any)
-      const data = docSnap.data()
+      const data = docSnap.data() as typeof appointmentData | undefined
 
       expect(data?.customerId).toBe('customer-123')
     })
@@ -224,7 +224,7 @@ describe('Appointment Integration Tests', () => {
       } as any)
 
       const docSnap = await getDoc({} as any)
-      const data = docSnap.data()
+      const data = docSnap.data() as typeof appointmentData | undefined
 
       expect(data?.businessId).toBe('business-456')
     })

@@ -170,7 +170,7 @@ describe('Business Application Integration Tests', () => {
       const docSnap = await getDoc({} as any)
 
       expect(docSnap.exists()).toBe(true)
-      const data = docSnap.data()
+      const data = docSnap.data() as typeof businessData | undefined
       expect(data?.ownerId).toBe('user-123')
     })
 
