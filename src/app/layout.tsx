@@ -1,9 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Analytics from '@/components/Analytics'
 import CookieConsent from '@/components/CookieConsent'
 import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#99edc3',
+}
 
 export const metadata: Metadata = {
   title: 'Try Local — Gresham, Oregon | Shop Local, Support Your Neighbors',
@@ -61,7 +69,6 @@ export default function RootLayout({
       <head>
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ff7a00" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
 
         {/* Preload critical assets for better performance */}

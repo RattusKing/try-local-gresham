@@ -12,6 +12,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const [showDropdown, setShowDropdown] = useState(false)
   const [showCart, setShowCart] = useState(false)
   const [showBusinessApp, setShowBusinessApp] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -45,6 +46,22 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           <span className="brand-name">Try Local</span>
           <span className="brand-subtle">Gresham, OR</span>
         </div>
+
+        {/* Mobile hamburger button */}
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          aria-label="Toggle menu"
+          aria-expanded={showMobileMenu}
+        >
+          <div className={`hamburger ${showMobileMenu ? 'open' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+
+        {/* Desktop navigation */}
         <nav className="nav">
           <a href="#discover" className="nav-link">
             Discover
@@ -184,6 +201,107 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
             </button>
           )}
         </nav>
+
+        {/* Mobile menu overlay */}
+        {showMobileMenu && (
+          <>
+            <div
+              className="mobile-menu-overlay"
+              onClick={() => setShowMobileMenu(false)}
+              aria-hidden="true"
+            />
+            <nav className="mobile-menu">
+              <a
+                href="#discover"
+                className="mobile-menu-link"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Discover
+              </a>
+              <a
+                href="#categories"
+                className="mobile-menu-link"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Categories
+              </a>
+              <button
+                onClick={() => {
+                  setShowBusinessApp(true)
+                  setShowMobileMenu(false)
+                }}
+                className="mobile-menu-link"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+              >
+                For Businesses
+              </button>
+
+              <div style={{ borderTop: '1px solid #eee', margin: '1rem 0' }} />
+
+              <button
+                onClick={() => {
+                  setShowCart(true)
+                  setShowMobileMenu(false)
+                }}
+                className="mobile-menu-link"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              >
+                <span>🛒 Cart</span>
+                {itemCount > 0 && (
+                  <span
+                    style={{
+                      background: 'var(--primary)',
+                      color: 'var(--dark)',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+
+              {user ? (
+                <>
+                  <a
+                    href="/dashboard"
+                    className="mobile-menu-link"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    Dashboard
+                  </a>
+                  <button
+                    onClick={() => {
+                      signOut()
+                      setShowMobileMenu(false)
+                    }}
+                    className="mobile-menu-link"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', color: '#d32f2f', fontWeight: 600 }}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    onSignIn()
+                    setShowMobileMenu(false)
+                  }}
+                  className="mobile-menu-link"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                >
+                  Sign In
+                </button>
+              )}
+            </nav>
+          </>
+        )}
       </div>
 
       <CartModal isOpen={showCart} onClose={() => setShowCart(false)} />

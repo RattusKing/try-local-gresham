@@ -301,45 +301,19 @@ export default function Home() {
 
             {/* Search and Filters */}
             <div style={{ marginBottom: '2rem' }}>
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                marginBottom: '1rem',
-                flexWrap: 'wrap',
-                alignItems: 'center'
-              }}>
+              <div className="filter-controls">
                 <input
                   type="text"
                   placeholder="Search businesses, products, or tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   aria-label="Search businesses"
-                  style={{
-                    flex: '1',
-                    minWidth: '250px',
-                    padding: '0.75rem 1rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--primary-orange)'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
 
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   aria-label="Filter by category"
-                  style={{
-                    padding: '0.75rem 1rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    background: 'white',
-                    cursor: 'pointer',
-                  }}
                 >
                   <option value="">All Categories</option>
                   {categories.map((cat) => (
@@ -351,15 +325,6 @@ export default function Home() {
                   value={selectedNeighborhood}
                   onChange={(e) => setSelectedNeighborhood(e.target.value)}
                   aria-label="Filter by neighborhood"
-                  style={{
-                    padding: '0.75rem 1rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    background: 'white',
-                    cursor: 'pointer',
-                  }}
                 >
                   <option value="">All Neighborhoods</option>
                   {neighborhoods.map((hood) => (
@@ -371,15 +336,6 @@ export default function Home() {
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'newest')}
                   aria-label="Sort businesses"
-                  style={{
-                    padding: '0.75rem 1rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    outline: 'none',
-                    background: 'white',
-                    cursor: 'pointer',
-                  }}
                 >
                   <option value="name">Sort: A-Z</option>
                   <option value="rating">Sort: Highest Rated</option>
