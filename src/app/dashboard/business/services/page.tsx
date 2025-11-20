@@ -77,13 +77,13 @@ export default function BusinessServices() {
       const serviceData = {
         businessId: user.uid,
         name: formData.name,
-        description: formData.description || undefined,
+        description: formData.description || '',
         duration: parseInt(formData.duration),
         price: parseFloat(formData.price),
-        category: formData.category || undefined,
+        category: formData.category || '',
         isActive: formData.isActive,
         requiresDeposit: formData.requiresDeposit,
-        depositAmount: formData.requiresDeposit && formData.depositAmount ? parseFloat(formData.depositAmount) : undefined,
+        depositAmount: formData.requiresDeposit && formData.depositAmount ? parseFloat(formData.depositAmount) : 0,
         bufferTime: parseInt(formData.bufferTime) || 0,
         updatedAt: new Date(),
       }
