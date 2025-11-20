@@ -163,6 +163,7 @@ export default function AppointmentBookingModal({
   }
 
   if (!availability) {
+    const isOwner = user?.uid === businessId
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
@@ -171,7 +172,27 @@ export default function AppointmentBookingModal({
             <button className="modal-close" onClick={onClose}>×</button>
           </div>
           <div className="modal-body">
-            <p>This business is not currently accepting appointments.</p>
+            {isOwner ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>
+                  ⚙️ Availability not configured
+                </p>
+                <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
+                  To accept appointments, you need to configure your business hours and availability settings.
+                </p>
+                <a
+                  href="/dashboard/business/settings"
+                  className="btn btn-primary"
+                  style={{ display: 'inline-block', textDecoration: 'none' }}
+                >
+                  Go to Settings
+                </a>
+              </div>
+            ) : (
+              <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
+                This business is not currently accepting appointments.
+              </p>
+            )}
           </div>
         </div>
       </div>
