@@ -10,13 +10,16 @@ export default function DashboardNav() {
   const pathname = usePathname()
 
   const adminLinks = [
+    { href: '/dashboard/admin/profile', label: 'My Profile', icon: '👤' },
     { href: '/dashboard/admin', label: 'Business Approvals', icon: '✓' },
+    { href: '/dashboard/admin/applications', label: 'Applications', icon: '📋' },
     { href: '/dashboard/admin/users', label: 'User Management', icon: '👥' },
     { href: '/dashboard/admin/orders', label: 'All Orders', icon: '📦' },
     { href: '/dashboard/admin/banners', label: 'Promo Banners', icon: '📢' },
   ]
 
   const businessLinks = [
+    { href: '/dashboard/business/profile', label: 'My Profile', icon: '👤' },
     { href: '/dashboard/business', label: 'My Business', icon: '🏪' },
     { href: '/dashboard/business/products', label: 'Products', icon: '📦' },
     { href: '/dashboard/business/services', label: 'Services', icon: '📅' },
