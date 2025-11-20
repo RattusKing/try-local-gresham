@@ -1,7 +1,7 @@
 .dashboard-nav {
   width: 280px;
-  background: white;
-  border-right: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05));
+  border-right: 2px solid rgba(194, 175, 240, 0.2);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -11,20 +11,25 @@
 
 .dashboard-nav-header {
   padding: 2rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid rgba(194, 175, 240, 0.2);
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1));
 }
 
 .dashboard-nav-logo {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--primary-black);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   text-decoration: none;
   display: block;
   margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
 }
 
 .dashboard-nav-logo:hover {
-  color: var(--primary-orange);
+  transform: scale(1.05);
 }
 
 .dashboard-nav-user {
@@ -38,10 +43,11 @@
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--primary-orange);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid var(--primary-light);
 }
 
 .dashboard-nav-avatar img {
@@ -93,18 +99,23 @@
   padding: 0.875rem 1.5rem;
   color: #6b7280;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  margin: 0.25rem 0.5rem;
 }
 
 .dashboard-nav-link:hover {
-  background: #f9fafb;
-  color: var(--primary-black);
+  background: rgba(153, 237, 195, 0.15);
+  color: var(--dark);
+  transform: translateX(4px);
 }
 
 .dashboard-nav-link.active {
-  background: #fef3e7;
-  color: var(--primary-orange);
-  border-right: 3px solid var(--primary-orange);
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.2), rgba(194, 175, 240, 0.2));
+  color: var(--dark);
+  border-right: 4px solid var(--primary);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(153, 237, 195, 0.3);
 }
 
 .dashboard-nav-link-icon {
@@ -120,7 +131,8 @@
 
 .dashboard-nav-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 2px solid rgba(194, 175, 240, 0.2);
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05));
 }
 
 .dashboard-nav-back {
@@ -128,12 +140,16 @@
   color: #6b7280;
   text-decoration: none;
   font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
 }
 
 .dashboard-nav-back:hover {
-  color: var(--primary-orange);
+  color: var(--dark);
+  background: rgba(153, 237, 195, 0.2);
+  transform: translateX(-4px);
 }
 
 @media (max-width: 48rem) {
@@ -194,7 +210,7 @@
 
   .dashboard-nav-link.active {
     border-right: none;
-    border-bottom: 3px solid var(--primary-orange);
+    border-bottom: 4px solid var(--primary);
   }
 
   .dashboard-nav-link-icon {
