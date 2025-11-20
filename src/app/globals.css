@@ -8,16 +8,21 @@
 :root {
   --primary: #99edc3;
   --primary-dark: #7dd4ab;
+  --primary-light: #b3f3d5;
   --secondary: #c2aff0;
   --secondary-dark: #ab96dd;
+  --secondary-light: #d4c6f5;
   --dark: #373737;
   --ink: #373737;
   --muted: #6b7280;
   --bg: #f8fafb;
   --card: #ffffff;
   --radius: 18px;
+  --radius-lg: 24px;
   --shadow: 0 10px 30px rgba(55, 55, 55, 0.08);
+  --shadow-md: 0 12px 35px rgba(55, 55, 55, 0.1);
   --shadow-lg: 0 15px 40px rgba(55, 55, 55, 0.12);
+  --shadow-xl: 0 20px 50px rgba(55, 55, 55, 0.15);
 
   /* Legacy support */
   --orange: #99edc3;
@@ -133,8 +138,28 @@ body {
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.9375rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .btn:hover {
@@ -148,7 +173,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
 }
 
 .btn-outline {
@@ -158,8 +183,9 @@ body {
 }
 
 .btn-outline:hover {
-  background: var(--secondary);
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
   color: white;
+  border-color: var(--secondary-dark);
 }
 
 .btn-ghost {
@@ -190,6 +216,7 @@ body {
   background: url('/assets/gresham.jpg') center/cover no-repeat fixed;
   display: grid;
   align-items: end;
+  overflow: hidden;
 }
 
 /* Remove fixed background on mobile for better performance */
@@ -204,17 +231,50 @@ body {
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(55, 55, 55, 0.6),
-    rgba(55, 55, 55, 0.4) 30%,
-    rgba(248, 250, 251, 0.9) 75%,
+    rgba(55, 55, 55, 0.65),
+    rgba(55, 55, 55, 0.45) 30%,
+    rgba(248, 250, 251, 0.92) 70%,
     rgba(248, 250, 251, 1) 100%
   );
+}
+
+.hero-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(153, 237, 195, 0.15), transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(194, 175, 240, 0.15), transparent 50%);
+  animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .hero-content {
   position: relative;
   padding: 80px 0 30px 0;
   color: var(--dark);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero h1 {
@@ -309,14 +369,36 @@ body {
 
 /* Sections */
 .section {
-  padding: 2.5rem 0;
+  padding: 3.5rem 0;
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.125rem;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.section-head::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.section-head h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--dark), var(--primary-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Grid */
@@ -336,13 +418,30 @@ body {
   box-shadow: var(--shadow);
   overflow: hidden;
   border: 2px solid rgba(153, 237, 195, 0.15);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-xl);
   border-color: var(--primary);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .card .cover {
@@ -422,16 +521,40 @@ body {
 .empty-state {
   text-align: center;
   color: var(--muted);
-  padding: 40px;
+  padding: 3rem;
   border: 2px dashed var(--secondary);
-  border-radius: var(--radius);
-  background: rgba(194, 175, 240, 0.05);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.08));
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(194, 175, 240, 0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
 }
 
 /* Chips */
 .chip-row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -439,16 +562,34 @@ body {
   border: 2px solid rgba(194, 175, 240, 0.3);
   background: white;
   border-radius: 999px;
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .chip:hover {
   border-color: var(--secondary);
-  background: rgba(194, 175, 240, 0.1);
+  transform: translateY(-2px);
+}
+
+.chip:hover::before {
+  opacity: 1;
 }
 
 .chip.active {
@@ -456,6 +597,11 @@ body {
   background: linear-gradient(135deg, rgba(153, 237, 195, 0.2), rgba(194, 175, 240, 0.2));
   box-shadow: var(--shadow);
   color: var(--dark);
+  transform: translateY(-2px);
+}
+
+.chip.active::before {
+  opacity: 1;
 }
 
 /* Category Cards */
@@ -470,15 +616,32 @@ body {
   padding: 20px;
   text-align: center;
   box-shadow: var(--shadow);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: var(--shadow-xl);
   border-color: var(--primary);
-  background: linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05));
+}
+
+.category-card:hover::before {
+  opacity: 1;
 }
 
 /* For Businesses Section */

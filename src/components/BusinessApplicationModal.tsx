@@ -17,10 +17,11 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
+  // Pre-fill user info if authenticated
   const [formData, setFormData] = useState({
     businessName: '',
-    ownerName: '',
-    email: '',
+    ownerName: user?.displayName || '',
+    email: user?.email || '',
     phone: '',
     address: '',
     neighborhood: '',
@@ -33,6 +34,13 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Require authentication
+    if (!user) {
+      setError('Please sign in to submit a business application')
+      return
+    }
+
     setSubmitting(true)
 
     if (!db) {
@@ -42,10 +50,11 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
     }
 
     try {
-      // Create business application
+      // Create business application with user link
       const applicationData = {
         ...formData,
-        userId: user?.uid || null,
+        userId: user.uid,
+        userEmail: user.email,
         status: 'pending',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -93,14 +102,63 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
 
   if (!isOpen) return null
 
+  // Show authentication required message
+  if (!user) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content application-modal auth-required-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Authentication Required</h2>
+            <button className="modal-close" onClick={onClose} aria-label="Close">
+              ✕
+            </button>
+          </div>
+          <div className="modal-body">
+            <div className="auth-required-content">
+              <div className="auth-icon">🔐</div>
+              <h3>Sign In Required</h3>
+              <p>
+                To apply for a business account, you need to be signed in. This ensures your business
+                is securely linked to your account and you can manage it effectively.
+              </p>
+              <div className="auth-benefits">
+                <h4>Why sign in?</h4>
+                <ul>
+                  <li>Secure account linking</li>
+                  <li>Easy application tracking</li>
+                  <li>Instant dashboard access upon approval</li>
+                  <li>Manage your business profile and products</li>
+                </ul>
+              </div>
+              <p className="auth-note">
+                Please close this dialog and sign in to continue with your business application.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (success) {
     return (
       <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content application-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-content application-modal success-modal" onClick={(e) => e.stopPropagation()}>
           <div className="success-message">
-            <h2>✓ Application Submitted!</h2>
-            <p>Thank you for your interest in joining Try Local Gresham.</p>
-            <p>We'll review your application and get back to you within 1-2 business days.</p>
+            <div className="success-icon">✓</div>
+            <h2>Application Submitted Successfully!</h2>
+            <p className="success-lead">Thank you for your interest in joining Try Local Gresham.</p>
+            <div className="success-details">
+              <h3>What happens next?</h3>
+              <ol>
+                <li>Our team will review your application within 1-2 business days</li>
+                <li>You'll receive an email notification about your application status</li>
+                <li>Once approved, you'll gain immediate access to your business dashboard</li>
+              </ol>
+            </div>
+            <p className="success-note">
+              Questions? Feel free to reach out at <strong>support@try-local.com</strong>
+            </p>
           </div>
         </div>
       </div>
@@ -111,7 +169,10 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content application-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Apply to Join Try Local Gresham</h2>
+          <div className="header-content">
+            <h2>Join Try Local Gresham</h2>
+            <p className="header-subtitle">Grow your business with Gresham's premier local marketplace</p>
+          </div>
           <button className="modal-close" onClick={onClose} aria-label="Close">
             ✕
           </button>
@@ -120,9 +181,25 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
         <div className="modal-body">
           {error && <div className="alert alert-error">{error}</div>}
 
-          <p className="application-intro">
-            Join Gresham's premier local marketplace and connect with customers in your community.
-          </p>
+          <div className="application-intro">
+            <p className="intro-lead">
+              Connect with local customers and showcase your business to the Gresham community.
+            </p>
+            <div className="intro-benefits">
+              <div className="benefit">
+                <span className="benefit-icon">📈</span>
+                <span>Increase Visibility</span>
+              </div>
+              <div className="benefit">
+                <span className="benefit-icon">💳</span>
+                <span>Accept Online Orders</span>
+              </div>
+              <div className="benefit">
+                <span className="benefit-icon">🎯</span>
+                <span>Targeted Marketing</span>
+              </div>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -257,22 +334,54 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
               />
             </div>
 
-            <div className="pricing-info">
-              <h3>Pricing</h3>
-              <p><strong>Monthly Subscription:</strong> $39/month</p>
-              <p><strong>Transaction Fee:</strong> 2% per sale</p>
-              <p className="pricing-note">
-                Special offer: First month free for early adopters!
-              </p>
+            <div className="pricing-section">
+              <h3>Transparent Pricing</h3>
+              <div className="pricing-cards">
+                <div className="pricing-card featured">
+                  <div className="pricing-badge">Most Popular</div>
+                  <h4>Standard Plan</h4>
+                  <div className="pricing-amount">
+                    <span className="currency">$</span>
+                    <span className="price">39</span>
+                    <span className="period">/month</span>
+                  </div>
+                  <ul className="pricing-features">
+                    <li>✓ Unlimited product listings</li>
+                    <li>✓ Online ordering system</li>
+                    <li>✓ Business analytics dashboard</li>
+                    <li>✓ Customer reviews & ratings</li>
+                    <li>✓ Featured in local directory</li>
+                  </ul>
+                  <div className="pricing-fee">
+                    <strong>Transaction Fee:</strong> 2% per sale
+                  </div>
+                </div>
+              </div>
+              <div className="pricing-promo">
+                <span className="promo-badge">🎉 Special Offer</span>
+                <p>First month free for early adopters! No credit card required to apply.</p>
+              </div>
             </div>
 
             <button
               type="submit"
-              className="btn btn-primary btn-large"
+              className="btn btn-primary btn-large submit-btn"
               disabled={submitting}
             >
-              {submitting ? 'Submitting...' : 'Submit Application'}
+              {submitting ? (
+                <>
+                  <span className="spinner"></span>
+                  Submitting Application...
+                </>
+              ) : (
+                'Submit Application'
+              )}
             </button>
+
+            <p className="form-footer-note">
+              By submitting, you agree to our Terms of Service and understand that your application
+              will be reviewed within 1-2 business days.
+            </p>
           </form>
         </div>
       </div>
