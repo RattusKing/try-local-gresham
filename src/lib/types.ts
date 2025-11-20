@@ -9,6 +9,11 @@ export interface Business {
   map: string
   cover: string
   description?: string
+  address?: string
+  email?: string
+  facebook?: string
+  instagram?: string
+  twitter?: string
   ownerId?: string
   status?: 'pending' | 'approved' | 'rejected'
   subscriptionTier?: 'free' | 'standard' | 'premium'

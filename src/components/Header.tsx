@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import CartModal from './CartModal'
 import BusinessApplicationModal from './BusinessApplicationModal'
 
@@ -30,7 +31,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <div className="brand">
+        <Link href="/" className="brand" style={{ textDecoration: 'none', cursor: 'pointer' }}>
           <div className="brand-mark" aria-hidden="true">
             <img
               src="/logo.jpeg"
@@ -45,7 +46,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           </div>
           <span className="brand-name">Try Local</span>
           <span className="brand-subtle">Gresham, OR</span>
-        </div>
+        </Link>
 
         {/* Mobile hamburger button */}
         <button

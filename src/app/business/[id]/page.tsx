@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { db } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
 import { Business, Product, Review, Service } from '@/lib/types'
@@ -415,6 +416,36 @@ export default function BusinessProfilePage() {
         {products.map((product) => (
           <ProductSchema key={product.id} product={product} business={business} />
         ))}
+
+        {/* Back Button */}
+        <div style={{ padding: '1rem 0', maxWidth: '1200px', margin: '0 auto' }}>
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              color: 'var(--secondary-dark)',
+              textDecoration: 'none',
+              fontSize: '0.9375rem',
+              fontWeight: 600,
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              transition: 'all 0.2s ease',
+              background: 'rgba(194, 175, 240, 0.1)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = 'rgba(194, 175, 240, 0.2)'
+              e.currentTarget.style.transform = 'translateX(-4px)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'rgba(194, 175, 240, 0.1)'
+              e.currentTarget.style.transform = 'translateX(0)'
+            }}
+          >
+            ← Back to Home
+          </Link>
+        </div>
 
         {/* Hero Section */}
       <motion.div

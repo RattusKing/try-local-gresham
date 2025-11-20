@@ -22,11 +22,16 @@ export default function BusinessDashboard() {
     name: '',
     tags: '',
     neighborhood: '',
+    address: '',
     hours: '',
     phone: '',
+    email: '',
     website: '',
     map: '',
     description: '',
+    facebook: '',
+    instagram: '',
+    twitter: '',
     subscriptionTier: 'free' as 'free' | 'standard' | 'premium',
   })
 
@@ -49,11 +54,16 @@ export default function BusinessDashboard() {
           name: data.name || '',
           tags: (data.tags || []).join(', '),
           neighborhood: data.neighborhood || '',
+          address: data.address || '',
           hours: data.hours || '',
           phone: data.phone || '',
+          email: data.email || '',
           website: data.website || '',
           map: data.map || '',
           description: data.description || '',
+          facebook: data.facebook || '',
+          instagram: data.instagram || '',
+          twitter: data.twitter || '',
           subscriptionTier: data.subscriptionTier || 'free',
         })
       }
@@ -77,11 +87,16 @@ export default function BusinessDashboard() {
         name: formData.name,
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
         neighborhood: formData.neighborhood,
+        address: formData.address,
         hours: formData.hours,
         phone: formData.phone,
+        email: formData.email,
         website: formData.website,
         map: formData.map,
         description: formData.description,
+        facebook: formData.facebook,
+        instagram: formData.instagram,
+        twitter: formData.twitter,
         subscriptionTier: formData.subscriptionTier,
         ownerId: user.uid,
         updatedAt: new Date(),
@@ -248,6 +263,19 @@ export default function BusinessDashboard() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="address">Street Address</label>
+              <input
+                type="text"
+                id="address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                placeholder="123 Main St, Gresham, OR 97030"
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="description">Description</label>
               <textarea
                 id="description"
@@ -274,6 +302,19 @@ export default function BusinessDashboard() {
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 placeholder="(503) 555-1234"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="contact@yourbusiness.com"
               />
             </div>
 
@@ -318,6 +359,52 @@ export default function BusinessDashboard() {
                   setFormData({ ...formData, map: e.target.value })
                 }
                 placeholder="https://maps.google.com/..."
+              />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2>Social Media</h2>
+            <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              Connect your social media accounts to help customers find you
+            </p>
+
+            <div className="form-group">
+              <label htmlFor="facebook">Facebook</label>
+              <input
+                type="url"
+                id="facebook"
+                value={formData.facebook}
+                onChange={(e) =>
+                  setFormData({ ...formData, facebook: e.target.value })
+                }
+                placeholder="https://facebook.com/yourbusiness"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="instagram">Instagram</label>
+              <input
+                type="url"
+                id="instagram"
+                value={formData.instagram}
+                onChange={(e) =>
+                  setFormData({ ...formData, instagram: e.target.value })
+                }
+                placeholder="https://instagram.com/yourbusiness"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="twitter">Twitter</label>
+              <input
+                type="url"
+                id="twitter"
+                value={formData.twitter}
+                onChange={(e) =>
+                  setFormData({ ...formData, twitter: e.target.value })
+                }
+                placeholder="https://twitter.com/yourbusiness"
               />
             </div>
           </div>
