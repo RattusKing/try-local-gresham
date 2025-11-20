@@ -297,11 +297,15 @@ export default function Home() {
 
         <section id="discover" className="section container">
           <div className="section-head">
-            <h2>Featured in Gresham</h2>
+            <h2>Find Something Local</h2>
+            <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>
+              Explore businesses in Gresham
+            </p>
+          </div>
 
-            {/* Search and Filters */}
-            <div style={{ marginBottom: '2rem' }}>
-              <div className="filter-controls">
+          {/* Search and Filters */}
+          <div style={{ marginBottom: '2rem' }}>
+            <div className="filter-controls">
                 <input
                   type="text"
                   placeholder="Search businesses, products, or tags..."
@@ -463,9 +467,22 @@ export default function Home() {
               }}>
                 Showing {filteredBusinesses.length} of {businesses.length} businesses
               </div>
-            </div>
+          </div>
 
-            <div className="chip-row" aria-label="Quick filters">
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              marginBottom: '1rem',
+              color: 'var(--dark)'
+            }}>
+              Featured Businesses
+            </h3>
+            <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
+              Some of the local businesses we're highlighting right now.
+            </p>
+
+            <div className="chip-row" aria-label="Quick filters" style={{ marginBottom: '1.5rem' }}>
               {FILTER_CHIPS.map((chip) => (
                 <button
                   key={chip}
@@ -477,6 +494,7 @@ export default function Home() {
               ))}
             </div>
           </div>
+
           {loading ? (
             <div className="empty-state" role="status" aria-live="polite">
               <div className="spinner" aria-hidden="true"></div>
@@ -508,6 +526,73 @@ export default function Home() {
           )}
         </section>
 
+        {/* How it Works Section */}
+        <section className="section container" style={{ background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05))', borderRadius: 'var(--radius-lg)', padding: '3rem 2rem', marginBottom: '3rem' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '2.5rem' }}>How It Works</h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '2rem',
+            maxWidth: '900px',
+            margin: '0 auto'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                margin: '0 auto 1rem',
+                boxShadow: 'var(--shadow)'
+              }}>
+                🔍
+              </div>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Browse local businesses</h3>
+              <p style={{ color: 'var(--muted)' }}>Explore real shops and services in Gresham.</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                margin: '0 auto 1rem',
+                boxShadow: 'var(--shadow)'
+              }}>
+                📋
+              </div>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Learn what they offer</h3>
+              <p style={{ color: 'var(--muted)' }}>Read details, hours, and contact info.</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                margin: '0 auto 1rem',
+                boxShadow: 'var(--shadow)'
+              }}>
+                🛍️
+              </div>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Shop or visit</h3>
+              <p style={{ color: 'var(--muted)' }}>Order online when available, or visit in person.</p>
+            </div>
+          </div>
+        </section>
+
         <section id="categories" className="section container">
           <h2>Popular Categories</h2>
           <div className="grid category-grid">
@@ -519,24 +604,29 @@ export default function Home() {
 
         <section id="for-businesses" className="section container for-biz">
           <div className="for-biz-card">
-            <h2>For Businesses</h2>
+            <h2>Own a Business in Gresham?</h2>
             <p>
-              Create your profile, add products, update hours, and connect with
-              local customers.
+              Create a clean, modern profile where local customers can find you.
             </p>
             <ul className="list">
-              <li>Dedicated store page with your branding</li>
-              <li>Tags, photos, hours, contact info</li>
-              <li>Optional pickup/delivery & order links</li>
-              <li>Customer favorites and reviews</li>
+              <li>Reach customers who are looking for local businesses</li>
+              <li>Modern business profile with hours, description, and photos</li>
+              <li>Simple management through your dashboard</li>
+              <li>Accept online orders and bookings</li>
             </ul>
             <div className="cta-row">
-              <button
+              <a
+                href="/for-businesses"
                 className="btn btn-primary"
-                onClick={() => setIsAuthOpen(true)}
               >
-                Get Started
-              </button>
+                Learn More
+              </a>
+              <a
+                href="/get-listed"
+                className="btn btn-outline"
+              >
+                Get Listed
+              </a>
             </div>
           </div>
           <aside className="for-biz-aside">

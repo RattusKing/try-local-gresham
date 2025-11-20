@@ -167,8 +167,8 @@ export default function BusinessProfilePage() {
 
       // Sort by createdAt descending on client-side
       reviewsList.sort((a, b) => {
-        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt).getTime()
-        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt).getTime()
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0)
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0)
         return dateB - dateA // Descending order (newest first)
       })
 
@@ -451,7 +451,7 @@ export default function BusinessProfilePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              📍 {business.neighborhood}
+              📍 {business.neighborhood ? `${business.neighborhood}, ` : ''}Gresham, OR
             </motion.p>
           </div>
         </div>

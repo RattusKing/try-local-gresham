@@ -6,6 +6,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useEffect, useState } from 'react'
 import { Business } from '@/lib/types'
+import StatusBadge from '@/components/StatusBadge'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -167,12 +168,8 @@ export default function BusinessDashboard() {
     <div className="business-dashboard">
       <div className="business-dashboard-header">
         <h1>My Business Profile</h1>
-        {business && (
-          <div className={`status-badge status-${business.status}`}>
-            {business.status === 'approved' && '✓ Approved'}
-            {business.status === 'pending' && '⏳ Pending Approval'}
-            {business.status === 'rejected' && '✗ Rejected'}
-          </div>
+        {business && business.status && (
+          <StatusBadge status={business.status} size="large" />
         )}
       </div>
 
