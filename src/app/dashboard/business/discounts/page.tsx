@@ -89,13 +89,13 @@ export default function BusinessDiscounts() {
         description: formData.description,
         type: formData.type,
         value: parseFloat(formData.value),
-        minPurchase: formData.minPurchase ? parseFloat(formData.minPurchase) : undefined,
-        maxDiscount: formData.maxDiscount ? parseFloat(formData.maxDiscount) : undefined,
-        usageLimit: formData.usageLimit ? parseInt(formData.usageLimit) : undefined,
+        minPurchase: formData.minPurchase ? parseFloat(formData.minPurchase) : 0,
+        maxDiscount: formData.maxDiscount ? parseFloat(formData.maxDiscount) : 0,
+        usageLimit: formData.usageLimit ? parseInt(formData.usageLimit) : 0,
         usageCount: editingDiscount?.usageCount || 0,
         isActive: formData.isActive,
         validFrom: new Date(formData.validFrom),
-        validUntil: formData.validUntil ? new Date(formData.validUntil) : undefined,
+        validUntil: formData.validUntil ? new Date(formData.validUntil) : null,
         updatedAt: new Date(),
       }
 

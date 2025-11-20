@@ -80,14 +80,14 @@ export default function BannersManagementPage() {
       const bannerData = {
         title: formData.title.trim(),
         message: formData.message.trim(),
-        ctaText: formData.ctaText.trim() || undefined,
-        ctaLink: formData.ctaLink.trim() || undefined,
+        ctaText: formData.ctaText.trim() || '',
+        ctaLink: formData.ctaLink.trim() || '',
         backgroundColor: formData.backgroundColor,
         textColor: formData.textColor,
         location: formData.location,
         isActive: formData.isActive,
         validFrom: new Date(formData.validFrom),
-        validUntil: formData.validUntil ? new Date(formData.validUntil) : undefined,
+        validUntil: formData.validUntil ? new Date(formData.validUntil) : null,
         displayOrder: parseInt(formData.displayOrder),
         updatedAt: new Date(),
       }

@@ -131,7 +131,7 @@ export default function AppointmentBookingModal({
         duration: selectedService.duration,
         price: selectedService.price,
         status: 'pending' as const,
-        notes: notes || undefined,
+        notes: notes || '',
         createdAt: new Date(),
         updatedAt: new Date(),
       }

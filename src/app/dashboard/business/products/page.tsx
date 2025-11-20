@@ -121,9 +121,9 @@ export default function BusinessProducts() {
         category: formData.category,
         inStock: formData.inStock,
         trackInventory: formData.trackInventory,
-        stockQuantity: formData.trackInventory && formData.stockQuantity ? parseInt(formData.stockQuantity) : undefined,
-        lowStockThreshold: formData.trackInventory && formData.lowStockThreshold ? parseInt(formData.lowStockThreshold) : undefined,
-        image: formData.image || undefined,
+        stockQuantity: formData.trackInventory && formData.stockQuantity ? parseInt(formData.stockQuantity) : 0,
+        lowStockThreshold: formData.trackInventory && formData.lowStockThreshold ? parseInt(formData.lowStockThreshold) : 0,
+        image: formData.image || '',
         updatedAt: new Date(),
       }
 
