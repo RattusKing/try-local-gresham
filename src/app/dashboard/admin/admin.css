@@ -26,7 +26,7 @@
 .admin-stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
 }
 
 .admin-stat-label {
@@ -61,8 +61,8 @@
 }
 
 .admin-tab.active {
-  color: var(--primary-orange);
-  border-bottom-color: var(--primary-orange);
+  color: var(--secondary-dark);
+  border-bottom-color: var(--secondary-dark);
 }
 
 .admin-businesses {
@@ -125,7 +125,7 @@
 }
 
 .business-card-tags {
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
   font-weight: 500;
 }
 
@@ -149,7 +149,7 @@
 }
 
 .business-card-details a {
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
   text-decoration: none;
 }
 
@@ -316,7 +316,7 @@
 }
 
 .application-row a {
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
   text-decoration: none;
 }
 

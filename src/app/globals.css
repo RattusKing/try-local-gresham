@@ -36,7 +36,7 @@
 
 /* Accessibility: Focus indicators */
 *:focus-visible {
-  outline: 3px solid var(--primary-orange);
+  outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
 

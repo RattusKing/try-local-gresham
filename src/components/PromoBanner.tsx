@@ -88,7 +88,7 @@ export default function PromoBanner({ location }: PromoBannerProps) {
           key={banner.id}
           className="promo-banner"
           style={{
-            backgroundColor: banner.backgroundColor || '#ff7a00',
+            backgroundColor: banner.backgroundColor || '#ab96dd',
             color: banner.textColor || '#ffffff',
           }}
         >
@@ -103,7 +103,7 @@ export default function PromoBanner({ location }: PromoBannerProps) {
                   href={banner.ctaLink}
                   className="promo-banner-cta"
                   style={{
-                    color: banner.backgroundColor || '#ff7a00',
+                    color: banner.backgroundColor || '#ab96dd',
                     backgroundColor: banner.textColor || '#ffffff',
                   }}
                 >

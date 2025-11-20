@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useState } from 'react'
@@ -22,6 +23,30 @@ export default function ForBusinessesPage() {
           overflow: 'hidden'
         }}>
           <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: 'var(--secondary-dark)',
+                textDecoration: 'none',
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                marginBottom: '2rem',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = 'var(--secondary)'
+                e.currentTarget.style.transform = 'translateX(-4px)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = 'var(--secondary-dark)'
+                e.currentTarget.style.transform = 'translateX(0)'
+              }}
+            >
+              ← Back to Home
+            </Link>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}

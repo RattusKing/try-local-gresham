@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BusinessCard from '@/components/BusinessCard'
@@ -165,6 +166,30 @@ export default function BusinessesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <Link
+                href="/"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  color: 'var(--secondary-dark)',
+                  textDecoration: 'none',
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  marginBottom: '1rem',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = 'var(--secondary)'
+                  e.currentTarget.style.transform = 'translateX(-4px)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = 'var(--secondary-dark)'
+                  e.currentTarget.style.transform = 'translateX(0)'
+                }}
+              >
+                ← Back to Home
+              </Link>
               <h1 style={{
                 fontSize: '2.5rem',
                 fontWeight: 800,

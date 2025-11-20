@@ -93,7 +93,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               padding: '10px 20px',
               border: 'none',
               background: 'transparent',
-              borderBottom: mode === 'signin' ? '2px solid var(--orange)' : '2px solid transparent',
+              borderBottom: mode === 'signin' ? '2px solid var(--secondary)' : '2px solid transparent',
               fontWeight: mode === 'signin' ? 700 : 400,
               cursor: 'pointer',
             }}
@@ -107,7 +107,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               padding: '10px 20px',
               border: 'none',
               background: 'transparent',
-              borderBottom: mode === 'signup' ? '2px solid var(--orange)' : '2px solid transparent',
+              borderBottom: mode === 'signup' ? '2px solid var(--secondary)' : '2px solid transparent',
               fontWeight: mode === 'signup' ? 700 : 400,
               cursor: 'pointer',
             }}

@@ -39,7 +39,7 @@
 }
 
 .star:focus {
-  outline: 2px solid var(--primary-orange);
+  outline: 2px solid var(--secondary-dark);
   outline-offset: 2px;
   border-radius: 2px;
 }

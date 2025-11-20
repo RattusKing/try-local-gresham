@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
@@ -36,15 +37,38 @@ export default function GetListedPage() {
         {/* Hero Section */}
         <section style={{
           background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1))',
-          padding: '5rem 0 4rem',
-          textAlign: 'center'
+          padding: '5rem 0 4rem'
         }}>
           <div className="container">
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: 'var(--secondary-dark)',
+                textDecoration: 'none',
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                marginBottom: '2rem',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = 'var(--secondary)'
+                e.currentTarget.style.transform = 'translateX(-4px)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = 'var(--secondary-dark)'
+                e.currentTarget.style.transform = 'translateX(0)'
+              }}
+            >
+              ← Back to Home
+            </Link>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              style={{ maxWidth: '700px', margin: '0 auto' }}
+              style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}
             >
               <h1 style={{
                 fontSize: '2.75rem',
