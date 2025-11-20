@@ -35,11 +35,10 @@ export default function BusinessAnalytics() {
     try {
       setLoading(true)
 
-      // Fetch all orders for this business
+      // Fetch all orders for this business (without orderBy to avoid composite index)
       const ordersQuery = query(
         collection(db, 'orders'),
-        where('businessId', '==', user.uid),
-        orderBy('createdAt', 'desc')
+        where('businessId', '==', user.uid)
       )
       const ordersSnap = await getDocs(ordersQuery)
       const orders = ordersSnap.docs.map((doc) => ({
@@ -48,6 +47,12 @@ export default function BusinessAnalytics() {
         createdAt: doc.data().createdAt?.toDate(),
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Order[]
+
+      // Sort by createdAt descending on client-side
+      orders.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0
+        return b.createdAt.getTime() - a.createdAt.getTime() // Descending order (newest first)
+      })
 
       // Calculate date range
       const daysAgo = parseInt(timeRange)

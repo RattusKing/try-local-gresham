@@ -153,16 +153,24 @@ export default function BusinessProfilePage() {
     if (!db) return
 
     try {
+      // Query without orderBy to avoid needing a composite index
       const reviewsQuery = query(
         collection(db, 'reviews'),
-        where('businessId', '==', businessId),
-        orderBy('createdAt', 'desc')
+        where('businessId', '==', businessId)
       )
       const reviewsSnap = await getDocs(reviewsQuery)
       const reviewsList = reviewsSnap.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
+        createdAt: doc.data().createdAt || new Date(),
       })) as Review[]
+
+      // Sort by createdAt descending on client-side
+      reviewsList.sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt).getTime()
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt).getTime()
+        return dateB - dateA // Descending order (newest first)
+      })
 
       setReviews(reviewsList)
 
