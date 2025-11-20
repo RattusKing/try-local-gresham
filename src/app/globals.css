@@ -51,12 +51,13 @@ body {
   color: var(--dark);
   background: var(--bg);
   line-height: 1.6;
+  font-size: 16px;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 1.25rem;
 }
 
 /* Header */
@@ -73,20 +74,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 0;
+  padding: 0.875rem 0;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   font-weight: 700;
 }
 
 .brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 0.625rem;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -96,18 +97,18 @@ body {
 }
 
 .brand-name {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .brand-subtle {
   color: var(--muted);
   font-weight: 600;
-  margin-left: 6px;
+  margin-left: 0.375rem;
 }
 
 .nav {
   display: flex;
-  gap: 16px;
+  gap: 1rem;
   align-items: center;
 }
 
@@ -128,12 +129,12 @@ body {
 .btn {
   border: 0;
   border-radius: 999px;
-  padding: 10px 18px;
+  padding: 0.625rem 1.125rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
   transition: all 0.2s ease;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .btn:hover {
@@ -191,6 +192,13 @@ body {
   align-items: end;
 }
 
+/* Remove fixed background on mobile for better performance */
+@media (max-width: 52.5rem) {
+  .hero {
+    background-attachment: scroll;
+  }
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -210,9 +218,9 @@ body {
 }
 
 .hero h1 {
-  font-size: 48px;
+  font-size: 3rem;
   line-height: 1.1;
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
 }
 
 .accent {
@@ -223,24 +231,24 @@ body {
 }
 
 .lead {
-  font-size: 18px;
+  font-size: 1.125rem;
   color: var(--dark);
-  margin: 8px 0 18px;
+  margin: 0.5rem 0 1.125rem;
   opacity: 0.9;
 }
 
 .hero-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .search-bar {
   display: flex;
-  gap: 10px;
+  gap: 0.625rem;
   align-items: center;
   background: white;
-  padding: 12px;
+  padding: 0.75rem;
   border-radius: 999px;
   box-shadow: var(--shadow);
   border: 2px solid rgba(153, 237, 195, 0.2);
@@ -248,10 +256,10 @@ body {
 
 .search-bar input,
 .search-bar select {
-  padding: 10px 14px;
+  padding: 0.625rem 0.875rem;
   border: 2px solid rgba(194, 175, 240, 0.2);
   border-radius: 999px;
-  min-width: 220px;
+  min-width: 13.75rem;
   transition: all 0.2s ease;
   background: white;
 }
@@ -263,26 +271,62 @@ body {
   background: rgba(194, 175, 240, 0.05);
 }
 
+/* Filter Controls */
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.filter-controls input,
+.filter-controls select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* Minimum touch target */
+  min-height: 44px;
+}
+
+.filter-controls input {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filter-controls input:focus {
+  border-color: var(--primary);
+}
+
+.filter-controls select:focus {
+  border-color: var(--primary);
+}
+
 /* Sections */
 .section {
-  padding: 40px 0;
+  padding: 2.5rem 0;
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 1.125rem;
 }
 
 /* Grid */
 .grid {
   display: grid;
-  gap: 18px;
+  gap: 1.125rem;
 }
 
 .cards {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(16.25rem, 1fr));
 }
 
 /* Cards */
@@ -302,19 +346,19 @@ body {
 }
 
 .card .cover {
-  height: 150px;
+  height: 9.375rem;
   background: #ddd;
   background-size: cover;
   background-position: center;
 }
 
 .card .content {
-  padding: 14px;
+  padding: 0.875rem;
 }
 
 .card h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
 }
 
 .card-rating {
@@ -332,13 +376,13 @@ body {
 
 .tag {
   display: inline-block;
-  font-size: 12px;
-  padding: 6px 12px;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 999px;
   background: rgba(194, 175, 240, 0.15);
   color: var(--dark);
-  margin-right: 6px;
-  margin-bottom: 6px;
+  margin-right: 0.375rem;
+  margin-bottom: 0.375rem;
   font-weight: 600;
   border: 1px solid rgba(194, 175, 240, 0.3);
 }
@@ -357,17 +401,17 @@ body {
 
 .card .meta {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
   color: var(--muted);
-  font-size: 13px;
-  margin-top: 6px;
+  font-size: 0.8125rem;
+  margin-top: 0.375rem;
 }
 
 .card .actions {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .card .btn {
@@ -568,14 +612,119 @@ body {
   margin-top: 14px;
 }
 
+/* Mobile Menu */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 100;
+}
+
+.hamburger {
+  width: 28px;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: var(--dark);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(10.5px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-10.5px) rotate(-45deg);
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(55, 55, 55, 0.5);
+  z-index: 90;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: white;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  padding: 80px 1.5rem 1.5rem;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-link {
+  display: block;
+  padding: 1rem;
+  color: var(--dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+  /* Ensure minimum touch target size */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link:active {
+  background: rgba(194, 175, 240, 0.1);
+  color: var(--secondary-dark);
+}
+
 /* Responsive */
-@media (max-width: 840px) {
+@media (max-width: 52.5rem) {
   .for-biz {
     grid-template-columns: 1fr;
   }
 
   .hero h1 {
-    font-size: 36px;
+    font-size: 2.25rem;
   }
 
   .search-bar {
@@ -584,5 +733,107 @@ body {
 
   .nav {
     display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  /* Stack filter controls vertically on mobile */
+  .filter-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .filter-controls input,
+  .filter-controls select {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  /* Larger touch targets on mobile */
+  .btn {
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+  }
+
+  /* Adjust hero text for smaller screens */
+  .hero {
+    min-height: 50vh;
+  }
+
+  .hero-content {
+    padding: 3.75rem 0 1.25rem 0;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  /* Modal adjustments for mobile */
+  .modal-card {
+    max-width: 95vw;
+    padding: 1.5rem;
+  }
+
+  /* Category grid more compact on mobile */
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .category-card {
+    padding: 1rem;
+  }
+
+  /* Chip row wrapping */
+  .chip-row {
+    gap: 0.5rem;
+  }
+
+  .chip {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 30rem) {
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .brand-subtle {
+    display: none;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .card .content {
+    padding: 0.75rem;
+  }
+
+  .section {
+    padding: 1.875rem 0;
+  }
+
+  /* Make cards single column on very small screens */
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  /* Smaller category cards on tiny screens */
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Full width buttons on very small screens */
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
   }
 }

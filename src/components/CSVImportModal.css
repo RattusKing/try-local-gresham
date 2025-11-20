@@ -3,6 +3,13 @@
   width: 100%;
 }
 
+@media (max-width: 52.5rem) {
+  .csv-import-modal {
+    max-width: 95vw;
+    width: 95vw;
+  }
+}
+
 .csv-instructions {
   background: #f9fafb;
   border-radius: 8px;
@@ -194,8 +201,8 @@
   color: #6b7280;
   cursor: pointer;
   padding: 0;
-  width: 2rem;
-  height: 2rem;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,4 +225,39 @@
   justify-content: flex-end;
   padding: 1.5rem;
   border-top: 1px solid #e5e7eb;
+}
+
+@media (max-width: 40rem) {
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.125rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+
+  .csv-instructions {
+    padding: 0.875rem;
+  }
+
+  .csv-format-info {
+    padding: 0.875rem;
+  }
+
+  .file-upload-label {
+    padding: 1.25rem;
+  }
 }
