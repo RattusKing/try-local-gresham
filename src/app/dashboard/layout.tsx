@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import DashboardNav from '@/components/DashboardNav'
 import './dashboard.css'
+import './dashboard-theme.css'
 
 export default function DashboardLayout({
   children,
