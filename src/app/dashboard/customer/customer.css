@@ -16,7 +16,7 @@
 }
 
 .btn-edit {
-  background: var(--primary-orange);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
   padding: 0.625rem 1.25rem;
   border: none;
@@ -28,7 +28,7 @@
 }
 
 .btn-edit:hover {
-  background: #e66900;
+  background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -51,7 +51,7 @@
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--primary-orange);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,7 +99,7 @@
 
 .profile-role {
   text-transform: capitalize;
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
   font-weight: 600;
 }
 
@@ -163,8 +163,8 @@
 }
 
 .quick-link-card:hover {
-  background: #fef3e7;
-  border-color: var(--primary-orange);
+  background: rgba(194, 175, 240, 0.15);
+  border-color: var(--secondary-dark);
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

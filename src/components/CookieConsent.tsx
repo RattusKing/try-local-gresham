@@ -72,7 +72,7 @@ export default function CookieConsent() {
           <p style={{ fontSize: '0.875rem', lineHeight: '1.6', opacity: 0.9 }}>
             We use cookies to enhance your browsing experience, provide personalized content, and
             analyze our traffic. By clicking "Accept", you consent to our use of cookies.{' '}
-            <Link href="/privacy" style={{ color: 'var(--primary-orange)', textDecoration: 'underline' }}>
+            <Link href="/privacy" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
               Learn more in our Privacy Policy
             </Link>
             .
@@ -90,8 +90,8 @@ export default function CookieConsent() {
             onClick={acceptCookies}
             style={{
               padding: '0.75rem 2rem',
-              backgroundColor: 'var(--primary-orange)',
-              color: 'white',
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              color: 'var(--dark)',
               border: 'none',
               borderRadius: '6px',
               fontSize: '1rem',

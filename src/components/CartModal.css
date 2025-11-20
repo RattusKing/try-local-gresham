@@ -119,7 +119,7 @@
   margin: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--primary-orange);
+  color: var(--secondary-dark);
 }
 
 .cart-item-actions {
@@ -139,7 +139,7 @@
 }
 
 .quantity-controls button {
-  background: var(--primary-orange);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
   border: none;
   width: 28px;
@@ -155,7 +155,7 @@
 }
 
 .quantity-controls button:hover {
-  background: #e66900;
+  background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
 }
 
 .quantity-controls span {

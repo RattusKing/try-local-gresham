@@ -208,7 +208,7 @@ export default function BusinessProfilePage() {
         businessId: business.id,
         userId: user.uid,
         userName: user.displayName || user.email || 'Anonymous',
-        userPhotoURL: user.photoURL || undefined,
+        userPhotoURL: user.photoURL || '',
         rating: reviewForm.rating,
         comment: reviewForm.comment,
         updatedAt: new Date(),
