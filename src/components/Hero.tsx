@@ -34,9 +34,8 @@ export default function Hero({ onSearch, categories }: HeroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          Shop Gresham.
-          <br />
-          <span className="accent">Support your neighbors.</span>
+          Discover Local Businesses{' '}
+          <span className="accent">in Gresham</span>
         </motion.h1>
         <motion.p
           className="lead"
@@ -44,8 +43,7 @@ export default function Hero({ onSearch, categories }: HeroProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          Find coffee, boutiques, services, and more — from the heart of
-          Gresham.
+          Find shops, services, and restaurants in our community — all in one place.
         </motion.p>
         <motion.div
           className="hero-actions"
@@ -56,8 +54,8 @@ export default function Hero({ onSearch, categories }: HeroProps) {
           <a href="#discover" className="btn btn-primary">
             Browse Businesses
           </a>
-          <a href="#for-businesses" className="btn btn-ghost">
-            List Your Business
+          <a href="/get-listed" className="btn btn-ghost">
+            List My Business
           </a>
         </motion.div>
         <motion.form
@@ -72,8 +70,8 @@ export default function Hero({ onSearch, categories }: HeroProps) {
           <input
             name="search"
             type="search"
-            placeholder="Search by name or tag…"
-            aria-label="Search by name or tag"
+            placeholder="Search Gresham shops, restaurants, and services…"
+            aria-label="Search businesses"
           />
           <select name="category" aria-label="Filter by category">
             <option value="">All Categories</option>

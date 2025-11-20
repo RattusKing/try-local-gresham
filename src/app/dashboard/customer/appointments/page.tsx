@@ -32,10 +32,10 @@ export default function CustomerAppointments() {
 
     try {
       setLoading(true)
+      // Query without orderBy to avoid needing a composite index
       const appointmentsQuery = query(
         collection(db, 'appointments'),
-        where('customerId', '==', user.uid),
-        orderBy('scheduledDate', 'desc')
+        where('customerId', '==', user.uid)
       )
       const appointmentsSnap = await getDocs(appointmentsQuery)
       const appointmentsList = appointmentsSnap.docs.map((doc) => ({
@@ -44,6 +44,13 @@ export default function CustomerAppointments() {
         createdAt: doc.data().createdAt?.toDate(),
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Appointment[]
+
+      // Sort by scheduledDate descending on client-side
+      appointmentsList.sort((a, b) => {
+        const dateA = new Date(a.scheduledDate).getTime()
+        const dateB = new Date(b.scheduledDate).getTime()
+        return dateB - dateA // Descending order (newest first)
+      })
 
       setAppointments(appointmentsList)
     } catch (err: any) {

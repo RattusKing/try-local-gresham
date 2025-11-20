@@ -153,16 +153,24 @@ export default function BusinessProfilePage() {
     if (!db) return
 
     try {
+      // Query without orderBy to avoid needing a composite index
       const reviewsQuery = query(
         collection(db, 'reviews'),
-        where('businessId', '==', businessId),
-        orderBy('createdAt', 'desc')
+        where('businessId', '==', businessId)
       )
       const reviewsSnap = await getDocs(reviewsQuery)
       const reviewsList = reviewsSnap.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
+        createdAt: doc.data().createdAt || new Date(),
       })) as Review[]
+
+      // Sort by createdAt descending on client-side
+      reviewsList.sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt.getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0)
+        const dateB = b.createdAt instanceof Date ? b.createdAt.getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0)
+        return dateB - dateA // Descending order (newest first)
+      })
 
       setReviews(reviewsList)
 
@@ -443,7 +451,7 @@ export default function BusinessProfilePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              📍 {business.neighborhood}
+              📍 {business.neighborhood ? `${business.neighborhood}, ` : ''}Gresham, OR
             </motion.p>
           </div>
         </div>

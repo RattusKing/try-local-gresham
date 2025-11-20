@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, getDocs, doc, deleteDoc, addDoc, setDoc, getDoc, orderBy } from 'firebase/firestore'
 import { motion } from 'framer-motion'
+import StatusBadge from '@/components/StatusBadge'
 import '../admin.css'
 
 interface BusinessApplication {

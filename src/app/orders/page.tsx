@@ -30,10 +30,10 @@ export default function OrdersPage() {
 
     try {
       setLoading(true)
+      // Query without orderBy to avoid needing a composite index
       const ordersQuery = query(
         collection(db, 'orders'),
-        where('userId', '==', user.uid),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', user.uid)
       )
 
       const ordersSnap = await getDocs(ordersQuery)
@@ -43,6 +43,11 @@ export default function OrdersPage() {
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date(),
       })) as Order[]
+
+      // Sort by createdAt descending on client-side
+      ordersList.sort((a, b) => {
+        return b.createdAt.getTime() - a.createdAt.getTime() // Descending order (newest first)
+      })
 
       setOrders(ordersList)
     } catch (err: any) {
