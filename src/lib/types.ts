@@ -16,6 +16,11 @@ export interface Business {
   reviewCount?: number
   createdAt?: Date
   updatedAt?: Date
+  // Stripe Connect fields
+  stripeConnectedAccountId?: string // Stripe Connect account ID
+  stripeAccountStatus?: 'pending' | 'verified' | 'restricted' // Account verification status
+  payoutsEnabled?: boolean // Whether payouts are enabled for this account
+  stripeOnboardingCompletedAt?: Date // When Stripe onboarding was completed
 }
 
 export type UserRole = 'customer' | 'business_owner' | 'admin'
@@ -100,9 +105,16 @@ export interface Order {
   deliveryAddress?: string
   deliveryNotes?: string
   pickupTime?: string
-  paymentStatus: 'pending' | 'completed' | 'failed'
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded'
   createdAt: Date
   updatedAt: Date
+  // Stripe payment fields
+  stripePaymentIntentId?: string // Stripe Payment Intent ID
+  stripeChargeId?: string // Stripe Charge ID
+  stripeTransferId?: string // Transfer ID for Connect payments
+  refundId?: string // Stripe Refund ID if order was refunded
+  refundAmount?: number // Amount refunded
+  refundedAt?: Date // When refund was processed
 }
 
 export type DiscountType = 'percentage' | 'fixed'
@@ -254,4 +266,24 @@ export interface CSVImportError {
   field?: string
   message: string
   data?: CSVProductRow
+}
+
+// Stripe Subscription Types
+
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing'
+
+export interface Subscription {
+  id: string
+  businessId: string
+  stripeSubscriptionId: string // Stripe Subscription ID
+  stripeCustomerId: string // Stripe Customer ID
+  stripePriceId: string // Stripe Price ID
+  tier: 'free' | 'standard' | 'premium'
+  status: SubscriptionStatus
+  currentPeriodStart: Date
+  currentPeriodEnd: Date
+  cancelAtPeriodEnd: boolean
+  canceledAt?: Date
+  createdAt: Date
+  updatedAt: Date
 }

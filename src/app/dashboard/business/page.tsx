@@ -190,6 +190,65 @@ export default function BusinessDashboard() {
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      {/* Stripe Payment Setup Section */}
+      {business && business.status === 'approved' && (
+        <div className="payment-setup-card">
+          {business.stripeAccountStatus === 'verified' ? (
+            <div className="payment-status-verified">
+              <div className="payment-status-header">
+                <svg className="icon-verified" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <h3>Payment Processing Active</h3>
+              </div>
+              <p>Your Stripe account is connected and ready to receive payments!</p>
+              <a href="/dashboard/business/stripe-onboarding" className="btn-secondary">
+                Manage Payment Settings
+              </a>
+            </div>
+          ) : business.stripeAccountStatus === 'pending' ? (
+            <div className="payment-status-pending">
+              <div className="payment-status-header">
+                <svg className="icon-pending" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3>Payment Setup In Progress</h3>
+              </div>
+              <p>Complete your Stripe onboarding to start accepting payments.</p>
+              <a href="/dashboard/business/stripe-onboarding" className="btn-primary">
+                Continue Setup
+              </a>
+            </div>
+          ) : business.stripeAccountStatus === 'restricted' ? (
+            <div className="payment-status-restricted">
+              <div className="payment-status-header">
+                <svg className="icon-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3>Payment Account Needs Attention</h3>
+              </div>
+              <p>Your Stripe account requires additional information to process payments.</p>
+              <a href="/dashboard/business/stripe-onboarding" className="btn-warning">
+                Fix Account Issues
+              </a>
+            </div>
+          ) : (
+            <div className="payment-status-setup">
+              <div className="payment-status-header">
+                <svg className="icon-setup" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3>Set Up Payment Processing</h3>
+              </div>
+              <p>Connect your Stripe account to start accepting payments from customers. You'll receive 98% of each sale directly to your bank account.</p>
+              <a href="/dashboard/business/stripe-onboarding" className="btn-primary">
+                Set Up Payments
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="business-form-container">
         <form onSubmit={handleSubmit} className="business-form">
           <div className="form-section">

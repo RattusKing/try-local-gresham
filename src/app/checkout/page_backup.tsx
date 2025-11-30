@@ -8,21 +8,12 @@ import { db } from '@/lib/firebase/config'
 import { collection, addDoc, doc, getDoc, updateDoc, increment, query, where, getDocs } from 'firebase/firestore'
 import { DeliveryMethod, DiscountCode } from '@/lib/types'
 import { reserveInventory } from '@/lib/inventory'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
-import StripeCheckoutForm from '@/components/stripe/StripeCheckoutForm'
 import './checkout.css'
-
-// Initialize Stripe
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
-)
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { user } = useAuth()
   const { items, subtotal, platformFee, total, clearCart } = useCart()
-  const [step, setStep] = useState<'details' | 'payment'>('details')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [discountCode, setDiscountCode] = useState('')
@@ -30,8 +21,6 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0)
   const [discountError, setDiscountError] = useState('')
   const [applyingDiscount, setApplyingDiscount] = useState(false)
-  const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     deliveryMethod: 'pickup' as DeliveryMethod,
@@ -62,6 +51,7 @@ export default function CheckoutPage() {
     setDiscountError('')
 
     try {
+      // Query for the discount code
       const discountsRef = collection(db, 'discountCodes')
       const q = query(discountsRef, where('code', '==', discountCode.toUpperCase()))
       const snapshot = await getDocs(q)
@@ -75,12 +65,14 @@ export default function CheckoutPage() {
       const discountDoc = snapshot.docs[0]
       const discount = { id: discountDoc.id, ...discountDoc.data() } as DiscountCode
 
+      // Validate discount code
       if (!discount.isActive) {
         setDiscountError('This discount code is no longer active')
         setApplyingDiscount(false)
         return
       }
 
+      // Check expiration
       const now = new Date()
       const validFrom = discount.validFrom instanceof Date ? discount.validFrom : new Date(discount.validFrom)
       const validUntil = discount.validUntil ?
@@ -99,28 +91,34 @@ export default function CheckoutPage() {
         return
       }
 
+      // Check usage limit
       if (discount.usageLimit && discount.usageCount >= discount.usageLimit) {
         setDiscountError('This discount code has reached its usage limit')
         setApplyingDiscount(false)
         return
       }
 
+      // Check minimum purchase
       if (discount.minPurchase && subtotal < discount.minPurchase) {
         setDiscountError(`Minimum purchase of $${discount.minPurchase.toFixed(2)} required`)
         setApplyingDiscount(false)
         return
       }
 
+      // Calculate discount amount
       let discountAmt = 0
       if (discount.type === 'percentage') {
         discountAmt = subtotal * (discount.value / 100)
+        // Apply max discount cap if set
         if (discount.maxDiscount && discountAmt > discount.maxDiscount) {
           discountAmt = discount.maxDiscount
         }
       } else {
+        // Fixed amount
         discountAmt = discount.value
       }
 
+      // Discount cannot exceed subtotal
       if (discountAmt > subtotal) {
         discountAmt = subtotal
       }
@@ -145,77 +143,44 @@ export default function CheckoutPage() {
     setDiscountError('')
   }
 
+  // Calculate final total with discount
   const finalTotal = total - discountAmount
 
-  const handleContinueToPayment = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!user || !db) return
 
+    // Validate phone
     if (!formData.phone.trim()) {
       setError('Phone number is required')
       return
     }
 
+    // Validate delivery address if delivery method is delivery
     if (formData.deliveryMethod === 'delivery' && !formData.deliveryAddress.trim()) {
       setError('Delivery address is required for delivery orders')
       return
     }
 
-    try {
-      setSubmitting(true)
-      setError('')
-
-      // Get the first business ID (for creating payment intent)
-      const firstBusinessId = items[0].businessId
-
-      // Create payment intent
-      const response = await fetch('/api/stripe/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: Math.round(finalTotal * 100), // Convert to cents
-          businessId: firstBusinessId,
-          customerEmail: user.email,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to initialize payment')
-      }
-
-      setClientSecret(data.clientSecret)
-      setPaymentIntentId(data.paymentIntentId)
-      setStep('payment')
-    } catch (err: any) {
-      setError(err.message || 'Failed to initialize payment. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handlePaymentSuccess = async (stripePaymentIntentId: string) => {
-    if (!user || !db) return
-
-    try {
-      setSubmitting(true)
-      setError('')
-
-      // Group items by business
-      const businessGroups = items.reduce((groups, item) => {
-        if (!groups[item.businessId]) {
-          groups[item.businessId] = {
-            businessId: item.businessId,
-            businessName: item.businessName,
-            items: [],
-          }
+    // Group items by business
+    const businessGroups = items.reduce((groups, item) => {
+      if (!groups[item.businessId]) {
+        groups[item.businessId] = {
+          businessId: item.businessId,
+          businessName: item.businessName,
+          items: [],
         }
-        groups[item.businessId].items.push(item)
-        return groups
-      }, {} as Record<string, { businessId: string; businessName: string; items: typeof items }>)
+      }
+      groups[item.businessId].items.push(item)
+      return groups
+    }, {} as Record<string, { businessId: string; businessName: string; items: typeof items }>)
 
+    try {
+      setSubmitting(true)
+      setError('')
+
+      // Ensure db is available
       const firestore = db
       if (!firestore) return
 
@@ -227,15 +192,17 @@ export default function CheckoutPage() {
         )
         const groupPlatformFee = groupSubtotal * 0.02
 
+        // Calculate discount for this business group
         let groupDiscount = 0
         if (appliedDiscount && discountAmount > 0) {
+          // Proportionally apply discount based on this group's subtotal
           const proportion = groupSubtotal / subtotal
           groupDiscount = discountAmount * proportion
         }
 
         const groupTotal = groupSubtotal + groupPlatformFee - groupDiscount
 
-        // Reserve inventory
+        // CRITICAL: Reserve inventory BEFORE creating order to prevent race conditions
         try {
           await reserveInventory(
             group.items.map((item) => ({
@@ -245,6 +212,7 @@ export default function CheckoutPage() {
             }))
           )
         } catch (inventoryError) {
+          // Inventory reservation failed - throw error to abort order creation
           throw new Error(
             inventoryError instanceof Error
               ? inventoryError.message
@@ -270,21 +238,21 @@ export default function CheckoutPage() {
           deliveryAddress: formData.deliveryMethod === 'delivery' ? formData.deliveryAddress : '',
           deliveryNotes: formData.deliveryNotes || '',
           pickupTime: formData.pickupTime || '',
-          paymentStatus: 'completed', // Payment was completed via Stripe
-          stripePaymentIntentId: stripePaymentIntentId,
+          paymentStatus: 'pending', // Will be updated when Stripe is integrated
           createdAt: new Date(),
           updatedAt: new Date(),
         }
 
         const orderRef = await addDoc(collection(firestore, 'orders'), orderData)
 
-        // Send email notifications
+        // Get business email and address for notifications
         try {
           const businessDoc = await getDoc(doc(firestore, 'businesses', group.businessId))
           const businessData = businessDoc.data()
           const businessEmail = businessData?.email || businessData?.website || ''
           const businessAddress = businessData?.address || ''
 
+          // Send email notifications (non-blocking)
           if (businessEmail && user.email) {
             fetch('/api/emails/order-confirmation', {
               method: 'POST',
@@ -320,14 +288,18 @@ export default function CheckoutPage() {
           if (process.env.NODE_ENV === 'development') {
             console.error('Error sending email notifications:', emailError)
           }
+          // Continue even if email fails
         }
+
+        // Note: Inventory was already reserved BEFORE order creation (see line 203)
+        // This prevents race conditions and overselling
 
         return orderRef
       })
 
       await Promise.all(orderPromises)
 
-      // Increment discount code usage
+      // Increment discount code usage count if applied
       if (appliedDiscount && appliedDiscount.id) {
         try {
           const discountRef = doc(firestore, 'discountCodes', appliedDiscount.id)
@@ -338,16 +310,21 @@ export default function CheckoutPage() {
           if (process.env.NODE_ENV === 'development') {
             console.error('Error updating discount code usage:', discountErr)
           }
+          // Don't block order completion if usage update fails
         }
       }
 
+      // Clear cart
       clearCart()
+
+      // Redirect to order confirmation
       router.push('/orders')
     } catch (err: any) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Error creating order:', err)
       }
 
+      // Provide specific error messages for inventory issues
       if (err.message && err.message.includes('Insufficient inventory:')) {
         setError(err.message)
       } else if (err.message && err.message.includes('inventory')) {
@@ -360,14 +337,11 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePaymentError = (errorMessage: string) => {
-    setError(errorMessage)
-  }
-
   if (!user || items.length === 0) {
     return null
   }
 
+  // Group items by business for display
   const businessGroups = items.reduce((groups, item) => {
     if (!groups[item.businessId]) {
       groups[item.businessId] = {
@@ -385,8 +359,8 @@ export default function CheckoutPage() {
         <h1>Checkout</h1>
 
         <div className="checkout-content">
+          {/* Order Summary */}
           <div className="checkout-main">
-            {/* Order Summary */}
             <div className="checkout-section">
               <h2>Order Summary</h2>
               {Object.entries(businessGroups).map(([businessId, group]) => (
@@ -415,140 +389,102 @@ export default function CheckoutPage() {
             </div>
 
             {/* Delivery Information */}
-            {step === 'details' && (
-              <div className="checkout-section">
-                <h2>Delivery Information</h2>
-                {error && <div className="alert alert-error">{error}</div>}
+            <div className="checkout-section">
+              <h2>Delivery Information</h2>
+              {error && <div className="alert alert-error">{error}</div>}
 
-                <form onSubmit={handleContinueToPayment}>
-                  <div className="form-group">
-                    <label>Delivery Method *</label>
-                    <div className="radio-group">
-                      <label className="radio-label">
-                        <input
-                          type="radio"
-                          name="deliveryMethod"
-                          value="pickup"
-                          checked={formData.deliveryMethod === 'pickup'}
-                          onChange={(e) =>
-                            setFormData({ ...formData, deliveryMethod: e.target.value as DeliveryMethod })
-                          }
-                        />
-                        <span>Pickup</span>
-                      </label>
-                      <label className="radio-label">
-                        <input
-                          type="radio"
-                          name="deliveryMethod"
-                          value="delivery"
-                          checked={formData.deliveryMethod === 'delivery'}
-                          onChange={(e) =>
-                            setFormData({ ...formData, deliveryMethod: e.target.value as DeliveryMethod })
-                          }
-                        />
-                        <span>Delivery</span>
-                      </label>
-                    </div>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Delivery Method *</label>
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="pickup"
+                        checked={formData.deliveryMethod === 'pickup'}
+                        onChange={(e) =>
+                          setFormData({ ...formData, deliveryMethod: e.target.value as DeliveryMethod })
+                        }
+                      />
+                      <span>Pickup</span>
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="delivery"
+                        checked={formData.deliveryMethod === 'delivery'}
+                        onChange={(e) =>
+                          setFormData({ ...formData, deliveryMethod: e.target.value as DeliveryMethod })
+                        }
+                      />
+                      <span>Delivery</span>
+                    </label>
                   </div>
+                </div>
 
+                <div className="form-group">
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="(555) 123-4567"
+                    required
+                  />
+                </div>
+
+                {formData.deliveryMethod === 'delivery' && (
                   <div className="form-group">
-                    <label htmlFor="phone">Phone Number *</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="(555) 123-4567"
+                    <label htmlFor="deliveryAddress">Delivery Address *</label>
+                    <textarea
+                      id="deliveryAddress"
+                      value={formData.deliveryAddress}
+                      onChange={(e) =>
+                        setFormData({ ...formData, deliveryAddress: e.target.value })
+                      }
+                      rows={3}
+                      placeholder="Street address, city, state, ZIP"
                       required
                     />
                   </div>
+                )}
 
-                  {formData.deliveryMethod === 'delivery' && (
-                    <div className="form-group">
-                      <label htmlFor="deliveryAddress">Delivery Address *</label>
-                      <textarea
-                        id="deliveryAddress"
-                        value={formData.deliveryAddress}
-                        onChange={(e) =>
-                          setFormData({ ...formData, deliveryAddress: e.target.value })
-                        }
-                        rows={3}
-                        placeholder="Street address, city, state, ZIP"
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {formData.deliveryMethod === 'pickup' && (
-                    <div className="form-group">
-                      <label htmlFor="pickupTime">Preferred Pickup Time</label>
-                      <input
-                        type="text"
-                        id="pickupTime"
-                        value={formData.pickupTime}
-                        onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
-                        placeholder="e.g., Today at 5pm, Tomorrow morning"
-                      />
-                    </div>
-                  )}
-
+                {formData.deliveryMethod === 'pickup' && (
                   <div className="form-group">
-                    <label htmlFor="deliveryNotes">Special Instructions</label>
-                    <textarea
-                      id="deliveryNotes"
-                      value={formData.deliveryNotes}
-                      onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
-                      rows={3}
-                      placeholder="Any special requests or instructions..."
+                    <label htmlFor="pickupTime">Preferred Pickup Time</label>
+                    <input
+                      type="text"
+                      id="pickupTime"
+                      value={formData.pickupTime}
+                      onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
+                      placeholder="e.g., Today at 5pm, Tomorrow morning"
                     />
                   </div>
+                )}
 
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-large"
-                    disabled={submitting}
-                  >
-                    {submitting ? 'Processing...' : 'Continue to Payment'}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* Payment Section */}
-            {step === 'payment' && clientSecret && (
-              <div className="checkout-section">
-                <div className="flex items-center gap-4 mb-4">
-                  <button
-                    onClick={() => {
-                      setStep('details')
-                      setClientSecret(null)
-                      setPaymentIntentId(null)
-                    }}
-                    className="text-green-600 hover:text-green-700 flex items-center gap-1"
-                  >
-                    ← Back to Details
-                  </button>
-                  <h2>Payment</h2>
-                </div>
-                {error && <div className="alert alert-error">{error}</div>}
-
-                <Elements
-                  stripe={stripePromise}
-                  options={{
-                    clientSecret,
-                    appearance: {
-                      theme: 'stripe',
-                    },
-                  }}
-                >
-                  <StripeCheckoutForm
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                    buttonText={`Pay $${finalTotal.toFixed(2)}`}
+                <div className="form-group">
+                  <label htmlFor="deliveryNotes">Special Instructions</label>
+                  <textarea
+                    id="deliveryNotes"
+                    value={formData.deliveryNotes}
+                    onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
+                    rows={3}
+                    placeholder="Any special requests or instructions..."
                   />
-                </Elements>
-              </div>
-            )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-large"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Processing...' : 'Place Order'}
+                </button>
+              </form>
+            </div>
           </div>
 
           {/* Order Total Sidebar */}
@@ -616,28 +552,15 @@ export default function CheckoutPage() {
                 <span>${finalTotal.toFixed(2)}</span>
               </div>
 
-              {step === 'details' && (
-                <div className="payment-notice">
-                  <p>
-                    <strong>Secure Payment:</strong> Powered by Stripe
-                  </p>
-                  <p className="payment-notice-text">
-                    Complete your information to proceed to secure payment processing.
-                  </p>
-                </div>
-              )}
-
-              {step === 'payment' && (
-                <div className="payment-notice">
-                  <p>
-                    <strong>Payment Info:</strong> Secure checkout
-                  </p>
-                  <p className="payment-notice-text">
-                    Your payment is processed securely through Stripe. Funds are automatically
-                    split: 98% to business, 2% platform fee.
-                  </p>
-                </div>
-              )}
+              <div className="payment-notice">
+                <p>
+                  <strong>Payment Status:</strong> Pending
+                </p>
+                <p className="payment-notice-text">
+                  Your order will be submitted with payment pending. The business will
+                  contact you to arrange payment.
+                </p>
+              </div>
             </div>
           </aside>
         </div>
