@@ -22,17 +22,23 @@ const isConfigValid = () => {
   )
 }
 
-// Initialize Firebase only if config is valid and we're in the browser
+// Initialize Firebase (works in both client and server environments)
 let app: FirebaseApp | undefined
 let auth: Auth | undefined
 let db: Firestore | undefined
 let storage: FirebaseStorage | undefined
 
-if (typeof window !== 'undefined' && isConfigValid()) {
+if (isConfigValid()) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
-  auth = getAuth(app)
+
+  // Auth and Storage are client-side only
+  if (typeof window !== 'undefined') {
+    auth = getAuth(app)
+    storage = getStorage(app)
+  }
+
+  // Firestore works on both client and server
   db = getFirestore(app)
-  storage = getStorage(app)
 }
 
 // Export firestore alias for backwards compatibility
