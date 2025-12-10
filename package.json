@@ -21,7 +21,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "firebase": "^10.14.1",
     "framer-motion": "^11.5.4",
-    "next": "^15.0.3",
+    "next": "15.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-email": "^5.0.4",
