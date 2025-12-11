@@ -90,9 +90,18 @@ export default function BusinessDashboard() {
       const businessRef = doc(db, 'businesses', user.uid)
 
       if (business) {
+        // Update existing business - preserves approval status
+        // Only updates the fields in businessData, status remains unchanged
         await updateDoc(businessRef, businessData)
-        setSuccess('Business profile updated successfully!')
+
+        // Different message based on approval status
+        if (business.status === 'approved') {
+          setSuccess('Profile updated! Your changes are live immediately.')
+        } else {
+          setSuccess('Profile updated successfully!')
+        }
       } else {
+        // Create new business - requires admin approval
         await setDoc(businessRef, {
           ...businessData,
           status: 'pending',
