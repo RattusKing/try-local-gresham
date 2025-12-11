@@ -89,19 +89,26 @@ export default function BusinessDashboard() {
 
       const businessRef = doc(db, 'businesses', user.uid)
 
-      if (business) {
-        // Update existing business - preserves approval status
-        // Only updates the fields in businessData, status remains unchanged
+      // IMPORTANT: Check if document actually exists in database
+      // Don't rely on state variable which might be stale
+      const existingDoc = await getDoc(businessRef)
+
+      if (existingDoc.exists()) {
+        // Document exists - UPDATE ONLY (preserves status and prevents duplicates)
+        // This ensures approved businesses stay approved
         await updateDoc(businessRef, businessData)
 
-        // Different message based on approval status
-        if (business.status === 'approved') {
+        const currentStatus = existingDoc.data().status
+        if (currentStatus === 'approved') {
           setSuccess('Profile updated! Your changes are live immediately.')
         } else {
           setSuccess('Profile updated successfully!')
         }
+
+        console.log('Updated existing business:', user.uid, 'Status:', currentStatus)
       } else {
-        // Create new business - requires admin approval
+        // Document doesn't exist - CREATE NEW (requires approval)
+        // This only happens for brand new businesses
         await setDoc(businessRef, {
           ...businessData,
           status: 'pending',
@@ -111,6 +118,8 @@ export default function BusinessDashboard() {
         setSuccess(
           'Business profile created! Waiting for admin approval.'
         )
+
+        console.log('Created new business:', user.uid)
       }
 
       await loadBusiness()
