@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
-import { db } from '@/lib/firebase/config'
-import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { getAdminDb } from '@/lib/firebase/admin'
 import Stripe from 'stripe'
 
 // Disable body parsing for webhooks
@@ -77,14 +76,13 @@ export async function POST(req: NextRequest) {
 async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   console.log('Payment succeeded:', paymentIntent.id)
 
-  if (!db) return
-
   const orderId = paymentIntent.metadata.orderId
 
   if (orderId) {
     try {
-      const orderRef = doc(db, 'orders', orderId)
-      await updateDoc(orderRef, {
+      const adminDb = getAdminDb()
+      const orderRef = adminDb.collection('orders').doc(orderId)
+      await orderRef.update({
         paymentStatus: 'completed',
         stripePaymentIntentId: paymentIntent.id,
         stripeChargeId: paymentIntent.latest_charge,
@@ -100,14 +98,13 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
   console.log('Payment failed:', paymentIntent.id)
 
-  if (!db) return
-
   const orderId = paymentIntent.metadata.orderId
 
   if (orderId) {
     try {
-      const orderRef = doc(db, 'orders', orderId)
-      await updateDoc(orderRef, {
+      const adminDb = getAdminDb()
+      const orderRef = adminDb.collection('orders').doc(orderId)
+      await orderRef.update({
         paymentStatus: 'failed',
         stripePaymentIntentId: paymentIntent.id,
         updatedAt: new Date(),
@@ -122,16 +119,15 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
 async function handleAccountUpdated(account: Stripe.Account) {
   console.log('Account updated:', account.id)
 
-  if (!db) return
-
   const businessId = account.metadata?.businessId
 
   if (businessId) {
     try {
-      const businessRef = doc(db, 'businesses', businessId)
-      const businessDoc = await getDoc(businessRef)
+      const adminDb = getAdminDb()
+      const businessRef = adminDb.collection('businesses').doc(businessId)
+      const businessDoc = await businessRef.get()
 
-      if (businessDoc.exists()) {
+      if (businessDoc.exists) {
         const chargesEnabled = account.charges_enabled
         const payoutsEnabled = account.payouts_enabled
         const detailsSubmitted = account.details_submitted
@@ -143,7 +139,7 @@ async function handleAccountUpdated(account: Stripe.Account) {
           accountStatus = 'restricted'
         }
 
-        await updateDoc(businessRef, {
+        await businessRef.update({
           stripeAccountStatus: accountStatus,
           payoutsEnabled: payoutsEnabled,
           stripeOnboardingCompletedAt: detailsSubmitted ? new Date() : null,
@@ -160,8 +156,6 @@ async function handleAccountUpdated(account: Stripe.Account) {
 
 async function handleChargeRefunded(charge: Stripe.Charge) {
   console.log('Charge refunded:', charge.id)
-
-  if (!db) return
 
   // Find order by charge ID
   // Note: This is simplified. In production, you'd want to query by stripeChargeId
