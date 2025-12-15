@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
-import { db } from '@/lib/firebase/config'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { getAdminDb } from '@/lib/firebase/admin'
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,25 +13,21 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Get admin database
+    const adminDb = getAdminDb()
+
     // Check if business exists
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Database not initialized' },
-        { status: 500 }
-      )
-    }
+    const businessRef = adminDb.collection('businesses').doc(businessId)
+    const businessDoc = await businessRef.get()
 
-    const businessRef = doc(db, 'businesses', businessId)
-    const businessDoc = await getDoc(businessRef)
-
-    if (!businessDoc.exists()) {
+    if (!businessDoc.exists) {
       return NextResponse.json(
         { error: 'Business not found' },
         { status: 404 }
       )
     }
 
-    const businessData = businessDoc.data()
+    const businessData = businessDoc.data()!
 
     // Check if account already exists
     if (businessData.stripeConnectedAccountId) {
@@ -64,7 +59,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Update business with Stripe account ID
-    await updateDoc(businessRef, {
+    await businessRef.update({
       stripeConnectedAccountId: account.id,
       stripeAccountStatus: 'pending',
       payoutsEnabled: false,

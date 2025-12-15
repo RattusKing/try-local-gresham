@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe, calculatePlatformFee } from '@/lib/stripe/config'
-import { db } from '@/lib/firebase/config'
-import { doc, getDoc } from 'firebase/firestore'
+import { getAdminDb } from '@/lib/firebase/admin'
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,24 +22,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Get business Stripe account
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Database not initialized' },
-        { status: 500 }
-      )
-    }
+    const adminDb = getAdminDb()
+    const businessRef = adminDb.collection('businesses').doc(businessId)
+    const businessDoc = await businessRef.get()
 
-    const businessRef = doc(db, 'businesses', businessId)
-    const businessDoc = await getDoc(businessRef)
-
-    if (!businessDoc.exists()) {
+    if (!businessDoc.exists) {
       return NextResponse.json(
         { error: 'Business not found' },
         { status: 404 }
       )
     }
 
-    const businessData = businessDoc.data()
+    const businessData = businessDoc.data()!
 
     // Check if business has Stripe Connect account
     if (!businessData.stripeConnectedAccountId) {

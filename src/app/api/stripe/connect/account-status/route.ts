@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
-import { db } from '@/lib/firebase/config'
-import { doc, updateDoc } from 'firebase/firestore'
+import { getAdminDb } from '@/lib/firebase/admin'
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,9 +30,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Update business in Firestore if businessId is provided
-    if (businessId && db) {
-      const businessRef = doc(db, 'businesses', businessId)
-      await updateDoc(businessRef, {
+    if (businessId) {
+      const adminDb = getAdminDb()
+      const businessRef = adminDb.collection('businesses').doc(businessId)
+      await businessRef.update({
         stripeAccountStatus: accountStatus,
         payoutsEnabled: payoutsEnabled,
         stripeOnboardingCompletedAt: detailsSubmitted ? new Date() : null,
