@@ -210,7 +210,12 @@ export default function BusinessDashboard() {
 
       {/* Stripe Payment Setup Section */}
       {business && business.status === 'approved' && (
-        <div className="payment-setup-card">
+        <>
+          <div className="section-header">
+            <h2>Payment Processing</h2>
+            <p className="section-subtitle">Connect your Stripe account to accept online payments and appointments</p>
+          </div>
+          <div className="payment-setup-card">
           {business.stripeAccountStatus === 'verified' ? (
             <div className="payment-status-verified">
               <div className="payment-status-header">
@@ -265,6 +270,7 @@ export default function BusinessDashboard() {
             </div>
           )}
         </div>
+        </>
       )}
 
       <div className="business-form-container">
