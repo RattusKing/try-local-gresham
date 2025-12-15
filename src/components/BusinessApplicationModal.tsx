@@ -183,22 +183,8 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
 
           <div className="application-intro">
             <p className="intro-lead">
-              Connect with local customers and showcase your business to the Gresham community.
+              Connect with local customers, accept online orders, and grow your presence in the Gresham community.
             </p>
-            <div className="intro-benefits">
-              <div className="benefit">
-                <span className="benefit-icon">📈</span>
-                <span>Increase Visibility</span>
-              </div>
-              <div className="benefit">
-                <span className="benefit-icon">💳</span>
-                <span>Accept Online Orders</span>
-              </div>
-              <div className="benefit">
-                <span className="benefit-icon">🎯</span>
-                <span>Targeted Marketing</span>
-              </div>
-            </div>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -335,7 +321,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
             </div>
 
             <div className="pricing-section">
-              <h3>Transparent Pricing</h3>
+              <h3>Simple, Transparent Pricing</h3>
               <div className="pricing-cards">
                 <div className="pricing-card featured">
                   <div className="pricing-badge">Most Popular</div>
@@ -346,11 +332,12 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
                     <span className="period">/month</span>
                   </div>
                   <ul className="pricing-features">
-                    <li>✓ Unlimited product listings</li>
-                    <li>✓ Online ordering system</li>
-                    <li>✓ Business analytics dashboard</li>
-                    <li>✓ Customer reviews & ratings</li>
-                    <li>✓ Featured in local directory</li>
+                    <li>Unlimited product & service listings</li>
+                    <li>Online ordering & appointment booking</li>
+                    <li>Business analytics & insights</li>
+                    <li>Customer reviews & ratings</li>
+                    <li>Featured in local directory</li>
+                    <li>Payment processing via Stripe</li>
                   </ul>
                   <div className="pricing-fee">
                     <strong>Transaction Fee:</strong> 2% per sale
@@ -358,7 +345,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
                 </div>
               </div>
               <div className="pricing-promo">
-                <span className="promo-badge">🎉 Special Offer</span>
+                <span className="promo-badge">Special Launch Offer</span>
                 <p>First month free for early adopters! No credit card required to apply.</p>
               </div>
             </div>
