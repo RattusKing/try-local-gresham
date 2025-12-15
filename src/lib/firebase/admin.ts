@@ -17,22 +17,29 @@ export function initializeAdminApp() {
   }
 
   try {
-    // For local development and production on platforms that support service account JSON
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-
-      adminApp = initializeApp({
-        credential: cert(serviceAccount),
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      })
-    } else {
-      // Fallback: Use individual environment variables
-      // This works when you have GOOGLE_APPLICATION_CREDENTIALS set
-      // or when running on Google Cloud Platform
-      adminApp = initializeApp({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      })
+    // Check if service account env var exists
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+      console.error('FIREBASE_SERVICE_ACCOUNT environment variable is not set!')
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is missing')
     }
+
+    console.log('Attempting to initialize Firebase Admin SDK...')
+
+    // For local development and production on platforms that support service account JSON
+    let serviceAccount
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      console.log('Service account JSON parsed successfully')
+      console.log('Project ID from service account:', serviceAccount.project_id)
+    } catch (parseError) {
+      console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:', parseError)
+      throw new Error('Invalid JSON in FIREBASE_SERVICE_ACCOUNT environment variable')
+    }
+
+    adminApp = initializeApp({
+      credential: cert(serviceAccount),
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || serviceAccount.project_id,
+    })
 
     adminDb = getFirestore(adminApp)
 
