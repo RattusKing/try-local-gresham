@@ -26,10 +26,25 @@ export async function POST(req: NextRequest) {
       url: accountLink.url,
       message: 'Account link created successfully',
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating account link:', error)
+
+    // Provide detailed error information
+    let errorMessage = 'Failed to create account link'
+    let errorDetails = error.message || 'Unknown error'
+
+    if (error.type === 'StripeInvalidRequestError') {
+      errorMessage = `Stripe error: ${error.message}`
+      errorDetails = error.raw?.message || error.message
+    }
+
     return NextResponse.json(
-      { error: 'Failed to create account link' },
+      {
+        error: errorMessage,
+        details: errorDetails,
+        type: error.type || 'Unknown',
+        code: error.code || 'Unknown'
+      },
       { status: 500 }
     )
   }
