@@ -13,8 +13,23 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get admin database
-    const adminDb = getAdminDb()
+    // Get admin database with detailed error handling
+    let adminDb
+    try {
+      console.log('About to call getAdminDb()...')
+      adminDb = getAdminDb()
+      console.log('getAdminDb() succeeded')
+    } catch (adminError: any) {
+      console.error('Failed to initialize Firebase Admin:', adminError)
+      return NextResponse.json(
+        {
+          error: 'Failed to initialize Firebase Admin SDK',
+          details: adminError.message,
+          stack: adminError.stack
+        },
+        { status: 500 }
+      )
+    }
 
     // Check if business exists
     const businessRef = adminDb.collection('businesses').doc(businessId)
