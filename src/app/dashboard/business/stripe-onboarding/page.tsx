@@ -17,12 +17,12 @@ export default function StripeOnboardingPage() {
   const [accountStatus, setAccountStatus] = useState<'pending' | 'verified' | 'restricted' | null>(null)
   const [business, setBusiness] = useState<Business | null>(null)
 
-  // Check for success/refresh params
+  // Check for success/refresh params and check status after business loads
   useEffect(() => {
     const successParam = searchParams.get('success')
     const refreshParam = searchParams.get('refresh')
 
-    if (successParam) {
+    if (successParam && business?.stripeConnectedAccountId) {
       setSuccess(true)
       checkAccountStatus()
     }
@@ -30,7 +30,7 @@ export default function StripeOnboardingPage() {
     if (refreshParam) {
       setError('Onboarding session expired. Please try again.')
     }
-  }, [searchParams])
+  }, [searchParams, business])
 
   // Load business data
   useEffect(() => {
@@ -58,6 +58,7 @@ export default function StripeOnboardingPage() {
   const checkAccountStatus = async () => {
     if (!business?.stripeConnectedAccountId) return
 
+    setLoading(true)
     try {
       const response = await fetch('/api/stripe/connect/account-status', {
         method: 'POST',
@@ -73,9 +74,14 @@ export default function StripeOnboardingPage() {
       if (response.ok) {
         setAccountStatus(data.accountStatus)
         setBusiness(prev => prev ? { ...prev, stripeAccountStatus: data.accountStatus } : null)
+
+        // Reload business data to get the updated status from Firestore
+        await loadBusinessData()
       }
     } catch (err) {
       console.error('Error checking account status:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -189,18 +195,27 @@ export default function StripeOnboardingPage() {
             <svg className="w-6 h-6 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div>
+            <div className="flex-1">
               <p className="font-semibold text-yellow-900">Verification Pending</p>
               <p className="text-yellow-700 text-sm mt-1">
                 Your account is being verified. Complete any remaining steps in Stripe to start accepting payments.
               </p>
-              <button
-                onClick={handleStartOnboarding}
-                disabled={loading}
-                className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-300 transition-colors"
-              >
-                {loading ? 'Loading...' : 'Continue Setup'}
-              </button>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={handleStartOnboarding}
+                  disabled={loading}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-300 transition-colors"
+                >
+                  {loading ? 'Loading...' : 'Continue Setup'}
+                </button>
+                <button
+                  onClick={checkAccountStatus}
+                  disabled={loading}
+                  className="px-4 py-2 bg-white text-yellow-800 border border-yellow-300 rounded-lg hover:bg-yellow-50 disabled:bg-gray-100 transition-colors"
+                >
+                  {loading ? 'Checking...' : 'Refresh Status'}
+                </button>
+              </div>
             </div>
           </div>
         ) : accountStatus === 'restricted' ? (
