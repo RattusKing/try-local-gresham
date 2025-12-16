@@ -342,7 +342,8 @@ export default function CheckoutPage() {
       }
 
       clearCart()
-      router.push('/orders')
+      // Redirect to success page with better confirmation
+      router.push('/checkout/success')
     } catch (err: any) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Error creating order:', err)
