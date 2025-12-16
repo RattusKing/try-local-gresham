@@ -18,6 +18,17 @@ export default function StripeCheckoutForm({
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isReady, setIsReady] = useState(false)
+
+  // Check if Stripe is loaded
+  useEffect(() => {
+    if (stripe && elements) {
+      setIsReady(true)
+      console.log('Stripe and Elements are ready')
+    } else {
+      console.log('Waiting for Stripe...', { stripe: !!stripe, elements: !!elements })
+    }
+  }, [stripe, elements])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +71,24 @@ export default function StripeCheckoutForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-white p-6 rounded-lg border border-gray-200">
         <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-        <PaymentElement />
+
+        {!isReady && (
+          <div className="py-8 text-center text-gray-500">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
+            <p>Loading payment form...</p>
+          </div>
+        )}
+
+        <div style={{ minHeight: '200px' }}>
+          <PaymentElement
+            options={{
+              layout: {
+                type: 'tabs',
+                defaultCollapsed: false,
+              },
+            }}
+          />
+        </div>
       </div>
 
       {errorMessage && (
