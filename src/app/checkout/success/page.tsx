@@ -11,26 +11,44 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const { user } = useAuth()
   const [countdown, setCountdown] = useState(10)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   // Countdown to auto-redirect
   useEffect(() => {
+    // Don't start countdown until user is loaded
+    if (!user) return
+
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
       return () => clearTimeout(timer)
     } else {
+      setIsRedirecting(true)
       router.push('/orders')
     }
-  }, [countdown, router])
+  }, [countdown, router, user])
 
-  // Redirect if not logged in
+  // Only redirect to home if we're SURE there's no user after a delay
   useEffect(() => {
-    if (!user) {
-      router.push('/')
-    }
-  }, [user, router])
+    const timeout = setTimeout(() => {
+      if (!user && !isRedirecting) {
+        console.log('No user found after timeout, redirecting to home')
+        router.push('/')
+      }
+    }, 2000) // Wait 2 seconds before redirecting to home
 
+    return () => clearTimeout(timeout)
+  }, [user, router, isRedirecting])
+
+  // Show loading while auth is initializing
   if (!user) {
-    return null
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+          <p className="text-gray-600">Loading your order confirmation...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
