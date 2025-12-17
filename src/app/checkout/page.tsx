@@ -64,7 +64,11 @@ export default function CheckoutPage() {
 
     try {
       const discountsRef = collection(db, 'discountCodes')
-      const q = query(discountsRef, where('code', '==', discountCode.toUpperCase()))
+      const q = query(
+        discountsRef,
+        where('code', '==', discountCode.toUpperCase()),
+        where('isActive', '==', true)
+      )
       const snapshot = await getDocs(q)
 
       if (snapshot.empty) {
