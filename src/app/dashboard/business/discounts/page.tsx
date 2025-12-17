@@ -48,7 +48,7 @@ export default function BusinessDiscounts() {
     try {
       setLoading(true)
       const discountsQuery = query(
-        collection(db, 'discounts'),
+        collection(db, 'discountCodes'),
         where('businessId', '==', user.uid)
       )
       const discountsSnap = await getDocs(discountsQuery)
@@ -100,11 +100,11 @@ export default function BusinessDiscounts() {
       }
 
       if (editingDiscount) {
-        const discountRef = doc(db, 'discounts', editingDiscount.id)
+        const discountRef = doc(db, 'discountCodes', editingDiscount.id)
         await updateDoc(discountRef, discountData)
         setSuccess('Discount code updated successfully!')
       } else {
-        await addDoc(collection(db, 'discounts'), {
+        await addDoc(collection(db, 'discountCodes'), {
           ...discountData,
           createdAt: new Date(),
         })
@@ -140,7 +140,7 @@ export default function BusinessDiscounts() {
     if (!confirm('Are you sure you want to delete this discount code?')) return
 
     try {
-      await deleteDoc(doc(db, 'discounts', discountId))
+      await deleteDoc(doc(db, 'discountCodes', discountId))
       setSuccess('Discount code deleted successfully!')
       await loadDiscounts()
     } catch (err: any) {
@@ -152,7 +152,7 @@ export default function BusinessDiscounts() {
     if (!db) return
 
     try {
-      const discountRef = doc(db, 'discounts', discount.id)
+      const discountRef = doc(db, 'discountCodes', discount.id)
       await updateDoc(discountRef, {
         isActive: !discount.isActive,
         updatedAt: new Date(),
