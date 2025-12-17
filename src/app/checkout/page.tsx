@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const [applyingDiscount, setApplyingDiscount] = useState(false)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
+  const [isProcessingSuccess, setIsProcessingSuccess] = useState(false)
 
   const [formData, setFormData] = useState({
     deliveryMethod: 'pickup' as DeliveryMethod,
@@ -41,12 +42,12 @@ export default function CheckoutPage() {
     pickupTime: '',
   })
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not during success flow)
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !isProcessingSuccess) {
       router.push('/')
     }
-  }, [items, router])
+  }, [items, router, isProcessingSuccess])
 
   // Redirect if not logged in
   useEffect(() => {
@@ -201,6 +202,7 @@ export default function CheckoutPage() {
 
     try {
       setSubmitting(true)
+      setIsProcessingSuccess(true)
       setError('')
 
       // Group items by business
