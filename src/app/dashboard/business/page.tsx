@@ -8,6 +8,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { Business } from '@/lib/types'
 import StatusBadge from '@/components/StatusBadge'
+import SubscriptionManager from '@/components/SubscriptionManager'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -28,7 +29,6 @@ export default function BusinessDashboard() {
     website: '',
     map: '',
     description: '',
-    subscriptionTier: 'free' as 'free' | 'standard' | 'premium',
   })
 
   const loadBusiness = useCallback(async () => {
@@ -51,7 +51,6 @@ export default function BusinessDashboard() {
           website: data.website || '',
           map: data.map || '',
           description: data.description || '',
-          subscriptionTier: data.subscriptionTier || 'free',
         })
       }
     } catch (err: any) {
@@ -83,7 +82,6 @@ export default function BusinessDashboard() {
         website: formData.website,
         map: formData.map,
         description: formData.description,
-        subscriptionTier: formData.subscriptionTier,
         ownerId: user.uid,
         updatedAt: new Date(),
       }
@@ -272,6 +270,11 @@ export default function BusinessDashboard() {
           )}
         </div>
         </>
+      )}
+
+      {/* Subscription Management Section */}
+      {business && business.status === 'approved' && (
+        <SubscriptionManager business={business} onSubscriptionUpdate={loadBusiness} />
       )}
 
       <div className="business-form-container">

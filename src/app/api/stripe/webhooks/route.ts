@@ -59,6 +59,31 @@ export async function POST(req: NextRequest) {
         await handleChargeRefunded(event.data.object as Stripe.Charge)
         break
 
+      // Subscription events
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session)
+        break
+
+      case 'customer.subscription.created':
+        await handleSubscriptionCreated(event.data.object as Stripe.Subscription)
+        break
+
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription)
+        break
+
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription)
+        break
+
+      case 'invoice.payment_succeeded':
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice)
+        break
+
+      case 'invoice.payment_failed':
+        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice)
+        break
+
       default:
         console.log(`Unhandled event type: ${event.type}`)
     }
@@ -161,4 +186,172 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
   // Note: This is simplified. In production, you'd want to query by stripeChargeId
   // For now, we'll just log it
   console.log('Refund processed for charge:', charge.id)
+}
+
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+  console.log('Checkout session completed:', session.id)
+
+  // If this is a subscription checkout
+  if (session.mode === 'subscription' && session.subscription) {
+    const businessId = session.metadata?.businessId
+
+    if (businessId) {
+      try {
+        const adminDb = getAdminDb()
+        const businessRef = adminDb.collection('businesses').doc(businessId)
+
+        await businessRef.update({
+          stripeSubscriptionId: session.subscription,
+          stripeCustomerId: session.customer,
+          updatedAt: new Date(),
+        })
+
+        console.log(`Business ${businessId} subscription session completed`)
+      } catch (error) {
+        console.error('Error updating business with subscription:', error)
+      }
+    }
+  }
+}
+
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+  console.log('Subscription created:', subscription.id)
+
+  const businessId = subscription.metadata?.businessId
+  const hasFirstMonthFree = subscription.metadata?.hasFirstMonthFree === 'true'
+
+  if (businessId) {
+    try {
+      const adminDb = getAdminDb()
+      const businessRef = adminDb.collection('businesses').doc(businessId)
+
+      // Type assertion for Stripe subscription properties
+      const sub = subscription as any
+
+      await businessRef.update({
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id,
+        subscriptionStatus: subscription.status,
+        subscriptionCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
+        subscriptionCancelAtPeriodEnd: sub.cancel_at_period_end,
+        hasFirstMonthFree: hasFirstMonthFree,
+        subscriptionCreatedAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      console.log(`Business ${businessId} subscription created with status: ${subscription.status}`)
+    } catch (error) {
+      console.error('Error creating subscription record:', error)
+    }
+  }
+}
+
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  console.log('Subscription updated:', subscription.id)
+
+  const businessId = subscription.metadata?.businessId
+
+  if (businessId) {
+    try {
+      const adminDb = getAdminDb()
+      const businessRef = adminDb.collection('businesses').doc(businessId)
+
+      // Type assertion for Stripe subscription properties
+      const sub = subscription as any
+
+      await businessRef.update({
+        subscriptionStatus: subscription.status,
+        subscriptionCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
+        subscriptionCancelAtPeriodEnd: sub.cancel_at_period_end,
+        updatedAt: new Date(),
+      })
+
+      console.log(`Business ${businessId} subscription updated to status: ${subscription.status}`)
+    } catch (error) {
+      console.error('Error updating subscription:', error)
+    }
+  }
+}
+
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  console.log('Subscription deleted:', subscription.id)
+
+  const businessId = subscription.metadata?.businessId
+
+  if (businessId) {
+    try {
+      const adminDb = getAdminDb()
+      const businessRef = adminDb.collection('businesses').doc(businessId)
+
+      await businessRef.update({
+        subscriptionStatus: 'canceled',
+        subscriptionCancelAtPeriodEnd: false,
+        updatedAt: new Date(),
+      })
+
+      console.log(`Business ${businessId} subscription canceled`)
+    } catch (error) {
+      console.error('Error deleting subscription:', error)
+    }
+  }
+}
+
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  console.log('Invoice payment succeeded:', invoice.id)
+
+  // Type assertion for invoice properties
+  const inv = invoice as any
+
+  if (inv.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(inv.subscription as string)
+    const businessId = subscription.metadata?.businessId
+
+    if (businessId) {
+      try {
+        const adminDb = getAdminDb()
+        const businessRef = adminDb.collection('businesses').doc(businessId)
+
+        // Type assertion for Stripe subscription properties
+        const sub = subscription as any
+
+        await businessRef.update({
+          subscriptionStatus: 'active',
+          subscriptionCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
+          updatedAt: new Date(),
+        })
+
+        console.log(`Business ${businessId} invoice paid, subscription active`)
+      } catch (error) {
+        console.error('Error updating subscription payment status:', error)
+      }
+    }
+  }
+}
+
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  console.log('Invoice payment failed:', invoice.id)
+
+  // Type assertion for invoice properties
+  const inv = invoice as any
+
+  if (inv.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(inv.subscription as string)
+    const businessId = subscription.metadata?.businessId
+
+    if (businessId) {
+      try {
+        const adminDb = getAdminDb()
+        const businessRef = adminDb.collection('businesses').doc(businessId)
+
+        await businessRef.update({
+          subscriptionStatus: 'past_due',
+          updatedAt: new Date(),
+        })
+
+        console.log(`Business ${businessId} invoice payment failed, subscription past due`)
+      } catch (error) {
+        console.error('Error updating subscription payment failure:', error)
+      }
+    }
+  }
 }

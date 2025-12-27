@@ -14,7 +14,6 @@ export interface Business {
   instagram?: string
   ownerId?: string
   status?: 'pending' | 'approved' | 'rejected'
-  subscriptionTier?: 'free' | 'standard' | 'premium'
   averageRating?: number
   reviewCount?: number
   createdAt?: Date
@@ -24,6 +23,14 @@ export interface Business {
   stripeAccountStatus?: 'pending' | 'verified' | 'restricted' // Account verification status
   payoutsEnabled?: boolean // Whether payouts are enabled for this account
   stripeOnboardingCompletedAt?: Date // When Stripe onboarding was completed
+  // Subscription fields
+  stripeCustomerId?: string // Stripe Customer ID for subscriptions
+  stripeSubscriptionId?: string // Stripe Subscription ID
+  subscriptionStatus?: SubscriptionStatus // Current subscription status
+  subscriptionCurrentPeriodEnd?: Date // When current billing period ends
+  subscriptionCancelAtPeriodEnd?: boolean // Whether subscription will cancel at period end
+  hasFirstMonthFree?: boolean // Whether this business got first month free promotion
+  subscriptionCreatedAt?: Date // When subscription was created
 }
 
 export type UserRole = 'customer' | 'business_owner' | 'admin'
@@ -273,7 +280,10 @@ export interface CSVImportError {
 
 // Stripe Subscription Types
 
-export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing'
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'unpaid'
+
+// Single-tier subscription at $39/month
+export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00 in cents
 
 export interface Subscription {
   id: string
@@ -281,12 +291,12 @@ export interface Subscription {
   stripeSubscriptionId: string // Stripe Subscription ID
   stripeCustomerId: string // Stripe Customer ID
   stripePriceId: string // Stripe Price ID
-  tier: 'free' | 'standard' | 'premium'
   status: SubscriptionStatus
   currentPeriodStart: Date
   currentPeriodEnd: Date
   cancelAtPeriodEnd: boolean
   canceledAt?: Date
+  hasFirstMonthFree: boolean // Whether first month was free
   createdAt: Date
   updatedAt: Date
 }
