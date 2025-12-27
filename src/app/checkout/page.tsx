@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { db } from '@/lib/firebase/config'
@@ -403,7 +404,13 @@ export default function CheckoutPage() {
                     {group.items.map((item) => (
                       <div key={item.productId} className="order-item">
                         {item.productImage && (
-                          <img src={item.productImage} alt={item.productName} />
+                          <Image
+                            src={item.productImage}
+                            alt={item.productName}
+                            width={80}
+                            height={80}
+                            style={{ objectFit: 'cover', borderRadius: '8px' }}
+                          />
                         )}
                         <div className="order-item-info">
                           <h4>{item.productName}</h4>

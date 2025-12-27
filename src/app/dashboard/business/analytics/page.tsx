@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Order, Product } from '@/lib/types'
 import './analytics.css'
 
@@ -25,11 +25,7 @@ export default function BusinessAnalytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [timeRange, setTimeRange] = useState<'7' | '30' | '90'>('30')
 
-  useEffect(() => {
-    loadAnalytics()
-  }, [user, timeRange])
-
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -139,7 +135,11 @@ export default function BusinessAnalytics() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db, timeRange])
+
+  useEffect(() => {
+    loadAnalytics()
+  }, [user, timeRange, loadAnalytics])
 
   const exportToCSV = () => {
     if (!analytics) return

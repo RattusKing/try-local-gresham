@@ -12,7 +12,7 @@ import {
   doc,
   orderBy,
 } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Appointment, AppointmentStatus } from '@/lib/types'
 import './appointments.css'
 
@@ -26,11 +26,7 @@ export default function BusinessAppointments() {
   const [editingNotes, setEditingNotes] = useState<string | null>(null)
   const [notesText, setNotesText] = useState('')
 
-  useEffect(() => {
-    loadAppointments()
-  }, [user])
-
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -61,7 +57,11 @@ export default function BusinessAppointments() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db])
+
+  useEffect(() => {
+    loadAppointments()
+  }, [user, loadAppointments])
 
   const updateStatus = async (appointmentId: string, status: AppointmentStatus) => {
     if (!db) return

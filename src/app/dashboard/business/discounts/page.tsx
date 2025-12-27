@@ -12,7 +12,7 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { DiscountCode, DiscountType } from '@/lib/types'
 import './discounts.css'
 
@@ -38,11 +38,7 @@ export default function BusinessDiscounts() {
     isActive: true,
   })
 
-  useEffect(() => {
-    loadDiscounts()
-  }, [user])
-
-  const loadDiscounts = async () => {
+  const loadDiscounts = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -67,7 +63,11 @@ export default function BusinessDiscounts() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db])
+
+  useEffect(() => {
+    loadDiscounts()
+  }, [loadDiscounts])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
