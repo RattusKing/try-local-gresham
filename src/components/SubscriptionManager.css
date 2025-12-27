@@ -1,0 +1,267 @@
+.subscription-manager {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.subscription-manager h2 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.subscription-manager h3 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+/* Inactive Subscription (Signup View) */
+.subscription-inactive {
+  text-align: center;
+}
+
+.subscription-plan {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.subscription-price {
+  margin: 24px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.price-amount {
+  font-size: 48px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.price-period {
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+.subscription-features {
+  text-align: left;
+  margin: 24px 0;
+}
+
+.subscription-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.subscription-features li {
+  padding: 8px 0;
+  font-size: 16px;
+  color: #555;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.subscription-features li:last-child {
+  border-bottom: none;
+}
+
+.first-month-promo {
+  background: #fff9e6;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 24px 0;
+}
+
+.promo-badge {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f57c00;
+  margin: 0 0 8px 0;
+}
+
+.promo-text {
+  font-size: 16px;
+  color: #333;
+  margin: 0;
+}
+
+.btn-subscribe {
+  width: 100%;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.subscription-note {
+  font-size: 14px;
+  color: #777;
+  margin: 12px 0 0 0;
+}
+
+/* Active Subscription */
+.subscription-active {
+  max-width: 600px;
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.subscription-status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-trial {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-past-due {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.status-canceled {
+  background: #f5f5f5;
+  color: #616161;
+}
+
+.status-incomplete,
+.status-unpaid {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.subscription-details {
+  margin: 24px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-item {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item.highlight {
+  background: #e3f2fd;
+}
+
+.detail-item.warning {
+  background: #fff3e0;
+}
+
+.detail-item.error {
+  background: #ffebee;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.detail-value {
+  color: #333;
+  text-align: right;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f5f7ff;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .subscription-manager {
+    padding: 16px;
+  }
+
+  .subscription-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .price-amount {
+    font-size: 36px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .detail-value {
+    text-align: left;
+  }
+}

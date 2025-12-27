@@ -3,9 +3,26 @@ import Stripe from 'stripe'
 // Platform fee percentage (2%)
 export const PLATFORM_FEE_PERCENTAGE = 0.02
 
+// Subscription pricing
+export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00 in cents
+
 // Helper function to calculate platform fee
 export function calculatePlatformFee(amount: number): number {
   return Math.round(amount * PLATFORM_FEE_PERCENTAGE)
+}
+
+// Get Stripe Price ID from environment
+export function getSubscriptionPriceId(): string {
+  const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID
+
+  if (!priceId) {
+    throw new Error(
+      'STRIPE_SUBSCRIPTION_PRICE_ID is not set in environment variables. ' +
+      'Please create a subscription product in Stripe and add the price ID to your .env.local file.'
+    )
+  }
+
+  return priceId
 }
 
 // Lazy initialization of Stripe - only creates instance when needed
