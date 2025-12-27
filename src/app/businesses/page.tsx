@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -22,18 +22,6 @@ export default function BusinessesPage() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [favoritedBusinessIds, setFavoritedBusinessIds] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    loadBusinesses()
-  }, [])
-
-  useEffect(() => {
-    if (user) {
-      loadFavorites()
-    } else {
-      setFavoritedBusinessIds(new Set())
-    }
-  }, [user])
 
   const loadBusinesses = async () => {
     if (!db) {
@@ -66,7 +54,7 @@ export default function BusinessesPage() {
     }
   }
 
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     if (!db || !user) return
 
     try {
@@ -82,7 +70,19 @@ export default function BusinessesPage() {
     } catch (error) {
       console.error('Error loading favorites:', error)
     }
-  }
+  }, [db, user])
+
+  useEffect(() => {
+    loadBusinesses()
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      loadFavorites()
+    } else {
+      setFavoritedBusinessIds(new Set())
+    }
+  }, [user, loadFavorites])
 
   const handleFavorite = async (businessId: string) => {
     if (!user) {

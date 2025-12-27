@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { Business } from '@/lib/types'
 import './admin.css'
 
@@ -196,8 +197,14 @@ export default function AdminDashboard() {
             ) : (
               pendingBusinesses.map((business) => (
                 <div key={business.id} className="business-card-admin">
-                  <div className="business-card-image">
-                    <img src={business.cover} alt={business.name} />
+                  <div className="business-card-image" style={{ position: 'relative', width: '100%', height: '200px' }}>
+                    <Image
+                      src={business.cover}
+                      alt={business.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, 300px"
+                    />
                   </div>
                   <div className="business-card-content">
                     <h3>{business.name}</h3>
@@ -260,8 +267,14 @@ export default function AdminDashboard() {
             ) : (
               approvedBusinesses.map((business) => (
                 <div key={business.id} className="business-card-admin approved">
-                  <div className="business-card-image">
-                    <img src={business.cover} alt={business.name} />
+                  <div className="business-card-image" style={{ position: 'relative', width: '100%', height: '200px' }}>
+                    <Image
+                      src={business.cover}
+                      alt={business.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, 300px"
+                    />
                   </div>
                   <div className="business-card-content">
                     <h3>{business.name}</h3>

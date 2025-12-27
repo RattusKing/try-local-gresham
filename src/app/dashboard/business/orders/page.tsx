@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, doc, updateDoc, orderBy } from 'firebase/firestore'
@@ -18,21 +19,7 @@ export default function BusinessOrdersPage() {
   const [error, setError] = useState('')
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/dashboard')
-      return
-    }
-
-    if (user.role !== 'business_owner') {
-      router.push('/dashboard')
-      return
-    }
-
-    loadBusinessAndOrders()
-  }, [user, router])
-
-  const loadBusinessAndOrders = async () => {
+  const loadBusinessAndOrders = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -63,7 +50,21 @@ export default function BusinessOrdersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db])
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/dashboard')
+      return
+    }
+
+    if (user.role !== 'business_owner') {
+      router.push('/dashboard')
+      return
+    }
+
+    loadBusinessAndOrders()
+  }, [user, router, loadBusinessAndOrders])
 
   const loadOrders = async (bizId: string) => {
     if (!db) return
@@ -344,7 +345,13 @@ export default function BusinessOrdersPage() {
                     {order.items.map((item, idx) => (
                       <div key={idx} className="order-item">
                         {item.productImage && (
-                          <img src={item.productImage} alt={item.productName} />
+                          <Image
+                            src={item.productImage}
+                            alt={item.productName}
+                            width={60}
+                            height={60}
+                            style={{ objectFit: 'cover', borderRadius: '8px' }}
+                          />
                         )}
                         <div className="order-item-details">
                           <h5>{item.productName}</h5>

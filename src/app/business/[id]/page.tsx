@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { db } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
 import { Business, Product, Review, Service } from '@/lib/types'
@@ -39,20 +40,7 @@ export default function BusinessProfilePage() {
     comment: '',
   })
 
-  useEffect(() => {
-    loadBusiness()
-  }, [params.id])
-
-  // Load user's product favorites
-  useEffect(() => {
-    if (user) {
-      loadProductFavorites()
-    } else {
-      setFavoritedProductIds(new Set())
-    }
-  }, [user])
-
-  const loadProductFavorites = async () => {
+  const loadProductFavorites = useCallback(async () => {
     if (!db || !user) return
 
     try {
@@ -68,9 +56,9 @@ export default function BusinessProfilePage() {
     } catch (error) {
       console.error('Error loading product favorites:', error)
     }
-  }
+  }, [db, user])
 
-  const loadBusiness = async () => {
+  const loadBusiness = useCallback(async () => {
     if (!params.id || !db) return
 
     try {
@@ -105,7 +93,8 @@ export default function BusinessProfilePage() {
     } finally {
       setLoading(false)
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id, db])
 
   const loadProducts = async (businessId: string) => {
     if (!db) return
@@ -189,6 +178,19 @@ export default function BusinessProfilePage() {
       console.error('Error loading reviews:', err)
     }
   }
+
+  // Effects
+  useEffect(() => {
+    loadBusiness()
+  }, [params.id, loadBusiness])
+
+  useEffect(() => {
+    if (user) {
+      loadProductFavorites()
+    } else {
+      setFavoritedProductIds(new Set())
+    }
+  }, [user, loadProductFavorites])
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -423,7 +425,16 @@ export default function BusinessProfilePage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <img src={business.cover} alt={business.name} className="business-hero-image" />
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Image
+            src={business.cover}
+            alt={business.name}
+            fill
+            className="business-hero-image"
+            style={{ objectFit: 'cover' }}
+            priority
+          />
+        </div>
         <div className="business-hero-overlay">
           <div className="business-hero-content">
             <motion.h1
@@ -489,11 +500,16 @@ export default function BusinessProfilePage() {
                 {products.map((product) => (
                   <div key={product.id} className="product-item">
                     {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="product-item-image"
-                      />
+                      <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          className="product-item-image"
+                          style={{ objectFit: 'cover' }}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
                     )}
                     <div className="product-item-content">
                       <div className="product-item-header">
@@ -648,10 +664,13 @@ export default function BusinessProfilePage() {
                     <div className="review-header">
                       <div className="review-author">
                         {review.userPhotoURL ? (
-                          <img
+                          <Image
                             src={review.userPhotoURL}
                             alt={review.userName}
+                            width={48}
+                            height={48}
                             className="review-avatar"
+                            style={{ borderRadius: '50%', objectFit: 'cover' }}
                           />
                         ) : (
                           <div className="review-avatar-placeholder">
@@ -762,8 +781,18 @@ export default function BusinessProfilePage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="map-link"
+                  style={{ position: 'relative', display: 'block' }}
                 >
-                  <img src={business.cover} alt="Location" className="map-placeholder" />
+                  <div style={{ position: 'relative', width: '100%', height: '300px' }}>
+                    <Image
+                      src={business.cover}
+                      alt="Location"
+                      fill
+                      className="map-placeholder"
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, 400px"
+                    />
+                  </div>
                   <div className="map-overlay">
                     <span>📍 Open in Maps</span>
                   </div>

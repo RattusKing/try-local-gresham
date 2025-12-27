@@ -14,7 +14,7 @@ import {
   writeBatch,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Product } from '@/lib/types'
 import { exportProductsToCSV } from '@/lib/csv-import'
 import CSVImportModal from '@/components/CSVImportModal'
@@ -43,11 +43,7 @@ export default function BusinessProducts() {
     image: '',
   })
 
-  useEffect(() => {
-    loadProducts()
-  }, [user])
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -68,7 +64,11 @@ export default function BusinessProducts() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db])
+
+  useEffect(() => {
+    loadProducts()
+  }, [loadProducts])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0] || !user || !storage) return

@@ -4,7 +4,8 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { db, storage } from '@/lib/firebase/config'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
 import { Business } from '@/lib/types'
 import StatusBadge from '@/components/StatusBadge'
 import './business.css'
@@ -30,11 +31,7 @@ export default function BusinessDashboard() {
     subscriptionTier: 'free' as 'free' | 'standard' | 'premium',
   })
 
-  useEffect(() => {
-    loadBusiness()
-  }, [user])
-
-  const loadBusiness = async () => {
+  const loadBusiness = useCallback(async () => {
     if (!user || !db) return
 
     try {
@@ -62,7 +59,11 @@ export default function BusinessDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, db])
+
+  useEffect(() => {
+    loadBusiness()
+  }, [loadBusiness])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -408,8 +409,14 @@ export default function BusinessDashboard() {
           <div className="form-section">
             <h2>Business Image</h2>
             {business?.cover && (
-              <div className="current-image">
-                <img src={business.cover} alt={business.name} />
+              <div className="current-image" style={{ position: 'relative', width: '100%', maxWidth: '600px', height: '300px' }}>
+                <Image
+                  src={business.cover}
+                  alt={business.name}
+                  fill
+                  style={{ objectFit: 'cover', borderRadius: '8px' }}
+                  sizes="(max-width: 768px) 100vw, 600px"
+                />
               </div>
             )}
             <div className="form-group">
