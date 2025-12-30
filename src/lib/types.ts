@@ -98,7 +98,7 @@ export type DeliveryMethod = 'pickup' | 'delivery'
 
 export interface Order {
   id: string
-  userId: string
+  userId?: string // Optional for guest checkout
   userName: string
   userEmail: string
   userPhone?: string

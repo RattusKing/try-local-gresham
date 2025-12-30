@@ -38,6 +38,8 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     deliveryMethod: 'pickup' as DeliveryMethod,
     phone: '',
+    email: '',
+    name: '',
     deliveryAddress: '',
     deliveryNotes: '',
     pickupTime: '',
@@ -49,13 +51,6 @@ export default function CheckoutPage() {
       router.push('/')
     }
   }, [items, router, isProcessingSuccess])
-
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!user) {
-      router.push('/')
-    }
-  }, [user, router])
 
   const applyDiscountCode = async () => {
     if (!db || !discountCode.trim()) return
@@ -156,7 +151,19 @@ export default function CheckoutPage() {
   const handleContinueToPayment = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!user || !db) return
+    if (!db) return
+
+    // For guest users, require email and name
+    if (!user) {
+      if (!formData.email.trim()) {
+        setError('Email is required')
+        return
+      }
+      if (!formData.name.trim()) {
+        setError('Name is required')
+        return
+      }
+    }
 
     if (!formData.phone.trim()) {
       setError('Phone number is required')
@@ -175,6 +182,9 @@ export default function CheckoutPage() {
       // Get the first business ID (for creating payment intent)
       const firstBusinessId = items[0].businessId
 
+      // Use authenticated user email or guest email
+      const customerEmail = user?.email || formData.email
+
       // Create payment intent
       const response = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
@@ -182,7 +192,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           amount: Math.round(finalTotal * 100), // Convert to cents
           businessId: firstBusinessId,
-          customerEmail: user.email,
+          customerEmail,
         }),
       })
 
@@ -203,7 +213,7 @@ export default function CheckoutPage() {
   }
 
   const handlePaymentSuccess = async (stripePaymentIntentId: string) => {
-    if (!user || !db) return
+    if (!db) return
 
     try {
       setSubmitting(true)
@@ -225,6 +235,10 @@ export default function CheckoutPage() {
 
       const firestore = db
       if (!firestore) return
+
+      // Get customer info - either from authenticated user or guest form
+      const customerEmail = user?.email || formData.email
+      const customerName = user?.displayName || formData.name
 
       // Create separate orders for each business
       const orderPromises = Object.values(businessGroups).map(async (group) => {
@@ -260,9 +274,9 @@ export default function CheckoutPage() {
         }
 
         const orderData = {
-          userId: user.uid,
-          userName: user.displayName || user.email || 'Anonymous',
-          userEmail: user.email || '',
+          ...(user?.uid && { userId: user.uid }), // Only include userId if user is authenticated
+          userName: customerName,
+          userEmail: customerEmail,
           userPhone: formData.phone,
           businessId: group.businessId,
           businessName: group.businessName,
@@ -292,13 +306,13 @@ export default function CheckoutPage() {
           const businessEmail = businessData?.email || businessData?.website || ''
           const businessAddress = businessData?.address || ''
 
-          if (businessEmail && user.email) {
+          if (businessEmail && customerEmail) {
             fetch('/api/emails/order-confirmation', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                customerEmail: user.email,
-                customerName: user.displayName || user.email,
+                customerEmail: customerEmail,
+                customerName: customerName,
                 businessEmail: businessEmail,
                 businessName: group.businessName,
                 orderId: orderRef.id,
@@ -372,7 +386,7 @@ export default function CheckoutPage() {
     setError(errorMessage)
   }
 
-  if (!user || items.length === 0) {
+  if (items.length === 0) {
     return null
   }
 
@@ -432,6 +446,11 @@ export default function CheckoutPage() {
             {step === 'details' && (
               <div className="checkout-section">
                 <h2>Delivery Information</h2>
+                {!user && (
+                  <div className="alert" style={{ backgroundColor: '#f0f9ff', border: '1px solid #0ea5e9', color: '#0c4a6e', marginBottom: '1rem' }}>
+                    <strong>Guest Checkout:</strong> No account needed! Just provide your contact information to complete your order.
+                  </div>
+                )}
                 {error && <div className="alert alert-error">{error}</div>}
 
                 <form onSubmit={handleContinueToPayment}>
@@ -464,6 +483,35 @@ export default function CheckoutPage() {
                       </label>
                     </div>
                   </div>
+
+                  {/* Guest checkout fields */}
+                  {!user && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="name">Full Name *</label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="John Doe"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="email">Email Address *</label>
+                        <input
+                          type="email"
+                          id="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="john@example.com"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="form-group">
                     <label htmlFor="phone">Phone Number *</label>
