@@ -196,6 +196,27 @@ export default function BusinessSettings() {
             Set your weekly hours for appointment bookings. Customers will only be able to book during these times.
           </p>
 
+          <div className="alert" style={{
+            background: '#dbeafe',
+            border: '1px solid #3b82f6',
+            borderRadius: 'var(--radius)',
+            padding: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.5rem' }}>ℹ️</span>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#1e40af' }}>
+                  Enable Appointment Bookings
+                </strong>
+                <p style={{ color: '#1e40af', fontSize: '0.875rem', margin: 0 }}>
+                  Configure your availability below to allow customers to book appointments for your services.
+                  Turn on the days you're available, set your hours, and save. Without this setup, customers won't be able to book appointments.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="availability-grid">
             {DAYS.map((day) => (
               <div key={day} className="day-availability">
