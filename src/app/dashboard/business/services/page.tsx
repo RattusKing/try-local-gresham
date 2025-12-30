@@ -24,6 +24,7 @@ export default function BusinessServices() {
   const [success, setSuccess] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingService, setEditingService] = useState<Service | null>(null)
+  const [hasAvailability, setHasAvailability] = useState(true)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,7 +40,23 @@ export default function BusinessServices() {
 
   useEffect(() => {
     loadServices()
+    checkAvailability()
   }, [user])
+
+  const checkAvailability = async () => {
+    if (!user || !db) return
+
+    try {
+      const availabilityQuery = query(
+        collection(db, 'businessAvailability'),
+        where('businessId', '==', user.uid)
+      )
+      const availabilitySnap = await getDocs(availabilityQuery)
+      setHasAvailability(!availabilitySnap.empty)
+    } catch (err: any) {
+      console.error('Error checking availability:', err)
+    }
+  }
 
   const loadServices = async () => {
     if (!user || !db) return
@@ -179,6 +196,35 @@ export default function BusinessServices() {
       <div className="services-info">
         <p>Manage your appointment-based services. Customers can book these services directly through your business page.</p>
       </div>
+
+      {!hasAvailability && services.length > 0 && (
+        <div className="alert alert-warning" style={{
+          background: '#fef3c7',
+          border: '1px solid #f59e0b',
+          borderRadius: 'var(--radius)',
+          padding: '1rem',
+          marginBottom: '1rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+            <div>
+              <strong style={{ display: 'block', marginBottom: '0.5rem' }}>
+                Appointments Not Available Yet
+              </strong>
+              <p style={{ marginBottom: '0.75rem', color: '#92400e' }}>
+                You've created services, but customers can't book them yet. You need to configure your appointment availability hours.
+              </p>
+              <a
+                href="/dashboard/business/settings"
+                className="btn btn-primary"
+                style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+              >
+                Configure Availability in Settings →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
