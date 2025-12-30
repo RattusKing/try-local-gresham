@@ -163,7 +163,7 @@ export default function AppointmentBookingModal({
   }
 
   if (!availability) {
-    const isOwner = user?.uid === businessId
+    const isOwner = business && user?.uid === business.userId
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
@@ -189,9 +189,14 @@ export default function AppointmentBookingModal({
                 </a>
               </div>
             ) : (
-              <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
-                This business is not currently accepting appointments.
-              </p>
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <p style={{ marginBottom: '1rem', fontSize: '1.125rem', color: 'var(--muted)' }}>
+                  📅 Appointments Coming Soon
+                </p>
+                <p style={{ color: 'var(--muted)' }}>
+                  This business hasn't set up their appointment availability yet. Please check back later or contact them directly.
+                </p>
+              </div>
             )}
           </div>
         </div>

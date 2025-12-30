@@ -3,15 +3,14 @@
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import CartModal from './CartModal'
-import BusinessApplicationModal from './BusinessApplicationModal'
 
 export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const { user, signOut } = useAuth()
   const { itemCount } = useCart()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showCart, setShowCart] = useState(false)
-  const [showBusinessApp, setShowBusinessApp] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -69,9 +68,9 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           <a href="#categories" className="nav-link">
             Categories
           </a>
-          <button onClick={() => setShowBusinessApp(true)} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <Link href="/apply" className="nav-link">
             For Businesses
-          </button>
+          </Link>
 
           <button
             onClick={() => setShowCart(true)}
@@ -225,16 +224,13 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
               >
                 Categories
               </a>
-              <button
-                onClick={() => {
-                  setShowBusinessApp(true)
-                  setShowMobileMenu(false)
-                }}
+              <Link
+                href="/apply"
                 className="mobile-menu-link"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                onClick={() => setShowMobileMenu(false)}
               >
                 For Businesses
-              </button>
+              </Link>
 
               <div style={{ borderTop: '1px solid #eee', margin: '1rem 0' }} />
 
@@ -305,7 +301,6 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
       </div>
 
       <CartModal isOpen={showCart} onClose={() => setShowCart(false)} />
-      <BusinessApplicationModal isOpen={showBusinessApp} onClose={() => setShowBusinessApp(false)} />
     </header>
   )
 }
