@@ -212,6 +212,7 @@ export interface DayAvailability {
 export interface BusinessAvailability {
   id: string
   businessId: string
+  acceptingAppointments: boolean // Master toggle - whether appointments are enabled at all
   monday: DayAvailability
   tuesday: DayAvailability
   wednesday: DayAvailability

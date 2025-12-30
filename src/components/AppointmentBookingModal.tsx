@@ -162,7 +162,7 @@ export default function AppointmentBookingModal({
     )
   }
 
-  if (!availability) {
+  if (!availability || !availability.acceptingAppointments) {
     const isOwner = business && user?.uid === business.ownerId
     return (
       <div className="modal-overlay" onClick={onClose}>
@@ -175,10 +175,12 @@ export default function AppointmentBookingModal({
             {isOwner ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>
                 <p style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>
-                  ⚙️ Availability not configured
+                  ⚙️ Appointments Not Enabled
                 </p>
                 <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
-                  To accept appointments, you need to configure your business hours and availability settings.
+                  {!availability
+                    ? 'You need to configure your appointment availability and turn on appointment bookings.'
+                    : 'You have availability configured, but appointment bookings are turned OFF. Go to Settings to turn them ON.'}
                 </p>
                 <a
                   href="/dashboard/business/settings"
@@ -194,7 +196,7 @@ export default function AppointmentBookingModal({
                   📅 Appointments Coming Soon
                 </p>
                 <p style={{ color: 'var(--muted)' }}>
-                  This business hasn't set up their appointment availability yet. Please check back later or contact them directly.
+                  This business hasn't enabled appointment bookings yet. Please check back later or contact them directly.
                 </p>
               </div>
             )}
