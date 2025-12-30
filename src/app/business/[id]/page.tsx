@@ -491,13 +491,52 @@ export default function BusinessProfilePage() {
             transition={{ delay: 0.6 }}
           >
             <h2>Products & Services</h2>
-            {products.length === 0 ? (
-              <div className="products-placeholder">
-                <p>No products or services listed yet.</p>
+
+            {/* Services List */}
+            {services.length > 0 && (
+              <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--secondary-dark)' }}>Services</h3>
+                <div className="products-display">
+                  {services.map((service) => (
+                    <div key={service.id} className="product-item">
+                      <div className="product-item-content">
+                        <div className="product-item-header">
+                          <h4>{service.name}</h4>
+                          <span className="product-item-price">
+                            ${service.price.toFixed(2)}
+                          </span>
+                        </div>
+                        {service.category && (
+                          <span className="product-item-category">{service.category}</span>
+                        )}
+                        {service.description && (
+                          <p className="product-item-description">{service.description}</p>
+                        )}
+                        <div style={{ fontSize: '0.875rem', color: 'var(--muted)', marginTop: '0.5rem' }}>
+                          ⏱️ Duration: {service.duration} minutes
+                        </div>
+                        <div className="product-item-actions">
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => setShowBookingModal(true)}
+                            style={{ flex: 1 }}
+                          >
+                            📅 Book Appointment
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="products-display">
-                {products.map((product) => (
+            )}
+
+            {/* Products List */}
+            {products.length > 0 && (
+              <div>
+                <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--secondary-dark)' }}>Products</h3>
+                <div className="products-display">
+                  {products.map((product) => (
                   <div key={product.id} className="product-item">
                     {product.image && (
                       <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
@@ -570,6 +609,14 @@ export default function BusinessProfilePage() {
                     </div>
                   </div>
                 ))}
+                </div>
+              </div>
+            )}
+
+            {/* Show message if no products or services */}
+            {products.length === 0 && services.length === 0 && (
+              <div className="products-placeholder">
+                <p>No products or services listed yet.</p>
               </div>
             )}
           </motion.section>

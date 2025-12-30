@@ -1,37 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import AuthModal from '@/components/AuthModal'
-import BusinessApplicationModal from '@/components/BusinessApplicationModal'
 import { useAuth } from '@/lib/firebase/auth-context'
 
 export default function GetListedPage() {
+  const router = useRouter()
   const { user } = useAuth()
-  const [isAuthOpen, setIsAuthOpen] = useState(false)
-  const [isApplicationOpen, setIsApplicationOpen] = useState(false)
 
-  // Auto-open application modal if user is signed in
+  // Auto-redirect to /apply if user is signed in
   useEffect(() => {
     if (user) {
-      setIsApplicationOpen(true)
+      router.push('/apply')
     }
-  }, [user])
+  }, [user, router])
 
   const handleApplyClick = () => {
-    if (!user) {
-      setIsAuthOpen(true)
-    } else {
-      setIsApplicationOpen(true)
-    }
+    router.push('/apply')
   }
 
   return (
     <>
-      <Header onSignIn={() => setIsAuthOpen(true)} />
+      <Header onSignIn={() => router.push('/apply')} />
 
       <main>
         {/* Hero Section */}
@@ -100,7 +94,7 @@ export default function GetListedPage() {
                 className="btn btn-primary"
                 style={{ fontSize: '1.125rem', padding: '1rem 2.5rem' }}
               >
-                {user ? 'Complete Application' : 'Sign In to Apply'}
+                Apply Now
               </button>
             </motion.div>
           </div>
@@ -381,7 +375,7 @@ export default function GetListedPage() {
                   fontWeight: 700
                 }}
               >
-                {user ? 'Start Application' : 'Sign In to Get Started'}
+                Get Started
               </button>
             </motion.div>
           </div>
@@ -389,11 +383,6 @@ export default function GetListedPage() {
       </main>
 
       <Footer />
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
-      <BusinessApplicationModal
-        isOpen={isApplicationOpen}
-        onClose={() => setIsApplicationOpen(false)}
-      />
     </>
   )
 }

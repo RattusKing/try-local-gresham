@@ -277,6 +277,44 @@ export default function BusinessDashboard() {
         <SubscriptionManager business={business} onSubscriptionUpdate={loadBusiness} />
       )}
 
+      {/* Quick Setup Tips */}
+      <div className="alert" style={{
+        background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1))',
+        border: '1px solid var(--primary)',
+        borderRadius: 'var(--radius)',
+        padding: '1.5rem',
+        marginBottom: '2rem'
+      }}>
+        <h3 style={{ fontSize: '1.125rem', marginBottom: '1rem', color: 'var(--dark)' }}>
+          💡 Quick Setup Tips
+        </h3>
+        <details>
+          <summary style={{ cursor: 'pointer', fontWeight: 600, marginBottom: '1rem', color: 'var(--secondary-dark)' }}>
+            Click here for tips to quickly fill in your business profile
+          </summary>
+          <div style={{ paddingLeft: '1rem', color: 'var(--muted)' }}>
+            <p style={{ marginBottom: '0.75rem' }}>
+              <strong>Have an existing website?</strong> You can copy and paste content directly:
+            </p>
+            <ul style={{ marginBottom: '1rem', paddingLeft: '1.5rem' }}>
+              <li>Copy your "About Us" section → Paste into <strong>Description</strong></li>
+              <li>Copy your business hours → Paste into <strong>Hours</strong></li>
+              <li>Copy your phone number and address → Paste into respective fields</li>
+              <li>Right-click and save images from your site → Upload them using the image upload button</li>
+            </ul>
+            <p style={{ marginBottom: '0.75rem' }}>
+              <strong>Next steps after basic info:</strong>
+            </p>
+            <ul style={{ paddingLeft: '1.5rem' }}>
+              <li>Go to <strong>Products</strong> to add items customers can purchase</li>
+              <li>Go to <strong>Services</strong> to add bookable appointments</li>
+              <li>Go to <strong>Settings</strong> to configure appointment availability</li>
+              <li>Set up <strong>Payment Processing</strong> to start accepting orders</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
       <div className="business-form-container">
         <form onSubmit={handleSubmit} className="business-form">
           <div className="form-section">
