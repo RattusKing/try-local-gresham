@@ -32,6 +32,7 @@ export default function BusinessSettings() {
 
   const [availability, setAvailability] = useState<Omit<BusinessAvailability, 'id' | 'createdAt' | 'updatedAt'>>({
     businessId: user?.uid || '',
+    acceptingAppointments: false,
     monday: DEFAULT_DAY_AVAILABILITY,
     tuesday: DEFAULT_DAY_AVAILABILITY,
     wednesday: DEFAULT_DAY_AVAILABILITY,
@@ -177,17 +178,55 @@ export default function BusinessSettings() {
     <div className="business-dashboard">
       <div className="business-dashboard-header">
         <h1>Business Settings</h1>
-        <button
-          className="btn-primary"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save Settings'}
-        </button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      {/* Master Appointment Toggle */}
+      <div style={{
+        background: availability.acceptingAppointments
+          ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))'
+          : 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1))',
+        border: `2px solid ${availability.acceptingAppointments ? '#10b981' : '#ef4444'}`,
+        borderRadius: 'var(--radius)',
+        padding: '1.5rem',
+        marginBottom: '2rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {availability.acceptingAppointments ? '✅' : '🔴'}
+              <span>Appointment Bookings</span>
+            </h2>
+            <p style={{ color: 'var(--muted)', margin: 0, fontSize: '0.9375rem' }}>
+              {availability.acceptingAppointments
+                ? 'Customers can book appointments on your business page'
+                : 'Appointments are currently disabled. Turn on to accept bookings.'}
+            </p>
+          </div>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            cursor: 'pointer',
+            padding: '1rem 1.5rem',
+            background: 'white',
+            borderRadius: 'var(--radius)',
+            boxShadow: 'var(--shadow)',
+            fontWeight: 600,
+            fontSize: '1.0625rem'
+          }}>
+            <span>{availability.acceptingAppointments ? 'ON' : 'OFF'}</span>
+            <input
+              type="checkbox"
+              checked={availability.acceptingAppointments}
+              onChange={(e) => setAvailability({ ...availability, acceptingAppointments: e.target.checked })}
+              style={{ width: '50px', height: '26px', cursor: 'pointer' }}
+            />
+          </label>
+        </div>
+      </div>
 
       <div className="settings-container">
         <div className="settings-section">
@@ -357,6 +396,40 @@ export default function BusinessSettings() {
               <small>Your business timezone for appointment scheduling</small>
             </div>
           </div>
+        </div>
+
+        {/* Sticky Save Button */}
+        <div style={{
+          position: 'sticky',
+          bottom: '2rem',
+          marginTop: '2rem',
+          padding: '1.5rem',
+          background: 'white',
+          borderRadius: 'var(--radius)',
+          boxShadow: '0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '1rem',
+          zIndex: 10
+        }}>
+          <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.875rem' }}>
+            Remember to save your changes to enable appointment bookings
+          </p>
+          <button
+            className="btn-primary"
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              fontSize: '1.125rem',
+              padding: '1rem 3rem',
+              fontWeight: 700,
+              boxShadow: 'var(--shadow-lg)',
+              minWidth: '200px'
+            }}
+          >
+            {saving ? '💾 Saving...' : '💾 Save Settings'}
+          </button>
         </div>
       </div>
     </div>
