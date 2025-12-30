@@ -62,8 +62,23 @@ export default function BusinessSettings() {
 
       if (!availabilitySnap.empty) {
         const doc = availabilitySnap.docs[0]
+        const loadedData = doc.data() as Omit<BusinessAvailability, 'id' | 'createdAt' | 'updatedAt'>
         setAvailabilityId(doc.id)
-        setAvailability(doc.data() as Omit<BusinessAvailability, 'id' | 'createdAt' | 'updatedAt'>)
+        // Merge loaded data with defaults to ensure all fields exist
+        setAvailability({
+          businessId: user.uid,
+          acceptingAppointments: loadedData.acceptingAppointments ?? false,
+          monday: loadedData.monday ?? DEFAULT_DAY_AVAILABILITY,
+          tuesday: loadedData.tuesday ?? DEFAULT_DAY_AVAILABILITY,
+          wednesday: loadedData.wednesday ?? DEFAULT_DAY_AVAILABILITY,
+          thursday: loadedData.thursday ?? DEFAULT_DAY_AVAILABILITY,
+          friday: loadedData.friday ?? DEFAULT_DAY_AVAILABILITY,
+          saturday: loadedData.saturday ?? DEFAULT_DAY_AVAILABILITY,
+          sunday: loadedData.sunday ?? DEFAULT_DAY_AVAILABILITY,
+          timezone: loadedData.timezone ?? 'America/Los_Angeles',
+          advanceBookingDays: loadedData.advanceBookingDays ?? 30,
+          minAdvanceHours: loadedData.minAdvanceHours ?? 2,
+        })
       }
     } catch (err: any) {
       setError(err.message)
