@@ -163,7 +163,7 @@ export default function AppointmentBookingModal({
   }
 
   if (!availability) {
-    const isOwner = business && user?.uid === business.userId
+    const isOwner = business && user?.uid === business.ownerId
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
