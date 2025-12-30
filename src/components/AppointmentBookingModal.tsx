@@ -92,7 +92,12 @@ export default function AppointmentBookingModal({
       )
       const availabilitySnap = await getDocs(availabilityQuery)
       if (!availabilitySnap.empty) {
-        setAvailability(availabilitySnap.docs[0].data() as BusinessAvailability)
+        const loadedAvailability = availabilitySnap.docs[0].data() as BusinessAvailability
+        // Ensure acceptingAppointments field exists (for backwards compatibility)
+        setAvailability({
+          ...loadedAvailability,
+          acceptingAppointments: loadedAvailability.acceptingAppointments ?? false,
+        })
       }
 
       // Load existing appointments
