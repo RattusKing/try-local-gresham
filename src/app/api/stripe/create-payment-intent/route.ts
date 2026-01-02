@@ -90,6 +90,17 @@ export async function POST(req: NextRequest) {
 
     // Handle specific Stripe errors
     if (error.type === 'StripeInvalidRequestError') {
+      // Detect test/live mode mismatch
+      if (error.message && error.message.includes('similar object exists in test mode')) {
+        return NextResponse.json(
+          {
+            error: 'Payment setup error: The business account was set up in test mode, but live mode is active. Please contact support.',
+            devMessage: 'Test/live mode mismatch: Business connected account is from test mode but live API keys are being used.'
+          },
+          { status: 400 }
+        )
+      }
+
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
