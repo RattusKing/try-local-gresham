@@ -295,12 +295,15 @@ export default function Home() {
       <main id="main-content">
         <Hero onSearch={handleSearch} categories={categories} />
 
-        <section id="discover" className="section container">
+        <section id="discover" className="section section-alt-light container">
           <div className="section-head">
-            <h2>Find Something Local</h2>
-            <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>
-              Explore businesses in Gresham
-            </p>
+            <div>
+              <span className="eyebrow">Discover</span>
+              <h2>Find Something Local</h2>
+              <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>
+                Explore businesses in Gresham
+              </p>
+            </div>
           </div>
 
           {/* Search and Filters */}
@@ -527,8 +530,12 @@ export default function Home() {
         </section>
 
         {/* How it Works Section */}
-        <section className="section container" style={{ background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05))', borderRadius: 'var(--radius-lg)', padding: '3rem 2rem', marginBottom: '3rem' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '2.5rem' }}>How It Works</h2>
+        <section className="section section-alt-mint">
+          <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+              <span className="eyebrow" style={{ display: 'inline-block' }}>Simple Process</span>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginTop: '0.5rem' }}>How It Works</h2>
+            </div>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -591,20 +598,28 @@ export default function Home() {
               <p style={{ color: 'var(--muted)' }}>Order online when available, or visit in person.</p>
             </div>
           </div>
+          </div>
         </section>
 
-        <section id="categories" className="section container">
-          <h2>Popular Categories</h2>
+        <section id="categories" className="section section-alt-lavender">
+          <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <span className="eyebrow">Browse</span>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginTop: '0.5rem' }}>Popular Categories</h2>
+            </div>
           <div className="grid category-grid">
             {topCategories.map(([name, count]) => (
               <CategoryCard key={name} name={name} count={count} />
             ))}
           </div>
+          </div>
         </section>
 
-        <section id="for-businesses" className="section container for-biz">
+        <section id="for-businesses" className="section section-alt-light">
+          <div className="container for-biz" style={{ position: 'relative', zIndex: 1 }}>
           <div className="for-biz-card">
-            <h2>Own a Business in Gresham?</h2>
+            <span className="eyebrow">For Business Owners</span>
+            <h2 style={{ marginTop: '0.5rem' }}>Own a Business in Gresham?</h2>
             <p>
               Create a clean, modern profile where local customers can find you.
             </p>
@@ -649,6 +664,7 @@ export default function Home() {
               </div>
             </div>
           </aside>
+          </div>
         </section>
       </main>
 

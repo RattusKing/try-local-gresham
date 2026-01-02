@@ -57,6 +57,10 @@ body {
   background: var(--bg);
   line-height: 1.6;
   font-size: 16px;
+  /* Subtle dot pattern background */
+  background-image: radial-gradient(circle, rgba(153, 237, 195, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
 }
 
 .container {
@@ -372,6 +376,30 @@ body {
   padding: 3.5rem 0;
 }
 
+/* Alternating section backgrounds */
+.section-alt-light {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+}
+
+.section-alt-mint {
+  background: linear-gradient(135deg, rgba(153, 237, 195, 0.08), rgba(153, 237, 195, 0.04));
+  position: relative;
+}
+
+.section-alt-mint::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(153, 237, 195, 0.12), transparent 50%),
+              radial-gradient(circle at 80% 50%, rgba(194, 175, 240, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+.section-alt-lavender {
+  background: linear-gradient(135deg, rgba(194, 175, 240, 0.06), rgba(194, 175, 240, 0.03));
+}
+
 .section-head {
   display: flex;
   justify-content: space-between;
@@ -393,12 +421,23 @@ body {
 }
 
 .section-head h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--dark), var(--primary-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Eyebrow text - small labels above headings */
+.eyebrow {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--secondary-dark);
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 /* Grid */
