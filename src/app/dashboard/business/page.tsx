@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { Business } from '@/lib/types'
 import StatusBadge from '@/components/StatusBadge'
 import SubscriptionManager from '@/components/SubscriptionManager'
+import SubscriptionRequiredBanner from '@/components/SubscriptionRequiredBanner'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -207,6 +208,11 @@ export default function BusinessDashboard() {
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      {/* Subscription Required Banner */}
+      {business && business.status === 'approved' && (
+        <SubscriptionRequiredBanner business={business} />
+      )}
+
       {/* Stripe Payment Setup Section */}
       {business && business.status === 'approved' && (
         <>
@@ -274,7 +280,9 @@ export default function BusinessDashboard() {
 
       {/* Subscription Management Section */}
       {business && business.status === 'approved' && (
-        <SubscriptionManager business={business} onSubscriptionUpdate={loadBusiness} />
+        <div id="subscription-section">
+          <SubscriptionManager business={business} onSubscriptionUpdate={loadBusiness} />
+        </div>
       )}
 
       {/* Quick Setup Tips */}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe, calculatePlatformFee } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { canAcceptPayments } from '@/lib/subscription'
+import { Business } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,9 +35,21 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const businessData = businessDoc.data()!
+    const businessData = businessDoc.data()! as Business
 
-    // Check if business has Stripe Connect account
+    // Check if business can accept payments (subscription + Stripe verification)
+    const paymentCheck = canAcceptPayments(businessData)
+    if (!paymentCheck.canAccept) {
+      return NextResponse.json(
+        {
+          error: paymentCheck.reason,
+          needsSubscription: true
+        },
+        { status: 400 }
+      )
+    }
+
+    // Check if business has Stripe Connect account (redundant with canAcceptPayments, but kept for clarity)
     if (!businessData.stripeConnectedAccountId) {
       return NextResponse.json(
         {

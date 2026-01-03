@@ -31,6 +31,8 @@ export interface Business {
   subscriptionCancelAtPeriodEnd?: boolean // Whether subscription will cancel at period end
   hasFirstMonthFree?: boolean // Whether this business got first month free promotion
   subscriptionCreatedAt?: Date // When subscription was created
+  grandfathered?: boolean // Exempt from subscription requirements (for early/existing businesses)
+  approvedAt?: Date // When business was approved by admin
 }
 
 export type UserRole = 'customer' | 'business_owner' | 'admin'
