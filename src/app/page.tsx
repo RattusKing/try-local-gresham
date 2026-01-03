@@ -162,16 +162,24 @@ export default function Home() {
   // Handle search
   const handleSearch = (query: string, category: string) => {
     const q = query.trim().toLowerCase()
-    const filtered = businesses.filter((b) => {
-      const qMatch =
-        !q ||
-        b.name.toLowerCase().includes(q) ||
-        b.tags.join(' ').toLowerCase().includes(q)
-      const cMatch = !category || b.tags.includes(category)
-      return qMatch && cMatch
-    })
-    setFilteredBusinesses(filtered)
+
+    // Set search query and category for filtering
+    setSearchQuery(q)
+    if (category) {
+      setSelectedCategory(category)
+    }
     setActiveChips(new Set()) // Clear chip filters when searching
+
+    // Smooth scroll to discover section
+    setTimeout(() => {
+      const discoverSection = document.getElementById('discover')
+      if (discoverSection) {
+        discoverSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        })
+      }
+    }, 100)
   }
 
   const loadFavorites = async () => {
@@ -294,19 +302,18 @@ export default function Home() {
 
       {/* Tagline */}
       <div style={{
-        padding: '1rem 1rem 0.5rem',
+        padding: 'clamp(0.5rem, 2vw, 0.75rem) 1rem',
         textAlign: 'center',
         background: 'rgba(255, 255, 255, 0.95)',
         borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
         <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+          fontSize: 'clamp(0.95rem, 2.5vw, 1.25rem)',
           fontWeight: 600,
           margin: 0,
           color: '#1a1a1a',
-          letterSpacing: '0.02em',
-          textTransform: 'none'
+          letterSpacing: '0.02em'
         }}>
           Everything local. One place.
         </p>
@@ -326,52 +333,53 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Search and Filters */}
-          <div style={{ marginBottom: '2rem' }}>
-            <div className="filter-controls">
-                <input
-                  type="text"
-                  placeholder="Search businesses, products, or tags..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search businesses"
-                />
+          {/* Search and Filters - Only show if businesses exist */}
+          {!loading && businesses.length > 0 && (
+            <div style={{ marginBottom: '2rem' }}>
+              <div className="filter-controls">
+                  <input
+                    type="text"
+                    placeholder="Search businesses, products, or tags..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label="Search businesses"
+                  />
 
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  aria-label="Filter by category"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    aria-label="Filter by category"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
 
-                <select
-                  value={selectedNeighborhood}
-                  onChange={(e) => setSelectedNeighborhood(e.target.value)}
-                  aria-label="Filter by neighborhood"
-                >
-                  <option value="">All Neighborhoods</option>
-                  {neighborhoods.map((hood) => (
-                    <option key={hood} value={hood}>{hood}</option>
-                  ))}
-                </select>
+                  <select
+                    value={selectedNeighborhood}
+                    onChange={(e) => setSelectedNeighborhood(e.target.value)}
+                    aria-label="Filter by neighborhood"
+                  >
+                    <option value="">All Neighborhoods</option>
+                    {neighborhoods.map((hood) => (
+                      <option key={hood} value={hood}>{hood}</option>
+                    ))}
+                  </select>
 
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'newest')}
-                  aria-label="Sort businesses"
-                >
-                  <option value="name">Sort: A-Z</option>
-                  <option value="rating">Sort: Highest Rated</option>
-                  <option value="newest">Sort: Newest</option>
-                </select>
-              </div>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'newest')}
+                    aria-label="Sort businesses"
+                  >
+                    <option value="name">Sort: A-Z</option>
+                    <option value="rating">Sort: Highest Rated</option>
+                    <option value="newest">Sort: Newest</option>
+                  </select>
+                </div>
 
-              {/* Active Filters and Clear */}
-              {(searchQuery || selectedCategory || selectedNeighborhood || activeChips.size > 0 || sortBy !== 'name') && (
+                {/* Active Filters and Clear - Only show if filters are actually active */}
+                {(searchQuery || selectedCategory || selectedNeighborhood || activeChips.size > 0) && (
                 <div style={{
                   display: 'flex',
                   gap: '0.5rem',
@@ -490,60 +498,125 @@ export default function Home() {
               }}>
                 Showing {filteredBusinesses.length} of {businesses.length} businesses
               </div>
-          </div>
-
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              marginBottom: '1rem',
-              color: 'var(--dark)'
-            }}>
-              Featured Businesses
-            </h3>
-            <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
-              Some of the local businesses we're highlighting right now.
-            </p>
-
-            <div className="chip-row" aria-label="Quick filters" style={{ marginBottom: '1.5rem' }}>
-              {FILTER_CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  className={`chip ${activeChips.has(chip) ? 'active' : ''}`}
-                  onClick={() => toggleChip(chip)}
-                >
-                  {chip}
-                </button>
-              ))}
             </div>
-          </div>
+          )}
+
+          {/* Featured Businesses Section - Only show if businesses exist */}
+          {!loading && businesses.length > 0 && (
+            <div style={{ marginBottom: '2rem' }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                marginBottom: '1rem',
+                color: 'var(--dark)'
+              }}>
+                Featured Businesses
+              </h3>
+              <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
+                Some of the local businesses we're highlighting right now.
+              </p>
+
+              <div className="chip-row" aria-label="Quick filters" style={{ marginBottom: '1.5rem' }}>
+                {FILTER_CHIPS.map((chip) => (
+                  <button
+                    key={chip}
+                    className={`chip ${activeChips.has(chip) ? 'active' : ''}`}
+                    onClick={() => toggleChip(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {loading ? (
-            <div className="empty-state" role="status" aria-live="polite">
-              <div className="spinner" aria-hidden="true"></div>
-              <p>Loading businesses...</p>
+            <div className="empty-state" role="status" aria-live="polite" style={{
+              padding: '4rem 2rem',
+              textAlign: 'center'
+            }}>
+              <div className="spinner" aria-hidden="true" style={{
+                margin: '0 auto 1rem'
+              }}></div>
+              <p style={{ fontSize: '1.125rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
+                Loading local businesses...
+              </p>
+              <p style={{ fontSize: '0.9375rem', color: 'var(--muted)', opacity: 0.7 }}>
+                Finding the best of Gresham for you
+              </p>
             </div>
           ) : (
             <>
-              <div className="grid cards">
-                {filteredBusinesses.map((business) => (
-                  <BusinessCard
-                    key={business.id}
-                    business={business}
-                    onFavorite={handleFavorite}
-                    isFavorited={favoritedBusinessIds.has(business.id)}
-                  />
-                ))}
-              </div>
-              {filteredBusinesses.length === 0 && (
-                <div className="empty-state">
-                  <h3>No businesses yet</h3>
-                  <p>
-                    {businesses.length === 0
-                      ? 'Be the first business to join Try Local Gresham!'
-                      : 'Try a different search or category.'}
+              {businesses.length === 0 ? (
+                <div className="empty-state" style={{
+                  padding: '4rem 2rem',
+                  textAlign: 'center',
+                  background: 'white',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                }}>
+                  <div style={{
+                    fontSize: '3.5rem',
+                    marginBottom: '1rem',
+                    opacity: 0.5
+                  }}>
+                    🏪
+                  </div>
+                  <h3 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: 'var(--dark)' }}>
+                    New Businesses Coming Soon!
+                  </h3>
+                  <p style={{ fontSize: '1.125rem', color: 'var(--muted)', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
+                    We're building the directory of Gresham's finest local businesses. Check back soon or be the first to join!
                   </p>
+                  <a href="/get-listed" className="btn btn-primary">
+                    List Your Business
+                  </a>
                 </div>
+              ) : (
+                <>
+                  <div className="grid cards">
+                    {filteredBusinesses.map((business) => (
+                      <BusinessCard
+                        key={business.id}
+                        business={business}
+                        onFavorite={handleFavorite}
+                        isFavorited={favoritedBusinessIds.has(business.id)}
+                      />
+                    ))}
+                  </div>
+                  {filteredBusinesses.length === 0 && (
+                    <div className="empty-state" style={{
+                      padding: '3rem 2rem',
+                      textAlign: 'center',
+                      background: 'white',
+                      borderRadius: '12px'
+                    }}>
+                      <div style={{
+                        fontSize: '3rem',
+                        marginBottom: '1rem',
+                        opacity: 0.5
+                      }}>
+                        🔍
+                      </div>
+                      <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No matches found</h3>
+                      <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
+                        Try adjusting your filters or search terms to find what you're looking for.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery('')
+                          setSelectedCategory('')
+                          setSelectedNeighborhood('')
+                          setActiveChips(new Set())
+                          setSortBy('name')
+                        }}
+                        className="btn btn-outline"
+                      >
+                        Clear All Filters
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
@@ -563,59 +636,80 @@ export default function Home() {
             maxWidth: '900px',
             margin: '0 auto'
           }}>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{
+              background: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+            }}>
               <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                background: 'var(--primary-green)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '2rem',
-                margin: '0 auto 1rem',
-                boxShadow: 'var(--shadow)'
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                color: 'var(--dark)',
+                marginBottom: '1.25rem'
               }}>
-                🔍
+                1
               </div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Browse local businesses</h3>
-              <p style={{ color: 'var(--muted)' }}>Explore real shops and services in Gresham.</p>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 700 }}>Browse local businesses</h3>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>Explore real shops and services in Gresham with detailed profiles and reviews.</p>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{
+              background: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+            }}>
               <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                background: 'var(--secondary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '2rem',
-                margin: '0 auto 1rem',
-                boxShadow: 'var(--shadow)'
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                color: 'var(--dark)',
+                marginBottom: '1.25rem'
               }}>
-                📋
+                2
               </div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Learn what they offer</h3>
-              <p style={{ color: 'var(--muted)' }}>Read details, hours, and contact info.</p>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 700 }}>Learn what they offer</h3>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>View hours, contact info, services, and products all in one convenient place.</p>
             </div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{
+              background: 'white',
+              padding: '2rem',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+            }}>
               <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                background: 'var(--primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '2rem',
-                margin: '0 auto 1rem',
-                boxShadow: 'var(--shadow)'
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                color: 'var(--dark)',
+                marginBottom: '1.25rem'
               }}>
-                🛍️
+                3
               </div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Shop or visit</h3>
-              <p style={{ color: 'var(--muted)' }}>Order online when available, or visit in person.</p>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 700 }}>Shop or visit</h3>
+              <p style={{ color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>Order online when available, or visit in person to support local.</p>
             </div>
           </div>
           </div>

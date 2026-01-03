@@ -194,6 +194,195 @@ export default function GetListedPage() {
           </motion.div>
         </section>
 
+        {/* Pricing Section */}
+        <section style={{
+          background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.08), rgba(194, 175, 240, 0.08))',
+          padding: '4rem 0'
+        }}>
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Simple, Transparent Pricing</h2>
+              <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '3rem', fontSize: '1.0625rem' }}>
+                Choose the plan that works best for your business
+              </p>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '2rem',
+                maxWidth: '900px',
+                margin: '0 auto'
+              }}>
+                {/* Monthly Plan */}
+                <div className="card" style={{
+                  padding: '2rem',
+                  textAlign: 'center',
+                  border: '2px solid #e5e7eb',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <h3 style={{ marginBottom: '0.5rem', fontSize: '1.5rem' }}>Monthly</h3>
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--secondary-dark)' }}>$39</span>
+                    <span style={{ color: 'var(--muted)', fontSize: '1rem' }}>/month</span>
+                  </div>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    textAlign: 'left',
+                    color: 'var(--muted)'
+                  }}>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Professional business profile</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Accept online orders</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Analytics dashboard</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Customer reviews</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Cancel anytime</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Annual Plan - Recommended */}
+                <div className="card" style={{
+                  padding: '2rem',
+                  textAlign: 'center',
+                  border: '3px solid var(--secondary-dark)',
+                  position: 'relative',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '-12px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'var(--secondary-dark)',
+                    color: 'white',
+                    padding: '0.25rem 1rem',
+                    borderRadius: '100px',
+                    fontSize: '0.875rem',
+                    fontWeight: 700
+                  }}>
+                    BEST VALUE
+                  </div>
+                  <h3 style={{ marginBottom: '0.5rem', fontSize: '1.5rem' }}>Annual</h3>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--secondary-dark)' }}>$430</span>
+                    <span style={{ color: 'var(--muted)', fontSize: '1rem' }}>/year</span>
+                  </div>
+                  <div style={{
+                    background: 'rgba(153, 237, 195, 0.2)',
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    marginBottom: '1.5rem',
+                    fontSize: '0.9375rem',
+                    fontWeight: 600,
+                    color: 'var(--primary-green)'
+                  }}>
+                    Save $38/year
+                  </div>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    textAlign: 'left',
+                    color: 'var(--muted)'
+                  }}>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Professional business profile</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Accept online orders</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Analytics dashboard</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Customer reviews</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Two months free!</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Non-Profit Plan */}
+                <div className="card" style={{
+                  padding: '2rem',
+                  textAlign: 'center',
+                  border: '2px solid #e5e7eb',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <h3 style={{ marginBottom: '0.5rem', fontSize: '1.5rem' }}>Non-Profit</h3>
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--secondary-dark)' }}>Free</span>
+                    <span style={{ color: 'var(--muted)', fontSize: '1rem' }}>/forever</span>
+                  </div>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    textAlign: 'left',
+                    color: 'var(--muted)'
+                  }}>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Professional business profile</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Accept online orders</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Analytics dashboard</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem' }}>
+                      <span style={{ color: 'var(--primary-green)' }}>✓</span>
+                      <span>Customer reviews</span>
+                    </li>
+                    <li style={{ padding: '0.5rem 0', display: 'flex', gap: '0.5rem', fontWeight: 600 }}>
+                      <span style={{ color: 'var(--secondary-dark)' }}>★</span>
+                      <span style={{ color: 'var(--secondary-dark)' }}>Requires verification</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <p style={{
+                textAlign: 'center',
+                color: 'var(--muted)',
+                marginTop: '2rem',
+                fontSize: '0.9375rem'
+              }}>
+                All plans include a 7-day grace period to get set up. First 10 businesses get the first month free!
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Process Section */}
         <section style={{
           background: 'linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05))',

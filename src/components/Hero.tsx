@@ -37,19 +37,11 @@ export default function Hero({ onSearch, categories }: HeroProps) {
           Discover Local Businesses{' '}
           <span className="accent">in Gresham</span>
         </motion.h1>
-        <motion.p
-          className="lead"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          Find shops, services, and restaurants in our community — all in one place.
-        </motion.p>
         <motion.div
           className="hero-actions"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <a href="#discover" className="btn btn-primary">
             Browse Businesses
@@ -61,7 +53,7 @@ export default function Hero({ onSearch, categories }: HeroProps) {
         <motion.form
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           onSubmit={handleSubmit}
           className="search-bar"
           role="search"
