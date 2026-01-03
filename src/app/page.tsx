@@ -292,24 +292,24 @@ export default function Home() {
       <Header onSignIn={() => setIsAuthOpen(true)} />
       <PromoBanner location="homepage" />
 
-      {/* Tagline Section */}
+      {/* Tagline */}
       <div style={{
-        background: 'linear-gradient(135deg, #99edc3 0%, #b8f0d6 100%)',
-        padding: '2rem 1rem',
+        padding: '1rem 1rem 0.5rem',
         textAlign: 'center',
-        borderBottom: '3px solid var(--primary-green)'
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
       }}>
-        <h1 style={{
+        <p style={{
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-          fontWeight: 700,
+          fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+          fontWeight: 600,
           margin: 0,
-          color: 'var(--primary-black)',
-          letterSpacing: '-0.02em',
-          textShadow: '0 2px 4px rgba(0,0,0,0.05)'
+          color: '#1a1a1a',
+          letterSpacing: '0.02em',
+          textTransform: 'none'
         }}>
           Everything local. One place.
-        </h1>
+        </p>
       </div>
 
       <main id="main-content">
