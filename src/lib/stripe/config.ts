@@ -1,28 +1,46 @@
 import Stripe from 'stripe'
+import { SubscriptionTier } from '@/lib/types'
 
 // Platform fee percentage (2%)
 export const PLATFORM_FEE_PERCENTAGE = 0.02
-
-// Subscription pricing
-export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00 in cents
 
 // Helper function to calculate platform fee
 export function calculatePlatformFee(amount: number): number {
   return Math.round(amount * PLATFORM_FEE_PERCENTAGE)
 }
 
-// Get Stripe Price ID from environment
-export function getSubscriptionPriceId(): string {
-  const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID
+// Get Stripe Price ID based on subscription tier
+export function getSubscriptionPriceId(tier: SubscriptionTier = 'monthly'): string {
+  let priceId: string | undefined
+
+  switch (tier) {
+    case 'monthly':
+      priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID_MONTHLY || process.env.STRIPE_SUBSCRIPTION_PRICE_ID
+      break
+    case 'yearly':
+      priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID_YEARLY
+      break
+    case 'nonprofit':
+      // Non-profits don't need a Stripe price ID (they get free access)
+      // But if you want to track them in Stripe, you could create a $0 price
+      return '' // Return empty string - non-profits don't use Stripe subscriptions
+    default:
+      priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID
+  }
 
   if (!priceId) {
     throw new Error(
-      'STRIPE_SUBSCRIPTION_PRICE_ID is not set in environment variables. ' +
+      `STRIPE_SUBSCRIPTION_PRICE_ID_${tier.toUpperCase()} is not set in environment variables. ` +
       'Please create a subscription product in Stripe and add the price ID to your .env.local file.'
     )
   }
 
   return priceId
+}
+
+// Legacy function for backwards compatibility
+export function getMonthlySubscriptionPriceId(): string {
+  return getSubscriptionPriceId('monthly')
 }
 
 // Lazy initialization of Stripe - only creates instance when needed

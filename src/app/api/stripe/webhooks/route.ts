@@ -219,6 +219,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 
   const businessId = subscription.metadata?.businessId
   const hasFirstMonthFree = subscription.metadata?.hasFirstMonthFree === 'true'
+  const tier = subscription.metadata?.tier || 'monthly' // Default to monthly for legacy subscriptions
 
   if (businessId) {
     try {
@@ -232,6 +233,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id,
         subscriptionStatus: subscription.status,
+        subscriptionTier: tier,
         subscriptionCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
         subscriptionCancelAtPeriodEnd: sub.cancel_at_period_end,
         hasFirstMonthFree: hasFirstMonthFree,
@@ -239,7 +241,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
         updatedAt: new Date(),
       })
 
-      console.log(`Business ${businessId} subscription created with status: ${subscription.status}`)
+      console.log(`Business ${businessId} subscription created with status: ${subscription.status}, tier: ${tier}`)
     } catch (error) {
       console.error('Error creating subscription record:', error)
     }

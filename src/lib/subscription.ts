@@ -8,6 +8,7 @@ export interface SubscriptionCheckResult {
   reason?: string
   daysRemaining?: number
   isGrandfathered: boolean
+  isNonProfit: boolean
   hasActiveSubscription: boolean
   inGracePeriod: boolean
 }
@@ -17,8 +18,9 @@ export interface SubscriptionCheckResult {
  *
  * Businesses are exempt from subscription requirements if:
  * 1. They are grandfathered (early adopters marked as exempt)
- * 2. They are within the 7-day grace period after approval
- * 3. They have an active or trialing subscription
+ * 2. They are a verified non-profit organization
+ * 3. They are within the 7-day grace period after approval
+ * 4. They have an active or trialing subscription
  *
  * @param business The business to check
  * @returns SubscriptionCheckResult with details about subscription status
@@ -30,6 +32,7 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
       requiresSubscription: true,
       reason: 'No business profile found',
       isGrandfathered: false,
+      isNonProfit: false,
       hasActiveSubscription: false,
       inGracePeriod: false,
     }
@@ -40,12 +43,24 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
     return {
       requiresSubscription: false,
       isGrandfathered: true,
+      isNonProfit: false,
       hasActiveSubscription: false,
       inGracePeriod: false,
     }
   }
 
-  // 2. Check if has active subscription
+  // 2. Check if non-profit (exempt from subscription requirements)
+  if (business.isNonProfit === true) {
+    return {
+      requiresSubscription: false,
+      isGrandfathered: false,
+      isNonProfit: true,
+      hasActiveSubscription: false,
+      inGracePeriod: false,
+    }
+  }
+
+  // 3. Check if has active subscription
   const hasActiveSubscription =
     business.subscriptionStatus === 'active' ||
     business.subscriptionStatus === 'trialing'
@@ -54,12 +69,13 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
     return {
       requiresSubscription: false,
       isGrandfathered: false,
+      isNonProfit: false,
       hasActiveSubscription: true,
       inGracePeriod: false,
     }
   }
 
-  // 3. Check grace period (7 days after approval)
+  // 4. Check grace period (7 days after approval)
   if (business.approvedAt) {
     const approvalDate = business.approvedAt instanceof Date
       ? business.approvedAt
@@ -77,6 +93,7 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
         daysRemaining,
         inGracePeriod: true,
         isGrandfathered: false,
+        isNonProfit: false,
         hasActiveSubscription: false,
       }
     }
@@ -86,12 +103,13 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
       requiresSubscription: true,
       reason: 'Grace period expired. Please subscribe to continue using the platform.',
       isGrandfathered: false,
+      isNonProfit: false,
       hasActiveSubscription: false,
       inGracePeriod: false,
     }
   }
 
-  // 4. No approval date - check if status is approved (legacy case)
+  // 5. No approval date - check if status is approved (legacy case)
   // If approved but no approvedAt date, give them benefit of grace period from now
   if (business.status === 'approved') {
     return {
@@ -100,15 +118,17 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
       daysRemaining: GRACE_PERIOD_DAYS,
       inGracePeriod: true,
       isGrandfathered: false,
+      isNonProfit: false,
       hasActiveSubscription: false,
     }
   }
 
-  // 5. Not approved yet - no subscription required during application phase
+  // 6. Not approved yet - no subscription required during application phase
   return {
     requiresSubscription: false,
     reason: 'Subscription will be required after approval',
     isGrandfathered: false,
+    isNonProfit: false,
     hasActiveSubscription: false,
     inGracePeriod: false,
   }
@@ -159,6 +179,10 @@ export function canAcceptPayments(business: Business | null): {
 export function getSubscriptionMessage(result: SubscriptionCheckResult): string {
   if (result.isGrandfathered) {
     return "Your business is exempt from subscription fees as an early adopter. Thank you for being part of our community!"
+  }
+
+  if (result.isNonProfit) {
+    return "Your non-profit organization has free access to the platform. Thank you for serving our community!"
   }
 
   if (result.hasActiveSubscription) {
