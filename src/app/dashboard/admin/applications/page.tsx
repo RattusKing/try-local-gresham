@@ -104,6 +104,7 @@ export default function BusinessApplicationsPage() {
         instagram: application.instagram || '', // Include Instagram
         ownerId: application.userId,
         status: 'approved',
+        approvedAt: new Date(), // Track when business was approved for grace period
         subscriptionTier: 'free', // Admin can change this later
         createdAt: new Date(),
         updatedAt: new Date(),
