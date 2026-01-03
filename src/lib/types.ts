@@ -27,11 +27,13 @@ export interface Business {
   stripeCustomerId?: string // Stripe Customer ID for subscriptions
   stripeSubscriptionId?: string // Stripe Subscription ID
   subscriptionStatus?: SubscriptionStatus // Current subscription status
+  subscriptionTier?: SubscriptionTier // Which subscription plan (monthly, yearly, nonprofit)
   subscriptionCurrentPeriodEnd?: Date // When current billing period ends
   subscriptionCancelAtPeriodEnd?: boolean // Whether subscription will cancel at period end
   hasFirstMonthFree?: boolean // Whether this business got first month free promotion
   subscriptionCreatedAt?: Date // When subscription was created
   grandfathered?: boolean // Exempt from subscription requirements (for early/existing businesses)
+  isNonProfit?: boolean // Non-profit organizations get free access
   approvedAt?: Date // When business was approved by admin
 }
 
@@ -285,8 +287,37 @@ export interface CSVImportError {
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'unpaid'
 
-// Single-tier subscription at $39/month
-export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00 in cents
+export type SubscriptionTier = 'monthly' | 'yearly' | 'nonprofit'
+
+// Subscription pricing (in cents)
+export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00/month
+export const SUBSCRIPTION_PRICE_YEARLY = 43000 // $430.00/year (saves $38/year vs monthly)
+export const SUBSCRIPTION_PRICE_NONPROFIT = 0 // Free for non-profits
+
+// Subscription metadata
+export const SUBSCRIPTION_TIERS = {
+  monthly: {
+    price: SUBSCRIPTION_PRICE_MONTHLY,
+    interval: 'month' as const,
+    displayName: 'Monthly Plan',
+    description: '$39/month',
+    savings: null,
+  },
+  yearly: {
+    price: SUBSCRIPTION_PRICE_YEARLY,
+    interval: 'year' as const,
+    displayName: 'Annual Plan',
+    description: '$430/year',
+    savings: 'Save $38/year',
+  },
+  nonprofit: {
+    price: SUBSCRIPTION_PRICE_NONPROFIT,
+    interval: 'year' as const,
+    displayName: 'Non-Profit',
+    description: 'Free for verified non-profits',
+    savings: 'Free forever',
+  },
+} as const
 
 export interface Subscription {
   id: string

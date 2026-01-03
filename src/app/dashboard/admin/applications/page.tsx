@@ -74,12 +74,14 @@ export default function BusinessApplicationsPage() {
     }
   }
 
-  const handleApprove = async (application: BusinessApplication) => {
+  const handleApprove = async (application: BusinessApplication, isNonProfit: boolean = false) => {
     if (!db) return
 
-    const confirmApprove = confirm(
-      `Approve ${application.businessName}? This will create a business account and send a welcome email.`
-    )
+    const confirmMessage = isNonProfit
+      ? `Approve ${application.businessName} as a NON-PROFIT? They will get FREE access to the platform.`
+      : `Approve ${application.businessName}? This will create a business account and send a welcome email.`
+
+    const confirmApprove = confirm(confirmMessage)
     if (!confirmApprove) return
 
     try {
@@ -90,7 +92,7 @@ export default function BusinessApplicationsPage() {
         throw new Error('Application must have a userId')
       }
 
-      const businessData = {
+      const businessData: any = {
         name: application.businessName,
         tags: [application.category],
         neighborhood: application.neighborhood,
@@ -109,6 +111,11 @@ export default function BusinessApplicationsPage() {
         createdAt: new Date(),
         updatedAt: new Date(),
         email: application.email, // Store email for notifications
+      }
+
+      // If non-profit, set the flag
+      if (isNonProfit) {
+        businessData.isNonProfit = true
       }
 
       // Use user.uid as document ID to match business dashboard expectations
@@ -296,10 +303,19 @@ export default function BusinessApplicationsPage() {
               <div className="application-actions">
                 <button
                   className="btn btn-primary"
-                  onClick={() => handleApprove(app)}
+                  onClick={() => handleApprove(app, false)}
                   disabled={processing === app.id}
                 >
                   {processing === app.id ? 'Processing...' : 'Approve'}
+                </button>
+                <button
+                  className="btn btn-success"
+                  onClick={() => handleApprove(app, true)}
+                  disabled={processing === app.id}
+                  style={{ background: '#4caf50', color: 'white', borderColor: '#4caf50' }}
+                  title="Approve as non-profit (FREE access)"
+                >
+                  Approve as Non-Profit
                 </button>
                 <button
                   className="btn btn-outline"

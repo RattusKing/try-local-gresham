@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe, getSubscriptionPriceId } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { SubscriptionTier } from '@/lib/types'
 
 export async function POST(req: NextRequest) {
   try {
-    const { businessId, userId, userEmail, userName } = await req.json()
+    const { businessId, userId, userEmail, userName, tier = 'monthly' } = await req.json()
 
     if (!businessId || !userId || !userEmail) {
       return NextResponse.json(
         { error: 'Business ID, user ID, and email are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate tier
+    const validTiers: SubscriptionTier[] = ['monthly', 'yearly', 'nonprofit']
+    if (!validTiers.includes(tier as SubscriptionTier)) {
+      return NextResponse.json(
+        { error: `Invalid subscription tier. Must be one of: ${validTiers.join(', ')}` },
         { status: 400 }
       )
     }
@@ -66,8 +76,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Get subscription price ID from environment
-    const priceId = getSubscriptionPriceId()
+    // Get subscription price ID based on tier
+    const priceId = getSubscriptionPriceId(tier as SubscriptionTier)
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
@@ -84,9 +94,11 @@ export async function POST(req: NextRequest) {
         metadata: {
           businessId: businessId,
           userId: userId,
+          tier: tier,
           hasFirstMonthFree: isFirstTenBusiness.toString(),
         },
-        // Give first 10 businesses a 1-month free trial
+        // Give first 10 businesses a free trial
+        // Monthly: 30 days, Yearly: 30 days
         ...(isFirstTenBusiness && {
           trial_period_days: 30,
         }),
@@ -94,6 +106,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         businessId: businessId,
         userId: userId,
+        tier: tier,
         hasFirstMonthFree: isFirstTenBusiness.toString(),
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business?subscription=success`,
@@ -104,6 +117,7 @@ export async function POST(req: NextRequest) {
       sessionId: session.id,
       url: session.url,
       isFirstTenBusiness: isFirstTenBusiness,
+      tier: tier,
     })
   } catch (error: any) {
     console.error('Error creating subscription checkout:', error)

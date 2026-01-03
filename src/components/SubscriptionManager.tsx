@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Business, SubscriptionStatus } from '@/lib/types'
+import { Business, SubscriptionStatus, SubscriptionTier, SUBSCRIPTION_TIERS } from '@/lib/types'
 import { useAuth } from '@/lib/firebase/auth-context'
+import { checkSubscriptionRequired } from '@/lib/subscription'
 import './SubscriptionManager.css'
 
 interface SubscriptionManagerProps {
@@ -14,11 +15,14 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('yearly') // Default to yearly (better value)
 
   const hasActiveSubscription = business.subscriptionStatus === 'active' ||
                                 business.subscriptionStatus === 'trialing'
 
-  const handleSubscribe = async () => {
+  const subCheck = checkSubscriptionRequired(business)
+
+  const handleSubscribe = async (tier: SubscriptionTier) => {
     if (!user) return
 
     try {
@@ -35,6 +39,7 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
           userId: user.uid,
           userEmail: user.email,
           userName: user.displayName || business.name,
+          tier, // Pass selected tier to API
         }),
       })
 
@@ -107,6 +112,25 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   }
 
+  // Don't show subscription selector for non-profits or grandfathered businesses
+  if (subCheck.isNonProfit || subCheck.isGrandfathered) {
+    return (
+      <div className="subscription-manager">
+        <h2>Subscription</h2>
+        <div className="subscription-exempt">
+          <div className="exempt-badge">
+            {subCheck.isNonProfit ? '🎁 Non-Profit' : '⭐ Early Adopter'}
+          </div>
+          <p className="exempt-message">
+            {subCheck.isNonProfit
+              ? 'Your non-profit organization has free access to the platform. Thank you for serving our community!'
+              : 'Your business is exempt from subscription fees as an early adopter. Thank you for being part of our community!'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="subscription-manager">
       <h2>Subscription</h2>
@@ -115,45 +139,78 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
 
       {!hasActiveSubscription ? (
         <div className="subscription-inactive">
-          <div className="subscription-plan">
-            <h3>Business Subscription</h3>
-            <div className="subscription-price">
-              <span className="price-amount">$39</span>
-              <span className="price-period">/month</span>
-            </div>
+          <p className="subscription-intro">Choose the plan that works best for your business:</p>
 
-            <div className="subscription-features">
-              <ul>
-                <li>✓ Full marketplace listing</li>
-                <li>✓ Product catalog management</li>
-                <li>✓ Order management system</li>
-                <li>✓ Appointment scheduling</li>
-                <li>✓ Analytics dashboard</li>
-                <li>✓ Discount code creation</li>
-                <li>✓ Customer reviews</li>
-                <li>✓ Direct payment processing</li>
-              </ul>
-            </div>
-
-            <div className="first-month-promo">
-              <p className="promo-badge">🎉 Limited Time Offer</p>
-              <p className="promo-text">
-                First 10 businesses get their <strong>first month FREE!</strong>
-              </p>
-            </div>
-
-            <button
-              onClick={handleSubscribe}
-              disabled={loading}
-              className="btn-primary btn-subscribe"
+          <div className="subscription-tiers">
+            {/* Monthly Plan */}
+            <div
+              className={`subscription-tier ${selectedTier === 'monthly' ? 'selected' : ''}`}
+              onClick={() => setSelectedTier('monthly')}
             >
-              {loading ? 'Processing...' : 'Start Subscription'}
-            </button>
+              <div className="tier-header">
+                <h3>Monthly Plan</h3>
+              </div>
+              <div className="tier-price">
+                <span className="price-amount">$39</span>
+                <span className="price-period">/month</span>
+              </div>
+              <div className="tier-billing">Billed monthly</div>
+              <div className="tier-annual-cost">$468/year</div>
+            </div>
 
-            <p className="subscription-note">
-              Cancel anytime. No long-term commitments.
+            {/* Yearly Plan (Recommended) */}
+            <div
+              className={`subscription-tier ${selectedTier === 'yearly' ? 'selected' : ''} recommended`}
+              onClick={() => setSelectedTier('yearly')}
+            >
+              <div className="tier-recommended-badge">Best Value</div>
+              <div className="tier-header">
+                <h3>Annual Plan</h3>
+              </div>
+              <div className="tier-price">
+                <span className="price-amount">$430</span>
+                <span className="price-period">/year</span>
+              </div>
+              <div className="tier-billing">Billed annually</div>
+              <div className="tier-savings">Save $38/year</div>
+            </div>
+          </div>
+
+          <div className="subscription-features">
+            <h4>All plans include:</h4>
+            <ul>
+              <li>✓ Full marketplace listing</li>
+              <li>✓ Product catalog management</li>
+              <li>✓ Order management system</li>
+              <li>✓ Appointment scheduling</li>
+              <li>✓ Analytics dashboard</li>
+              <li>✓ Discount code creation</li>
+              <li>✓ Customer reviews</li>
+              <li>✓ Direct payment processing</li>
+            </ul>
+          </div>
+
+          <div className="first-month-promo">
+            <p className="promo-badge">🎉 Limited Time Offer</p>
+            <p className="promo-text">
+              First 10 businesses get their <strong>first month FREE!</strong>
             </p>
           </div>
+
+          <button
+            onClick={() => handleSubscribe(selectedTier)}
+            disabled={loading}
+            className="btn-primary btn-subscribe"
+          >
+            {loading
+              ? 'Processing...'
+              : `Subscribe - ${SUBSCRIPTION_TIERS[selectedTier].description}`}
+          </button>
+
+          <p className="subscription-note">
+            Cancel anytime. No long-term commitments. <br />
+            <em>Non-profit organization? <a href="mailto:support@try-local.com">Contact us</a> for free access.</em>
+          </p>
         </div>
       ) : (
         <div className="subscription-active">
@@ -165,8 +222,21 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
 
             <div className="subscription-details">
               <div className="detail-item">
+                <span className="detail-label">Plan:</span>
+                <span className="detail-value">
+                  {business.subscriptionTier
+                    ? SUBSCRIPTION_TIERS[business.subscriptionTier].displayName
+                    : 'Monthly Plan'}
+                </span>
+              </div>
+
+              <div className="detail-item">
                 <span className="detail-label">Price:</span>
-                <span className="detail-value">$39/month</span>
+                <span className="detail-value">
+                  {business.subscriptionTier
+                    ? SUBSCRIPTION_TIERS[business.subscriptionTier].description
+                    : '$39/month'}
+                </span>
               </div>
 
               {business.hasFirstMonthFree && (
