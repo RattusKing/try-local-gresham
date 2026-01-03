@@ -6,6 +6,7 @@ import { collection, query, where, getDocs, updateDoc, deleteDoc, doc } from 'fi
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Business } from '@/lib/types'
+import { checkSubscriptionRequired } from '@/lib/subscription'
 import './admin.css'
 
 export default function AdminDashboard() {
@@ -128,6 +129,42 @@ export default function AdminDashboard() {
     } catch (err: any) {
       setError(err.message)
     }
+  }
+
+  const getSubscriptionBadge = (business: Business) => {
+    const subCheck = checkSubscriptionRequired(business)
+
+    if (subCheck.isGrandfathered) {
+      return <span className="badge badge-success">⭐ Grandfathered</span>
+    }
+
+    if (subCheck.isNonProfit) {
+      return <span className="badge badge-success">🎁 Non-Profit</span>
+    }
+
+    if (business.subscriptionStatus === 'active') {
+      return <span className="badge badge-success">✓ Active - {business.subscriptionTier === 'yearly' ? 'Annual' : 'Monthly'}</span>
+    }
+
+    if (business.subscriptionStatus === 'trialing') {
+      return <span className="badge badge-info">🎉 Free Trial</span>
+    }
+
+    if (subCheck.inGracePeriod) {
+      return <span className="badge badge-warning">⏰ Grace Period ({subCheck.daysRemaining} days left)</span>
+    }
+
+    if (subCheck.requiresSubscription) {
+      return <span className="badge badge-danger">❌ Subscription Required</span>
+    }
+
+    return <span className="badge badge-secondary">❓ Unknown</span>
+  }
+
+  const formatDate = (date?: Date | any) => {
+    if (!date) return 'N/A'
+    const d = date.toDate ? date.toDate() : new Date(date)
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
   if (user?.role !== 'admin') {
@@ -291,6 +328,20 @@ export default function AdminDashboard() {
                         {business.description}
                       </p>
                     )}
+                    <div style={{ marginTop: '12px' }}>
+                      <div style={{ marginBottom: '8px' }}>
+                        {getSubscriptionBadge(business)}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#666' }}>
+                        <div>Approved: {formatDate(business.approvedAt)}</div>
+                        {business.subscriptionCurrentPeriodEnd && (
+                          <div>Subscription ends: {formatDate(business.subscriptionCurrentPeriodEnd)}</div>
+                        )}
+                        {business.stripeConnectedAccountId && (
+                          <div>✓ Stripe Connected</div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div className="business-card-actions">
                     <button
