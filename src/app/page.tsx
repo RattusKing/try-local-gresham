@@ -292,6 +292,26 @@ export default function Home() {
       <Header onSignIn={() => setIsAuthOpen(true)} />
       <PromoBanner location="homepage" />
 
+      {/* Tagline Section */}
+      <div style={{
+        background: 'linear-gradient(135deg, #99edc3 0%, #b8f0d6 100%)',
+        padding: '2rem 1rem',
+        textAlign: 'center',
+        borderBottom: '3px solid var(--primary-green)'
+      }}>
+        <h1 style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+          fontWeight: 700,
+          margin: 0,
+          color: 'var(--primary-black)',
+          letterSpacing: '-0.02em',
+          textShadow: '0 2px 4px rgba(0,0,0,0.05)'
+        }}>
+          Everything local. One place.
+        </h1>
+      </div>
+
       <main id="main-content">
         <Hero onSearch={handleSearch} categories={categories} />
 
