@@ -353,31 +353,80 @@ export default function ApplyPage() {
 
                   <div className="pricing-section">
                     <h3>Simple, Transparent Pricing</h3>
-                    <div className="pricing-cards">
-                      <div className="pricing-card featured">
-                        <div className="pricing-badge">Most Popular</div>
-                        <h4>Standard Plan</h4>
+                    <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '1.5rem', fontSize: '0.9375rem' }}>
+                      Choose the plan that works best for your business
+                    </p>
+                    <div className="pricing-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+                      {/* Monthly Plan */}
+                      <div className="pricing-card">
+                        <h4>Monthly Plan</h4>
                         <div className="pricing-amount">
                           <span className="currency">$</span>
                           <span className="price">39</span>
                           <span className="period">/month</span>
                         </div>
-                        <ul className="pricing-features">
-                          <li>Unlimited product & service listings</li>
-                          <li>Online ordering & appointment booking</li>
-                          <li>Business analytics & insights</li>
-                          <li>Customer reviews & ratings</li>
-                          <li>Featured in local directory</li>
-                          <li>Payment processing via Stripe</li>
+                        <ul className="pricing-features" style={{ fontSize: '0.9375rem' }}>
+                          <li>✓ Unlimited product & service listings</li>
+                          <li>✓ Online ordering & appointment booking</li>
+                          <li>✓ Business analytics & insights</li>
+                          <li>✓ Customer reviews & ratings</li>
+                          <li>✓ Featured in local directory</li>
+                          <li>✓ Payment processing via Stripe</li>
                         </ul>
-                        <div className="pricing-fee">
+                        <div className="pricing-fee" style={{ fontSize: '0.875rem', marginTop: '1rem' }}>
+                          <strong>Transaction Fee:</strong> 2% per sale
+                        </div>
+                      </div>
+
+                      {/* Annual Plan - Best Value */}
+                      <div className="pricing-card featured" style={{ position: 'relative' }}>
+                        <div className="pricing-badge" style={{
+                          position: 'absolute',
+                          top: '-12px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          background: 'var(--secondary-dark)',
+                          color: 'white',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '100px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          whiteSpace: 'nowrap'
+                        }}>BEST VALUE</div>
+                        <h4>Annual Plan</h4>
+                        <div className="pricing-amount">
+                          <span className="currency">$</span>
+                          <span className="price">430</span>
+                          <span className="period">/year</span>
+                        </div>
+                        <div style={{
+                          background: 'rgba(153, 237, 195, 0.2)',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          marginBottom: '1rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          color: 'var(--primary-green)',
+                          textAlign: 'center'
+                        }}>
+                          Save $38/year
+                        </div>
+                        <ul className="pricing-features" style={{ fontSize: '0.9375rem' }}>
+                          <li>✓ Unlimited product & service listings</li>
+                          <li>✓ Online ordering & appointment booking</li>
+                          <li>✓ Business analytics & insights</li>
+                          <li>✓ Customer reviews & ratings</li>
+                          <li>✓ Featured in local directory</li>
+                          <li>✓ Payment processing via Stripe</li>
+                        </ul>
+                        <div className="pricing-fee" style={{ fontSize: '0.875rem', marginTop: '1rem' }}>
                           <strong>Transaction Fee:</strong> 2% per sale
                         </div>
                       </div>
                     </div>
                     <div className="pricing-promo">
                       <span className="promo-badge">Special Launch Offer</span>
-                      <p>First month free for early adopters! No credit card required to apply.</p>
+                      <p>First 10 businesses get their first month free! 7-day grace period to get set up. Non-profit? <a href="mailto:support@try-local.com" style={{ color: 'var(--secondary-dark)' }}>Contact us</a> for free access.</p>
                     </div>
                   </div>
 
