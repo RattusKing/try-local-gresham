@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { db } from '@/lib/firebase/config'
 import { collection, addDoc } from 'firebase/firestore'
 import { useAuth } from '@/lib/firebase/auth-context'
@@ -16,6 +16,15 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [freeTrialSpots, setFreeTrialSpots] = useState<{
+    remainingSpots: number
+    hasSpotsAvailable: boolean
+    loading: boolean
+  }>({
+    remainingSpots: 0,
+    hasSpotsAvailable: false,
+    loading: true,
+  })
 
   // Pre-fill user info if authenticated
   const [formData, setFormData] = useState({
@@ -30,6 +39,29 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
     website: '',
     instagram: '',
   })
+
+  // Fetch free trial spots when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/stripe/free-trial-spots')
+        .then(res => res.json())
+        .then(data => {
+          setFreeTrialSpots({
+            remainingSpots: data.remainingSpots || 0,
+            hasSpotsAvailable: data.hasSpotsAvailable || false,
+            loading: false,
+          })
+        })
+        .catch(err => {
+          console.error('Error fetching free trial spots:', err)
+          setFreeTrialSpots({
+            remainingSpots: 0,
+            hasSpotsAvailable: false,
+            loading: false,
+          })
+        })
+    }
+  }, [isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -346,7 +378,24 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
               </div>
               <div className="pricing-promo">
                 <span className="promo-badge">Special Launch Offer</span>
-                <p>First month free for early adopters! No credit card required to apply.</p>
+                {freeTrialSpots.loading ? (
+                  <p>Loading availability...</p>
+                ) : freeTrialSpots.hasSpotsAvailable ? (
+                  <div className="free-trial-counter">
+                    <p className="counter-text">
+                      <strong>First month FREE</strong> for the first 10 businesses!
+                    </p>
+                    <div className="spots-remaining">
+                      <span className="spots-number">{freeTrialSpots.remainingSpots}</span>
+                      <span className="spots-label">
+                        {freeTrialSpots.remainingSpots === 1 ? 'spot' : 'spots'} remaining
+                      </span>
+                    </div>
+                    <p className="no-credit-card">No credit card required to apply.</p>
+                  </div>
+                ) : (
+                  <p>7-day free trial included with all new accounts. No credit card required to apply.</p>
+                )}
               </div>
             </div>
 

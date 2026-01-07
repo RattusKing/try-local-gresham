@@ -234,6 +234,62 @@
   font-weight: 500;
 }
 
+/* Free Trial Counter */
+.free-trial-counter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.counter-text {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.125rem;
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.counter-text strong {
+  font-size: 1.25rem;
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.spots-remaining {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(153, 237, 195, 0.2);
+  border: 2px solid var(--primary);
+  margin: 0 auto;
+  max-width: fit-content;
+}
+
+.spots-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1;
+}
+
+.spots-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.no-credit-card {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
 /* Submit Button */
 .submit-btn {
   width: 100%;
