@@ -32,6 +32,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.7.9",
@@ -44,6 +45,7 @@
     "eslint-config-next": "^15.0.3",
     "jsdom": "^27.2.0",
     "postcss": "^8.4.47",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3",
     "vitest": "^4.0.10"

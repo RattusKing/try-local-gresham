@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import Analytics from '@/components/Analytics'
 import CookieConsent from '@/components/CookieConsent'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
@@ -10,7 +12,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#99edc3',
+  themeColor: '#ff7a00',
 }
 
 export const metadata: Metadata = {
@@ -83,10 +85,12 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <ServiceWorkerRegistration />
         <Analytics />
         <SpeedInsights />
         <Providers>{children}</Providers>
         <CookieConsent />
+        <PWAInstallPrompt />
       </body>
     </html>
   )
