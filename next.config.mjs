@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {},
   output: 'standalone',
   images: {
     remotePatterns: [
@@ -55,7 +56,7 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
-          // Content Security Policy
+          // Content Security Policy (updated for PWA service workers)
           {
             key: 'Content-Security-Policy',
             value: [
@@ -66,6 +67,8 @@ const nextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self' https://www.google-analytics.com https://*.firebaseio.com https://*.googleapis.com https://*.upstash.io https://vercel.live wss://*.firebaseio.com https://accounts.google.com https://api.stripe.com",
               "frame-src 'self' https://www.google.com https://vercel.live https://accounts.google.com https://try-local-f0c44.firebaseapp.com https://js.stripe.com https://hooks.stripe.com",
+              "worker-src 'self' blob:",
+              "manifest-src 'self'",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
