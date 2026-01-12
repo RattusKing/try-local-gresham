@@ -1,18 +1,19 @@
 .dashboard-nav {
   width: 280px;
-  background: linear-gradient(180deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05));
+  background: white;
   border-right: 2px solid rgba(194, 175, 240, 0.2);
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
   height: 100vh;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-nav-header {
   padding: 2rem 1.5rem;
   border-bottom: 2px solid rgba(194, 175, 240, 0.2);
-  background: linear-gradient(135deg, rgba(153, 237, 195, 0.1), rgba(194, 175, 240, 0.1));
+  background: white;
 }
 
 .dashboard-nav-logo {
@@ -132,7 +133,7 @@
 .dashboard-nav-footer {
   padding: 1.5rem;
   border-top: 2px solid rgba(194, 175, 240, 0.2);
-  background: linear-gradient(135deg, rgba(153, 237, 195, 0.05), rgba(194, 175, 240, 0.05));
+  background: white;
 }
 
 .dashboard-nav-back {
