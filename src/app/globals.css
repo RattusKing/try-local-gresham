@@ -1026,16 +1026,70 @@ body {
   .grid {
     width: 100%;
   }
+
+  /* Fix text overflow and wrapping on mobile */
+  h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  p, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Prevent long words from breaking layout */
+  * {
+    min-width: 0;
+  }
+
+  /* Ensure buttons don't overflow */
+  .btn {
+    max-width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  /* Card content text should wrap */
+  .card .content {
+    overflow: hidden;
+  }
+
+  .card h3 {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Section headings should scale and wrap */
+  .section-head h2 {
+    font-size: 2rem;
+    overflow-wrap: break-word;
+  }
+
+  /* Brand name should not overflow */
+  .brand-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
 }
 
 /* Extra small mobile devices */
 @media (max-width: 30rem) {
   .hero h1 {
     font-size: 1.75rem;
+    line-height: 1.2;
   }
 
   .brand-subtle {
     display: none;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+    max-width: 120px;
   }
 
   .container {
@@ -1048,6 +1102,10 @@ body {
 
   .section {
     padding: 1.875rem 0;
+  }
+
+  .section-head h2 {
+    font-size: 1.5rem;
   }
 
   /* Make cards single column on very small screens */
@@ -1067,5 +1125,14 @@ body {
 
   .hero-actions .btn {
     width: 100%;
+  }
+
+  /* Ensure text in modals wraps properly */
+  .modal-card {
+    max-width: 90vw;
+  }
+
+  .modal-card h2, .modal-card h3 {
+    font-size: 1.25rem;
   }
 }
