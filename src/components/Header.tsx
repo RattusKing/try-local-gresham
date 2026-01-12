@@ -147,9 +147,10 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
                     borderRadius: '12px',
                     boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
                     minWidth: '240px',
+                    maxWidth: '320px',
+                    width: 'auto',
                     zIndex: 1000,
                     border: '2px solid var(--primary)',
-                    overflow: 'hidden',
                   }}
                 >
                   <div style={{
