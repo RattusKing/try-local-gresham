@@ -138,26 +138,38 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
 
               {showDropdown && (
                 <div
+                  className="user-dropdown"
                   style={{
                     position: 'absolute',
                     top: 'calc(100% + 10px)',
                     right: 0,
-                    background: '#fff',
+                    background: 'white',
                     borderRadius: '12px',
-                    boxShadow: 'var(--shadow)',
-                    minWidth: '200px',
-                    zIndex: 100,
-                    border: '1px solid #eee',
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+                    minWidth: '240px',
+                    zIndex: 1000,
+                    border: '2px solid var(--primary)',
+                    overflow: 'hidden',
                   }}
                 >
-                  <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee' }}>
-                    <div style={{ fontWeight: 600, marginBottom: '4px' }}>
+                  <div style={{
+                    padding: '16px',
+                    borderBottom: '2px solid #f3f4f6',
+                    background: 'white'
+                  }}>
+                    <div style={{ fontWeight: 700, marginBottom: '4px', color: 'var(--dark)' }}>
                       {user.displayName || 'User'}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#666' }}>{user.email}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>{user.email}</div>
                     {user.role && (
-                      <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
-                        Role: {user.role.replace('_', ' ')}
+                      <div style={{
+                        fontSize: '12px',
+                        color: 'var(--secondary-dark)',
+                        marginTop: '6px',
+                        fontWeight: 600,
+                        textTransform: 'capitalize'
+                      }}>
+                        {user.role.replace('_', ' ')}
                       </div>
                     )}
                   </div>
@@ -165,13 +177,19 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
                     href="/dashboard"
                     style={{
                       display: 'block',
-                      padding: '12px 16px',
+                      padding: '14px 16px',
                       textDecoration: 'none',
-                      color: '#111',
-                      borderBottom: '1px solid #eee',
+                      color: 'var(--dark)',
+                      borderBottom: '1px solid #f3f4f6',
+                      background: 'white',
+                      fontWeight: 600,
+                      fontSize: '15px',
+                      transition: 'background 0.2s ease',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(153, 237, 195, 0.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
                   >
-                    Dashboard
+                    📊 Dashboard
                   </a>
                   <button
                     onClick={() => {
@@ -180,16 +198,20 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
                     }}
                     style={{
                       width: '100%',
-                      padding: '12px 16px',
+                      padding: '14px 16px',
                       border: 'none',
-                      background: 'transparent',
+                      background: 'white',
                       textAlign: 'left',
                       cursor: 'pointer',
-                      color: '#d32f2f',
+                      color: '#dc2626',
                       fontWeight: 600,
+                      fontSize: '15px',
+                      transition: 'background 0.2s ease',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
                   >
-                    Sign Out
+                    🚪 Sign Out
                   </button>
                 </div>
               )}
