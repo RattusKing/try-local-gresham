@@ -930,6 +930,12 @@ body {
   background: white !important;
   /* Prevent any backdrop filters or transparency */
   backdrop-filter: none !important;
+  /* No max height - allow full expansion */
+  max-height: none !important;
+  /* No scrolling - show everything */
+  overflow: visible !important;
+  /* Auto height to fit all content */
+  height: auto !important;
 }
 
 /* Responsive */
@@ -943,6 +949,10 @@ body {
     min-width: 260px !important;
     max-width: calc(100vw - 2rem) !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25) !important;
+    /* Ensure full dropdown on mobile - no scrolling */
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
   }
 
   .for-biz {
