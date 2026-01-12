@@ -149,7 +149,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
                     minWidth: '240px',
                     maxWidth: '320px',
                     width: 'auto',
-                    zIndex: 1000,
+                    zIndex: 9999,
                     border: '2px solid var(--primary)',
                   }}
                 >
