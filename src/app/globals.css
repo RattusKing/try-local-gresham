@@ -924,8 +924,27 @@ body {
   color: var(--secondary-dark);
 }
 
+/* User Dropdown Menu - Mobile & PWA Optimizations */
+.user-dropdown {
+  /* Ensure solid background on all devices */
+  background: white !important;
+  /* Prevent any backdrop filters or transparency */
+  backdrop-filter: none !important;
+}
+
 /* Responsive */
 @media (max-width: 52.5rem) {
+  /* User dropdown - full visibility on mobile */
+  .user-dropdown {
+    position: fixed !important;
+    top: 70px !important;
+    right: 1rem !important;
+    left: auto !important;
+    min-width: 260px !important;
+    max-width: calc(100vw - 2rem) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25) !important;
+  }
+
   .for-biz {
     grid-template-columns: 1fr;
   }
