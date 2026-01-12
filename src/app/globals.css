@@ -48,6 +48,9 @@
 html,
 body {
   height: 100%;
+  /* Prevent horizontal scrolling on mobile */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -61,6 +64,8 @@ body {
   background-image: radial-gradient(circle, rgba(153, 237, 195, 0.08) 1px, transparent 1px);
   background-size: 20px 20px;
   background-attachment: fixed;
+  /* Ensure body takes full width only */
+  max-width: 100vw;
 }
 
 .container {
@@ -888,6 +893,19 @@ body {
   animation: slideIn 0.3s ease;
 }
 
+/* Mobile menu improvements for better scrolling */
+@media (max-width: 52.5rem) {
+  .mobile-menu {
+    width: 100%;
+    max-width: 100%;
+    right: 0;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 1.5rem 2rem;
+  }
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -931,6 +949,15 @@ body {
 
   .search-bar {
     flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* Fix search bar inputs to fit mobile screen */
+  .search-bar input,
+  .search-bar select {
+    min-width: 0;
+    width: 100%;
+    flex: 1;
   }
 
   .nav {
@@ -950,7 +977,7 @@ body {
   .filter-controls input,
   .filter-controls select {
     width: 100%;
-    min-width: 100%;
+    min-width: 0;
   }
 
   /* Larger touch targets on mobile */
@@ -995,6 +1022,34 @@ body {
   .chip {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+  }
+
+  /* Ensure all content stays within viewport */
+  .container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  /* Cards should never exceed viewport */
+  .card {
+    max-width: 100%;
+  }
+
+  /* Grid should respect mobile width */
+  .grid {
+    width: 100%;
+  }
+
+  /* Make user dropdown full-height on mobile - no internal scroll */
+  .nav > div[style*="position: relative"] > div[style*="position: absolute"] {
+    max-height: none !important;
+    overflow-y: visible !important;
+    position: fixed !important;
+    top: 60px !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    max-width: none !important;
+    width: auto !important;
   }
 }
 

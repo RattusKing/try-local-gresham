@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase/config'
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { UserProfile } from '@/lib/types'
+import PaymentMethodsManager from '@/components/stripe/PaymentMethodsManager'
 
 export default function ProfileEditor() {
   const { user } = useAuth()
@@ -410,6 +411,17 @@ export default function ProfileEditor() {
           </div>
         </div>
       )}
+
+      {/* Payment Methods Section */}
+      <div style={{
+        background: 'white',
+        padding: '2rem',
+        borderRadius: 'var(--radius)',
+        boxShadow: 'var(--shadow)',
+        marginTop: '2rem'
+      }}>
+        <PaymentMethodsManager />
+      </div>
     </div>
   )
 }
