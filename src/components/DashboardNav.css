@@ -152,7 +152,87 @@
   transform: translateX(-4px);
 }
 
+/* Mobile Menu Toggle Button */
+.dashboard-nav-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dashboard-nav-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-nav-toggle .hamburger {
+  width: 24px;
+  height: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dashboard-nav-toggle .hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: var(--dark);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.dashboard-nav-toggle .hamburger.open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.dashboard-nav-toggle .hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.dashboard-nav-toggle .hamburger.open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* Mobile Overlay */
+.dashboard-nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(55, 55, 55, 0.5);
+  z-index: 90;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 48rem) {
+  .dashboard-nav-toggle {
+    display: block;
+  }
+
+  .dashboard-nav-overlay {
+    display: block;
+  }
+
   .dashboard-nav {
     width: 100%;
     max-width: 280px;
@@ -160,10 +240,18 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 50;
+    z-index: 95;
     border-right: 2px solid rgba(194, 175, 240, 0.2);
     border-bottom: none;
     overflow-y: auto;
+    /* Hidden by default on mobile */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  /* Show sidebar when open */
+  .dashboard-nav.is-open {
+    transform: translateX(0);
   }
 
   .dashboard-nav-header {
@@ -227,12 +315,5 @@
 
   .dashboard-nav-user-name {
     font-size: 0.875rem;
-  }
-}
-
-/* Add padding to main content when sidebar is visible on mobile */
-@media (max-width: 48rem) {
-  body:has(.dashboard-nav) {
-    padding-left: 280px;
   }
 }

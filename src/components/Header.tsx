@@ -151,6 +151,9 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
                     width: 'auto',
                     zIndex: 9999,
                     border: '2px solid var(--primary)',
+                    maxHeight: 'none',
+                    height: 'auto',
+                    overflow: 'visible',
                   }}
                 >
                   <div style={{
