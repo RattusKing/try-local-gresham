@@ -889,7 +889,7 @@ body {
   bottom: 0;
   width: 280px;
   max-width: 85vw;
-  background: white;
+  background: rgb(255, 255, 255);
   border-right: 2px solid rgba(194, 175, 240, 0.2);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
   z-index: 100;
@@ -899,6 +899,7 @@ body {
   justify-content: center;
   overflow-y: visible;
   animation: slideInFromLeft 0.3s ease;
+  opacity: 1;
 }
 
 @keyframes slideInFromLeft {
