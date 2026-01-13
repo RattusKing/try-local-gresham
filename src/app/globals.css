@@ -886,20 +886,20 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  bottom: 0;
   width: 280px;
   max-width: 85vw;
+  height: 100vh;
   background: rgb(255, 255, 255);
   border-right: 2px solid rgba(194, 175, 240, 0.2);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
   z-index: 100;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  overflow-y: visible;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  overflow-y: auto;
   animation: slideInFromLeft 0.3s ease;
-  opacity: 1;
 }
 
 @keyframes slideInFromLeft {
