@@ -418,6 +418,25 @@ export default function BusinessProfilePage() {
           <ProductSchema key={product.id} product={product} business={business} />
         ))}
 
+        {/* Header Banner Image */}
+        {business.headerImage && (
+          <motion.div
+            className="business-header-banner"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            style={{ position: 'relative', width: '100%', height: '250px', marginBottom: '1rem' }}
+          >
+            <Image
+              src={business.headerImage}
+              alt={`${business.name} header`}
+              fill
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
+              priority
+            />
+          </motion.div>
+        )}
+
         {/* Hero Section */}
       <motion.div
         className="business-hero"
@@ -480,6 +499,36 @@ export default function BusinessProfilePage() {
             >
               <h2>About</h2>
               <p className="business-description">{business.description}</p>
+            </motion.section>
+          )}
+
+          {/* Photo Gallery Section */}
+          {business.gallery && business.gallery.length > 0 && (
+            <motion.section
+              className="business-section"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <h2>Photo Gallery</h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: '1rem',
+                marginTop: '1rem'
+              }}>
+                {business.gallery.map((imageUrl, index) => (
+                  <div key={index} style={{ position: 'relative', width: '100%', height: '250px' }}>
+                    <Image
+                      src={imageUrl}
+                      alt={`${business.name} gallery image ${index + 1}`}
+                      fill
+                      style={{ objectFit: 'cover', borderRadius: '8px' }}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
+                ))}
+              </div>
             </motion.section>
           )}
 
@@ -793,6 +842,26 @@ export default function BusinessProfilePage() {
               </div>
             )}
 
+            {business.email && (
+              <div className="info-item">
+                <span className="info-icon">✉️</span>
+                <div className="info-content">
+                  <strong>Email</strong>
+                  <a href={`mailto:${business.email}`}>{business.email}</a>
+                </div>
+              </div>
+            )}
+
+            {business.address && (
+              <div className="info-item">
+                <span className="info-icon">📍</span>
+                <div className="info-content">
+                  <strong>Address</strong>
+                  <p>{business.address}</p>
+                </div>
+              </div>
+            )}
+
             {business.website && (
               <div className="info-item">
                 <span className="info-icon">🌐</span>
@@ -805,9 +874,25 @@ export default function BusinessProfilePage() {
               </div>
             )}
 
+            {business.instagram && (
+              <div className="info-item">
+                <span className="info-icon">📸</span>
+                <div className="info-content">
+                  <strong>Instagram</strong>
+                  <a
+                    href={`https://instagram.com/${business.instagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {business.instagram}
+                  </a>
+                </div>
+              </div>
+            )}
+
             {business.map && (
               <div className="info-item">
-                <span className="info-icon">📍</span>
+                <span className="info-icon">🗺️</span>
                 <div className="info-content">
                   <strong>Location</strong>
                   <a href={business.map} target="_blank" rel="noopener noreferrer">

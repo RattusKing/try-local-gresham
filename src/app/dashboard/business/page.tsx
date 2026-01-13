@@ -10,6 +10,7 @@ import { Business } from '@/lib/types'
 import StatusBadge from '@/components/StatusBadge'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import SubscriptionRequiredBanner from '@/components/SubscriptionRequiredBanner'
+import BusinessPreview from '@/components/BusinessPreview'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -20,6 +21,9 @@ export default function BusinessDashboard() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [uploadingHeader, setUploadingHeader] = useState(false)
+  const [uploadingGallery, setUploadingGallery] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,6 +34,9 @@ export default function BusinessDashboard() {
     website: '',
     map: '',
     description: '',
+    address: '',
+    email: '',
+    instagram: '',
   })
 
   const loadBusiness = useCallback(async () => {
@@ -52,6 +59,9 @@ export default function BusinessDashboard() {
           website: data.website || '',
           map: data.map || '',
           description: data.description || '',
+          address: data.address || '',
+          email: data.email || '',
+          instagram: data.instagram || '',
         })
       }
     } catch (err: any) {
@@ -83,6 +93,9 @@ export default function BusinessDashboard() {
         website: formData.website,
         map: formData.map,
         description: formData.description,
+        address: formData.address,
+        email: formData.email,
+        instagram: formData.instagram,
         ownerId: user.uid,
         updatedAt: new Date(),
       }
@@ -164,12 +177,132 @@ export default function BusinessDashboard() {
         updatedAt: new Date(),
       })
 
-      setSuccess('Image uploaded successfully!')
+      setSuccess('Cover image uploaded successfully!')
       await loadBusiness()
     } catch (err: any) {
       setError(err.message)
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleHeaderImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !user || !storage || !db)
+      return
+
+    const file = e.target.files[0]
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size must be less than 5MB')
+      return
+    }
+
+    try {
+      setUploadingHeader(true)
+      setError('')
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `businesses/${user.uid}/header_${Date.now()}_${file.name}`)
+      await uploadBytes(storageRef, file)
+      const downloadURL = await getDownloadURL(storageRef)
+
+      // Update Firestore document
+      const businessRef = doc(db, 'businesses', user.uid)
+      await updateDoc(businessRef, {
+        headerImage: downloadURL,
+        updatedAt: new Date(),
+      })
+
+      setSuccess('Header image uploaded successfully!')
+      await loadBusiness()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setUploadingHeader(false)
+    }
+  }
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !user || !storage || !db) return
+
+    const files = Array.from(e.target.files)
+
+    // Validate all files
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        setError('All files must be images')
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Each image must be less than 5MB')
+        return
+      }
+    }
+
+    try {
+      setUploadingGallery(true)
+      setError('')
+
+      // Upload all files
+      const uploadPromises = files.map(async (file) => {
+        if (!storage) throw new Error('Storage not initialized')
+        const storageRef = ref(storage, `businesses/${user.uid}/gallery_${Date.now()}_${file.name}`)
+        await uploadBytes(storageRef, file)
+        return getDownloadURL(storageRef)
+      })
+
+      const downloadURLs = await Promise.all(uploadPromises)
+
+      // Get existing gallery images
+      const businessRef = doc(db, 'businesses', user.uid)
+      const businessSnap = await getDoc(businessRef)
+      const existingGallery = businessSnap.exists() ? (businessSnap.data().gallery || []) : []
+
+      // Update Firestore document with new images added to existing gallery
+      await updateDoc(businessRef, {
+        gallery: [...existingGallery, ...downloadURLs],
+        updatedAt: new Date(),
+      })
+
+      setSuccess(`${files.length} image(s) added to gallery!`)
+      await loadBusiness()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setUploadingGallery(false)
+    }
+  }
+
+  const handleRemoveGalleryImage = async (imageUrl: string) => {
+    if (!user || !db) return
+
+    try {
+      setError('')
+
+      const businessRef = doc(db, 'businesses', user.uid)
+      const businessSnap = await getDoc(businessRef)
+
+      if (businessSnap.exists()) {
+        const currentGallery = businessSnap.data().gallery || []
+        const updatedGallery = currentGallery.filter((url: string) => url !== imageUrl)
+
+        await updateDoc(businessRef, {
+          gallery: updatedGallery,
+          updatedAt: new Date(),
+        })
+
+        setSuccess('Image removed from gallery')
+        await loadBusiness()
+      }
+    } catch (err: any) {
+      setError(err.message)
     }
   }
 
@@ -453,12 +586,88 @@ export default function BusinessDashboard() {
                 placeholder="https://maps.google.com/..."
               />
             </div>
+
+            <div className="form-group">
+              <label htmlFor="address">Physical Address</label>
+              <input
+                type="text"
+                id="address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                placeholder="123 Main St, Gresham, OR 97030"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Business Email</label>
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="contact@yourbusiness.com"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="instagram">
+                Instagram Handle
+                <span className="form-hint">
+                  e.g., @yourbusiness (optional)
+                </span>
+              </label>
+              <input
+                type="text"
+                id="instagram"
+                value={formData.instagram}
+                onChange={(e) =>
+                  setFormData({ ...formData, instagram: e.target.value })
+                }
+                placeholder="@yourbusiness"
+              />
+            </div>
           </div>
 
           <div className="form-section">
-            <h2>Business Image</h2>
+            <h2>Header Banner Image</h2>
+            <p className="form-hint" style={{ marginBottom: '1rem' }}>
+              Large banner image that appears at the top of your business page. Recommended size: 1200x400px
+            </p>
+            {business?.headerImage && (
+              <div className="current-image" style={{ position: 'relative', width: '100%', maxWidth: '800px', height: '250px', marginBottom: '1rem' }}>
+                <Image
+                  src={business.headerImage}
+                  alt={`${business.name} header`}
+                  fill
+                  style={{ objectFit: 'cover', borderRadius: '8px' }}
+                  sizes="(max-width: 768px) 100vw, 800px"
+                />
+              </div>
+            )}
+            <div className="form-group">
+              <label htmlFor="header">Upload Header Banner</label>
+              <input
+                type="file"
+                id="header"
+                accept="image/*"
+                onChange={handleHeaderImageUpload}
+                disabled={uploadingHeader}
+              />
+              {uploadingHeader && <p className="upload-status">Uploading...</p>}
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2>Cover Image</h2>
+            <p className="form-hint" style={{ marginBottom: '1rem' }}>
+              Main image shown in business listings and cards. Recommended size: 600x400px
+            </p>
             {business?.cover && (
-              <div className="current-image" style={{ position: 'relative', width: '100%', maxWidth: '600px', height: '300px' }}>
+              <div className="current-image" style={{ position: 'relative', width: '100%', maxWidth: '600px', height: '300px', marginBottom: '1rem' }}>
                 <Image
                   src={business.cover}
                   alt={business.name}
@@ -481,13 +690,97 @@ export default function BusinessDashboard() {
             </div>
           </div>
 
+          <div className="form-section">
+            <h2>Photo Gallery</h2>
+            <p className="form-hint" style={{ marginBottom: '1rem' }}>
+              Upload multiple images to showcase your business. Select multiple files at once.
+            </p>
+            {business?.gallery && business.gallery.length > 0 && (
+              <div className="gallery-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1rem'
+              }}>
+                {business.gallery.map((imageUrl, index) => (
+                  <div key={index} style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+                      <Image
+                        src={imageUrl}
+                        alt={`Gallery image ${index + 1}`}
+                        fill
+                        style={{ objectFit: 'cover', borderRadius: '8px' }}
+                        sizes="200px"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveGalleryImage(imageUrl)}
+                      style={{
+                        position: 'absolute',
+                        top: '0.5rem',
+                        right: '0.5rem',
+                        background: 'rgba(220, 38, 38, 0.9)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '30px',
+                        height: '30px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.25rem',
+                        fontWeight: 'bold'
+                      }}
+                      title="Remove image"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="form-group">
+              <label htmlFor="gallery">Add Images to Gallery</label>
+              <input
+                type="file"
+                id="gallery"
+                accept="image/*"
+                multiple
+                onChange={handleGalleryUpload}
+                disabled={uploadingGallery}
+              />
+              <span className="form-hint">You can select multiple images at once (hold Ctrl/Cmd while selecting)</span>
+              {uploadingGallery && <p className="upload-status">Uploading images...</p>}
+            </div>
+          </div>
+
           <div className="form-actions">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={() => setShowPreview(true)}
+              disabled={!business}
+              style={{ marginRight: '1rem' }}
+            >
+              👁️ Preview Business Page
+            </button>
             <button type="submit" className="btn-primary" disabled={saving}>
               {saving ? 'Saving...' : business ? 'Update Profile' : 'Create Profile'}
             </button>
           </div>
         </form>
       </div>
+
+      {/* Business Preview Modal */}
+      {business && (
+        <BusinessPreview
+          business={business}
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   )
 }
