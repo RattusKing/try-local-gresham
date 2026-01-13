@@ -885,21 +885,22 @@ body {
 .mobile-menu {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   bottom: 0;
   width: 280px;
   max-width: 85vw;
   background: white;
-  box-shadow: var(--shadow-lg);
+  border-right: 2px solid rgba(194, 175, 240, 0.2);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
   z-index: 100;
   padding: 80px 1.5rem 1.5rem;
   overflow-y: auto;
-  animation: slideIn 0.3s ease;
+  animation: slideInFromLeft 0.3s ease;
 }
 
-@keyframes slideIn {
+@keyframes slideInFromLeft {
   from {
-    transform: translateX(100%);
+    transform: translateX(-100%);
   }
   to {
     transform: translateX(0);
