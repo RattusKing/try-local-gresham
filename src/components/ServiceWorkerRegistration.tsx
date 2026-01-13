@@ -37,10 +37,22 @@ export default function ServiceWorkerRegistration() {
             }
           });
 
-          // Check for updates periodically
+          // Check for updates more frequently (every 10 minutes)
           setInterval(() => {
             registration.update();
-          }, 60 * 60 * 1000); // Check every hour
+          }, 10 * 60 * 1000); // Check every 10 minutes
+
+          // Check for updates when page becomes visible
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              registration.update();
+            }
+          });
+
+          // Check for updates on page focus
+          window.addEventListener('focus', () => {
+            registration.update();
+          });
 
           // Check if there's already a waiting service worker
           if (registration.waiting) {

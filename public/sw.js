@@ -1,8 +1,8 @@
 // Try Local Gresham - Service Worker
-// Version: 1.0.0
+// Version: 1.1.0
 
-const CACHE_NAME = 'try-local-v1';
-const RUNTIME_CACHE = 'try-local-runtime';
+const CACHE_NAME = 'try-local-v1.1';
+const RUNTIME_CACHE = 'try-local-runtime-v1.1';
 
 // Assets to cache on install
 const PRECACHE_URLS = [
