@@ -2,29 +2,16 @@
 
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import CartModal from './CartModal'
 
 export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const { user, signOut } = useAuth()
   const { itemCount } = useCart()
-  const [showDropdown, setShowDropdown] = useState(false)
+  const [showUserSidebar, setShowUserSidebar] = useState(false)
   const [showCart, setShowCart] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   return (
     <header className="site-header">
@@ -103,123 +90,37 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           </button>
 
           {user ? (
-            <div ref={dropdownRef} style={{ position: 'relative' }}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="btn btn-outline"
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'User'}
-                    style={{ width: '24px', height: '24px', borderRadius: '50%' }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--dark)',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {user.email?.[0].toUpperCase()}
-                  </div>
-                )}
-                <span>{user.displayName || user.email}</span>
-              </button>
-
-              {showDropdown && (
+            <button
+              onClick={() => setShowUserSidebar(!showUserSidebar)}
+              className="btn btn-outline"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || 'User'}
+                  style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                />
+              ) : (
                 <div
-                  className="user-dropdown"
                   style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    background: 'white',
-                    borderRadius: '12px',
-                    boxShadow: '2px 0 8px rgba(0, 0, 0, 0.1)',
-                    minWidth: '240px',
-                    maxWidth: '320px',
-                    width: 'auto',
-                    zIndex: 9999,
-                    border: '2px solid rgba(194, 175, 240, 0.2)',
-                    maxHeight: 'none',
-                    height: 'auto',
-                    overflow: 'visible',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--dark)',
+                    fontSize: '12px',
+                    fontWeight: 700,
                   }}
                 >
-                  <div style={{
-                    padding: '16px',
-                    borderBottom: '2px solid #f3f4f6',
-                    background: 'white'
-                  }}>
-                    <div style={{ fontWeight: 700, marginBottom: '4px', color: 'var(--dark)' }}>
-                      {user.displayName || 'User'}
-                    </div>
-                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>{user.email}</div>
-                    {user.role && (
-                      <div style={{
-                        fontSize: '12px',
-                        color: 'var(--secondary-dark)',
-                        marginTop: '6px',
-                        fontWeight: 600,
-                        textTransform: 'capitalize'
-                      }}>
-                        {user.role.replace('_', ' ')}
-                      </div>
-                    )}
-                  </div>
-                  <a
-                    href="/dashboard"
-                    style={{
-                      display: 'block',
-                      padding: '14px 16px',
-                      textDecoration: 'none',
-                      color: 'var(--dark)',
-                      borderBottom: '1px solid #f3f4f6',
-                      background: 'white',
-                      fontWeight: 600,
-                      fontSize: '15px',
-                      transition: 'background 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(153, 237, 195, 0.1)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                  >
-                    📊 Dashboard
-                  </a>
-                  <button
-                    onClick={() => {
-                      signOut()
-                      setShowDropdown(false)
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '14px 16px',
-                      border: 'none',
-                      background: 'white',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: '#dc2626',
-                      fontWeight: 600,
-                      fontSize: '15px',
-                      transition: 'background 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                  >
-                    🚪 Sign Out
-                  </button>
+                  {user.email?.[0].toUpperCase()}
                 </div>
               )}
-            </div>
+              <span>{user.displayName || user.email}</span>
+            </button>
           ) : (
             <button onClick={onSignIn} className="btn btn-outline">
               Sign In
@@ -325,6 +226,67 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
           </>
         )}
       </div>
+
+      {/* User Profile Sidebar */}
+      {showUserSidebar && (
+        <>
+          <div
+            className="user-sidebar-overlay"
+            onClick={() => setShowUserSidebar(false)}
+          />
+          <aside className={`user-sidebar ${showUserSidebar ? 'is-open' : ''}`}>
+            {/* User Info Header */}
+            <div className="user-sidebar-header">
+              <div className="user-sidebar-avatar">
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt={user.displayName || 'User'} />
+                ) : (
+                  <div className="user-sidebar-avatar-text">
+                    {user?.email?.[0].toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="user-sidebar-info">
+                <p className="user-sidebar-name">
+                  {user?.displayName || user?.email}
+                </p>
+                <p className="user-sidebar-email">{user?.email}</p>
+                {user?.role && (
+                  <p className="user-sidebar-role">
+                    {user.role.replace('_', ' ')}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Menu Links */}
+            <ul className="user-sidebar-links">
+              <li>
+                <a
+                  href="/dashboard"
+                  className="user-sidebar-link"
+                  onClick={() => setShowUserSidebar(false)}
+                >
+                  <span className="user-sidebar-link-icon">📊</span>
+                  <span className="user-sidebar-link-label">Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    signOut()
+                    setShowUserSidebar(false)
+                  }}
+                  className="user-sidebar-link sign-out"
+                >
+                  <span className="user-sidebar-link-icon">🚪</span>
+                  <span className="user-sidebar-link-label">Sign Out</span>
+                </button>
+              </li>
+            </ul>
+          </aside>
+        </>
+      )}
 
       <CartModal isOpen={showCart} onClose={() => setShowCart(false)} />
     </header>
