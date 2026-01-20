@@ -34,6 +34,7 @@ export default function BusinessProfilePage() {
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
   const [favoritedProductIds, setFavoritedProductIds] = useState<Set<string>>(new Set())
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0)
 
   const [reviewForm, setReviewForm] = useState({
     rating: 0,
@@ -425,13 +426,22 @@ export default function BusinessProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            style={{ position: 'relative', width: '100%', height: '250px', marginBottom: '1rem' }}
+            style={{
+              position: 'relative',
+              width: '100%',
+              minHeight: '200px',
+              maxHeight: '400px',
+              height: 'auto',
+              aspectRatio: '16/9',
+              marginBottom: '1rem',
+              backgroundColor: '#f3f4f6'
+            }}
           >
             <Image
               src={business.headerImage}
               alt={`${business.name} header`}
               fill
-              style={{ objectFit: 'cover', borderRadius: '8px' }}
+              style={{ objectFit: 'contain', borderRadius: '8px' }}
               priority
             />
           </motion.div>
@@ -512,22 +522,102 @@ export default function BusinessProfilePage() {
             >
               <h2>Photo Gallery</h2>
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                gap: '1rem',
-                marginTop: '1rem'
+                position: 'relative',
+                marginTop: '1rem',
+                backgroundColor: '#f3f4f6',
+                borderRadius: '8px',
+                overflow: 'hidden'
               }}>
-                {business.gallery.map((imageUrl, index) => (
-                  <div key={index} style={{ position: 'relative', width: '100%', height: '250px' }}>
-                    <Image
-                      src={imageUrl}
-                      alt={`${business.name} gallery image ${index + 1}`}
-                      fill
-                      style={{ objectFit: 'cover', borderRadius: '8px' }}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                ))}
+                {/* Gallery Image */}
+                <div style={{ position: 'relative', width: '100%', height: '500px' }}>
+                  <Image
+                    src={business.gallery[currentGalleryIndex]}
+                    alt={`${business.name} gallery image ${currentGalleryIndex + 1}`}
+                    fill
+                    style={{ objectFit: 'contain' }}
+                    sizes="(max-width: 768px) 100vw, 800px"
+                  />
+                </div>
+
+                {/* Navigation Arrows */}
+                {business.gallery.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentGalleryIndex((prev) =>
+                        prev === 0 ? business.gallery!.length - 1 : prev - 1
+                      )}
+                      style={{
+                        position: 'absolute',
+                        left: '1rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '48px',
+                        height: '48px',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background-color 0.2s',
+                        zIndex: 10
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+                      aria-label="Previous image"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      onClick={() => setCurrentGalleryIndex((prev) =>
+                        prev === business.gallery!.length - 1 ? 0 : prev + 1
+                      )}
+                      style={{
+                        position: 'absolute',
+                        right: '1rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '48px',
+                        height: '48px',
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background-color 0.2s',
+                        zIndex: 10
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+                      aria-label="Next image"
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
+
+                {/* Image Counter */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '1rem',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '20px',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  {currentGalleryIndex + 1} / {business.gallery.length}
+                </div>
               </div>
             </motion.section>
           )}
