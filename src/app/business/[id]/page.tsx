@@ -60,7 +60,17 @@ export default function BusinessProfilePage() {
   }, [db, user])
 
   const loadBusiness = useCallback(async () => {
-    if (!params.id || !db) return
+    if (!params.id) {
+      setError('Invalid business ID')
+      setLoading(false)
+      return
+    }
+
+    if (!db) {
+      setError('Database connection unavailable. Please check your internet connection and try again.')
+      setLoading(false)
+      return
+    }
 
     try {
       setLoading(true)
@@ -73,6 +83,7 @@ export default function BusinessProfilePage() {
         // Only show approved businesses (or allow owners/admins to see their own)
         if (data.status !== 'approved') {
           setError('This business is not available.')
+          setLoading(false)
           return
         }
 
@@ -90,7 +101,7 @@ export default function BusinessProfilePage() {
         setError('Business not found')
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Failed to load business. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -372,9 +383,14 @@ export default function BusinessProfilePage() {
       <div className="business-profile-error">
         <h1>😔 Oops!</h1>
         <p>{error || 'Business not found'}</p>
-        <button onClick={() => router.push('/')} className="btn-back">
-          ← Back to Home
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+          <button onClick={() => loadBusiness()} className="btn-primary">
+            Try Again
+          </button>
+          <button onClick={() => router.push('/')} className="btn-back">
+            ← Back to Home
+          </button>
+        </div>
       </div>
     )
   }
