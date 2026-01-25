@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { db } from '@/lib/firebase/config'
+import { db, storage } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { Business, Product, Review, Service } from '@/lib/types'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
@@ -40,6 +41,9 @@ export default function BusinessProfilePage() {
     rating: 0,
     comment: '',
   })
+  const [reviewPhotos, setReviewPhotos] = useState<File[]>([])
+  const [reviewPhotoUrls, setReviewPhotoUrls] = useState<string[]>([])
+  const [uploadingPhotos, setUploadingPhotos] = useState(false)
 
   const loadProductFavorites = useCallback(async () => {
     if (!db || !user) return
@@ -184,6 +188,7 @@ export default function BusinessProfilePage() {
             rating: userReview.rating,
             comment: userReview.comment,
           })
+          setReviewPhotoUrls(userReview.photos || [])
         }
       }
     } catch (err: any) {
@@ -204,6 +209,43 @@ export default function BusinessProfilePage() {
     }
   }, [user, loadProductFavorites])
 
+  const handleReviewPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const newFiles: File[] = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (!file.type.startsWith('image/')) {
+        setReviewError('Please upload only image files')
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setReviewError('Each image must be less than 5MB')
+        return
+      }
+      newFiles.push(file)
+    }
+
+    // Limit total photos to 5
+    const totalPhotos = reviewPhotos.length + reviewPhotoUrls.length + newFiles.length
+    if (totalPhotos > 5) {
+      setReviewError('Maximum 5 photos allowed per review')
+      return
+    }
+
+    setReviewPhotos([...reviewPhotos, ...newFiles])
+    setReviewError('')
+  }
+
+  const handleRemoveNewPhoto = (index: number) => {
+    setReviewPhotos(reviewPhotos.filter((_, i) => i !== index))
+  }
+
+  const handleRemoveExistingPhoto = (index: number) => {
+    setReviewPhotoUrls(reviewPhotoUrls.filter((_, i) => i !== index))
+  }
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !db || !business) return
@@ -218,6 +260,19 @@ export default function BusinessProfilePage() {
       setReviewError('')
       setReviewSuccess('')
 
+      // Upload any new photos
+      let uploadedPhotoUrls: string[] = [...reviewPhotoUrls]
+      if (reviewPhotos.length > 0 && storage) {
+        setUploadingPhotos(true)
+        for (const photo of reviewPhotos) {
+          const photoRef = ref(storage, `reviews/${business.id}/${user.uid}/${Date.now()}_${photo.name}`)
+          await uploadBytes(photoRef, photo)
+          const url = await getDownloadURL(photoRef)
+          uploadedPhotoUrls.push(url)
+        }
+        setUploadingPhotos(false)
+      }
+
       const reviewData = {
         businessId: business.id,
         userId: user.uid,
@@ -225,6 +280,7 @@ export default function BusinessProfilePage() {
         userPhotoURL: user.photoURL || '',
         rating: reviewForm.rating,
         comment: reviewForm.comment,
+        photos: uploadedPhotoUrls,
         updatedAt: new Date(),
       }
 
@@ -242,6 +298,10 @@ export default function BusinessProfilePage() {
         setReviewSuccess('Review submitted successfully!')
       }
 
+      // Clear photo state
+      setReviewPhotos([])
+      setReviewPhotoUrls(uploadedPhotoUrls)
+
       // Reload reviews
       await loadReviews(business.id)
 
@@ -251,6 +311,7 @@ export default function BusinessProfilePage() {
       setReviewError(err.message)
     } finally {
       setSubmittingReview(false)
+      setUploadingPhotos(false)
     }
   }
 
@@ -263,6 +324,8 @@ export default function BusinessProfilePage() {
       setReviewSuccess('Review deleted successfully!')
       setEditingReview(null)
       setReviewForm({ rating: 0, comment: '' })
+      setReviewPhotos([])
+      setReviewPhotoUrls([])
 
       // Reload reviews
       await loadReviews(business.id)
@@ -824,6 +887,142 @@ export default function BusinessProfilePage() {
                       required
                     />
                   </div>
+                  <div className="form-group">
+                    <label>Add Photos (optional, max 5)</label>
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleReviewPhotoUpload}
+                        style={{ display: 'none' }}
+                        id="review-photos"
+                        disabled={reviewPhotos.length + reviewPhotoUrls.length >= 5}
+                      />
+                      <label
+                        htmlFor="review-photos"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.5rem 1rem',
+                          backgroundColor: reviewPhotos.length + reviewPhotoUrls.length >= 5 ? '#e5e7eb' : '#f3f4f6',
+                          border: '1px dashed #d1d5db',
+                          borderRadius: '8px',
+                          cursor: reviewPhotos.length + reviewPhotoUrls.length >= 5 ? 'not-allowed' : 'pointer',
+                          fontSize: '0.875rem',
+                          color: reviewPhotos.length + reviewPhotoUrls.length >= 5 ? '#9ca3af' : '#374151',
+                        }}
+                      >
+                        📷 Add Photos
+                      </label>
+                      <span style={{ marginLeft: '0.75rem', fontSize: '0.75rem', color: '#6b7280' }}>
+                        {reviewPhotos.length + reviewPhotoUrls.length}/5 photos
+                      </span>
+                    </div>
+                    {/* Preview existing photos */}
+                    {reviewPhotoUrls.length > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        flexWrap: 'wrap',
+                        marginTop: '0.75rem'
+                      }}>
+                        {reviewPhotoUrls.map((url, idx) => (
+                          <div key={`existing-${idx}`} style={{ position: 'relative' }}>
+                            <Image
+                              src={url}
+                              alt={`Review photo ${idx + 1}`}
+                              width={80}
+                              height={80}
+                              style={{ objectFit: 'cover', borderRadius: '8px' }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveExistingPhoto(idx)}
+                              style={{
+                                position: 'absolute',
+                                top: '-8px',
+                                right: '-8px',
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '50%',
+                                backgroundColor: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '14px',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {/* Preview new photos to upload */}
+                    {reviewPhotos.length > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        flexWrap: 'wrap',
+                        marginTop: reviewPhotoUrls.length > 0 ? '0.5rem' : '0.75rem'
+                      }}>
+                        {reviewPhotos.map((file, idx) => (
+                          <div key={`new-${idx}`} style={{ position: 'relative' }}>
+                            <Image
+                              src={URL.createObjectURL(file)}
+                              alt={`New photo ${idx + 1}`}
+                              width={80}
+                              height={80}
+                              style={{ objectFit: 'cover', borderRadius: '8px', opacity: 0.9 }}
+                            />
+                            <div style={{
+                              position: 'absolute',
+                              bottom: '0',
+                              left: '0',
+                              right: '0',
+                              backgroundColor: 'rgba(34, 197, 94, 0.9)',
+                              color: 'white',
+                              fontSize: '10px',
+                              textAlign: 'center',
+                              borderRadius: '0 0 8px 8px',
+                              padding: '2px'
+                            }}>
+                              New
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveNewPhoto(idx)}
+                              style={{
+                                position: 'absolute',
+                                top: '-8px',
+                                right: '-8px',
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '50%',
+                                backgroundColor: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '14px',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="review-form-actions">
                     <button
                       type="submit"
@@ -831,7 +1030,9 @@ export default function BusinessProfilePage() {
                       disabled={submittingReview}
                     >
                       {submittingReview
-                        ? 'Submitting...'
+                        ? uploadingPhotos
+                          ? 'Uploading photos...'
+                          : 'Submitting...'
                         : editingReview
                         ? 'Update Review'
                         : 'Submit Review'}
@@ -893,6 +1094,46 @@ export default function BusinessProfilePage() {
                       )}
                     </div>
                     <p className="review-comment">{review.comment}</p>
+                    {/* Review Photos */}
+                    {review.photos && review.photos.length > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        flexWrap: 'wrap',
+                        marginTop: '1rem'
+                      }}>
+                        {review.photos.map((photo, idx) => (
+                          <a
+                            key={idx}
+                            href={photo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ display: 'block' }}
+                          >
+                            <Image
+                              src={photo}
+                              alt={`Review photo ${idx + 1}`}
+                              width={120}
+                              height={120}
+                              style={{
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                cursor: 'pointer'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.05)'
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)'
+                                e.currentTarget.style.boxShadow = 'none'
+                              }}
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))
               )}
