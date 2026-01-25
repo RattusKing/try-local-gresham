@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import Analytics from '@/components/Analytics'
 import CookieConsent from '@/components/CookieConsent'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import IOSInstallPrompt from '@/components/IOSInstallPrompt'
+import NotificationPrompt from '@/components/NotificationPrompt'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -91,6 +93,8 @@ export default function RootLayout({
         <Providers>{children}</Providers>
         <CookieConsent />
         <PWAInstallPrompt />
+        <IOSInstallPrompt />
+        <NotificationPrompt />
       </body>
     </html>
   )
