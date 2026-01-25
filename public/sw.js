@@ -1,8 +1,8 @@
 // Try Local Gresham - Service Worker
-// Version: 1.1.0
+// Version: 1.2.0
 
-const CACHE_NAME = 'try-local-v1.1';
-const RUNTIME_CACHE = 'try-local-runtime-v1.1';
+const CACHE_NAME = 'try-local-v1.2';
+const RUNTIME_CACHE = 'try-local-runtime-v1.2';
 
 // Assets to cache on install
 const PRECACHE_URLS = [
@@ -90,4 +90,61 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+});
+
+// Push notification event handler
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/icon-192x192.png',
+    badge: '/icon-192x192.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || '/',
+      dateOfArrival: Date.now(),
+    },
+    actions: data.actions || [
+      { action: 'open', title: 'Open' },
+      { action: 'close', title: 'Dismiss' },
+    ],
+    tag: data.tag || 'try-local-notification',
+    renotify: true,
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Try Local Gresham', options)
+  );
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') return;
+
+  const urlToOpen = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if there's already a window/tab open with the target URL
+      for (const client of clientList) {
+        if (client.url.includes(urlToOpen) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If no existing window, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});
+
+// Notification close handler (for analytics)
+self.addEventListener('notificationclose', (event) => {
+  // Can be used to track notification dismissals
+  console.log('Notification closed:', event.notification.tag);
 });
