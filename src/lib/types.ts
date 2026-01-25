@@ -84,6 +84,7 @@ export interface Review {
   userPhotoURL?: string
   rating: number
   comment: string
+  photos?: string[] // Customer-uploaded review photos
   createdAt?: Date
   updatedAt?: Date
 }
