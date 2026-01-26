@@ -337,3 +337,29 @@ export interface Subscription {
   createdAt: Date
   updatedAt: Date
 }
+
+// Push Notification Types
+
+export interface PushSubscription {
+  id: string
+  userId: string
+  userType: 'customer' | 'business_owner'
+  businessId?: string // For business owners, to receive business-specific notifications
+  endpoint: string
+  keys: {
+    p256dh: string
+    auth: string
+  }
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface PushNotificationPayload {
+  title: string
+  body: string
+  icon?: string
+  badge?: string
+  url?: string
+  tag?: string
+  data?: Record<string, unknown>
+}

@@ -16,6 +16,7 @@ export const orderConfirmationSchema = z.object({
   customerPhone: z.string().optional(),
   businessEmail: emailSchema,
   businessName: z.string().min(1, 'Business name is required').max(100),
+  businessId: z.string().optional(), // For push notifications
   orderId: z.string().min(1, 'Order ID is required'),
   items: z.array(
     z.object({
@@ -34,6 +35,7 @@ export const orderConfirmationSchema = z.object({
 export const orderStatusUpdateSchema = z.object({
   customerEmail: emailSchema,
   customerName: z.string().min(1).max(100),
+  customerId: z.string().optional(), // For push notifications
   orderId: z.string().min(1, 'Order ID is required'),
   businessName: z.string().min(1).max(100),
   status: z.enum(['accepted', 'ready', 'completed', 'rejected']),

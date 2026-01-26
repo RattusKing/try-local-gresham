@@ -315,6 +315,7 @@ export default function CheckoutPage() {
                 customerName: customerName,
                 businessEmail: businessEmail,
                 businessName: group.businessName,
+                businessId: group.businessId,
                 orderId: orderRef.id,
                 items: group.items.map((item) => ({
                   name: item.productName,

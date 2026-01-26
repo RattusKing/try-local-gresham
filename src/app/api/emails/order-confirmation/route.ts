@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendOrderConfirmation, sendNewOrderNotification } from '@/lib/email/service'
 import { orderConfirmationSchema, validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +32,7 @@ export async function POST(request: NextRequest) {
       customerName,
       businessEmail,
       businessName,
+      businessId,
       orderId,
       items,
       total,
@@ -65,6 +68,38 @@ export async function POST(request: NextRequest) {
       deliveryAddress,
       deliveryNotes,
     })
+
+    // Send push notification to business owner (non-blocking)
+    if (businessId) {
+      try {
+        const adminDb = getAdminDb()
+        const subscriptionsSnapshot = await adminDb
+          .collection('pushSubscriptions')
+          .where('businessId', '==', businessId)
+          .where('userType', '==', 'business_owner')
+          .get()
+
+        if (!subscriptionsSnapshot.empty) {
+          const subscriptions: WebPushSubscription[] = subscriptionsSnapshot.docs.map(doc => {
+            const data = doc.data()
+            return {
+              endpoint: data.endpoint,
+              keys: { p256dh: data.keys.p256dh, auth: data.keys.auth }
+            }
+          })
+
+          await sendPushToMultiple(subscriptions, {
+            title: 'New Order Received!',
+            body: `New order #${orderId.slice(-6)} for $${total.toFixed(2)} from ${customerName}`,
+            url: '/dashboard/business/orders',
+            tag: `order-${orderId}`,
+          })
+        }
+      } catch (pushError) {
+        // Log but don't fail the request if push fails
+        console.error('Push notification failed:', pushError)
+      }
+    }
 
     if (customerResult.success && businessResult.success) {
       return NextResponse.json({ success: true })

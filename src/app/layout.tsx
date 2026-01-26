@@ -90,11 +90,13 @@ export default function RootLayout({
         <ServiceWorkerRegistration />
         <Analytics />
         <SpeedInsights />
-        <Providers>{children}</Providers>
-        <CookieConsent />
-        <PWAInstallPrompt />
-        <IOSInstallPrompt />
-        <NotificationPrompt />
+        <Providers>
+          {children}
+          <CookieConsent />
+          <PWAInstallPrompt />
+          <IOSInstallPrompt />
+          <NotificationPrompt />
+        </Providers>
       </body>
     </html>
   )
