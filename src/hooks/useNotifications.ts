@@ -17,7 +17,10 @@ export interface UseNotificationsReturn {
   permission: NotificationPermissionState;
   platform: PlatformInfo;
   isLoading: boolean;
+  isSubscribed: boolean;
   requestPermission: () => Promise<NotificationPermissionState>;
+  subscribeToPush: (userId: string, userType: 'customer' | 'business_owner', businessId?: string) => Promise<boolean>;
+  unsubscribeFromPush: (userId: string) => Promise<boolean>;
   sendTestNotification: () => void;
 }
 
@@ -56,6 +59,22 @@ function getPlatformInfo(): PlatformInfo {
   };
 }
 
+// Convert base64 string to Uint8Array for applicationServerKey
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export function useNotifications(): UseNotificationsReturn {
   const [permission, setPermission] = useState<NotificationPermissionState>('default');
   const [platform, setPlatform] = useState<PlatformInfo>({
@@ -67,6 +86,7 @@ export function useNotifications(): UseNotificationsReturn {
     supportsPush: false,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     const info = getPlatformInfo();
@@ -76,6 +96,14 @@ export function useNotifications(): UseNotificationsReturn {
       setPermission('unsupported');
     } else {
       setPermission(Notification.permission as NotificationPermissionState);
+    }
+
+    // Check if already subscribed to push
+    if (info.supportsPush && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(async (registration) => {
+        const subscription = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!subscription);
+      });
     }
 
     setIsLoading(false);
@@ -106,6 +134,91 @@ export function useNotifications(): UseNotificationsReturn {
     }
   }, [platform]);
 
+  const subscribeToPush = useCallback(async (
+    userId: string,
+    userType: 'customer' | 'business_owner',
+    businessId?: string
+  ): Promise<boolean> => {
+    if (!platform.supportsPush || permission !== 'granted') {
+      console.warn('Push not supported or permission not granted');
+      return false;
+    }
+
+    try {
+      // Get VAPID public key from server
+      const keyResponse = await fetch('/api/push/subscribe');
+      if (!keyResponse.ok) {
+        console.error('Failed to get VAPID public key');
+        return false;
+      }
+      const { publicKey } = await keyResponse.json();
+
+      if (!publicKey) {
+        console.error('VAPID public key not configured');
+        return false;
+      }
+
+      // Get service worker registration
+      const registration = await navigator.serviceWorker.ready;
+
+      // Subscribe to push
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
+      });
+
+      // Send subscription to server
+      const response = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: subscription.toJSON(),
+          userId,
+          userType,
+          businessId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save subscription to server');
+      }
+
+      setIsSubscribed(true);
+      return true;
+    } catch (error) {
+      console.error('Failed to subscribe to push:', error);
+      return false;
+    }
+  }, [platform, permission]);
+
+  const unsubscribeFromPush = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (subscription) {
+        // Unsubscribe from push manager
+        await subscription.unsubscribe();
+
+        // Remove from server
+        await fetch('/api/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            userId,
+          }),
+        });
+      }
+
+      setIsSubscribed(false);
+      return true;
+    } catch (error) {
+      console.error('Failed to unsubscribe from push:', error);
+      return false;
+    }
+  }, []);
+
   const sendTestNotification = useCallback(() => {
     if (permission !== 'granted') return;
 
@@ -113,7 +226,7 @@ export function useNotifications(): UseNotificationsReturn {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
         registration.showNotification('Try Local Gresham', {
-          body: 'Notifications are working! You\'ll receive updates about local businesses.',
+          body: 'Notifications are working! You\'ll receive updates about orders and local businesses.',
           icon: '/icon-192x192.png',
           badge: '/icon-192x192.png',
           tag: 'test-notification',
@@ -122,7 +235,7 @@ export function useNotifications(): UseNotificationsReturn {
     } else {
       // Fallback to Notification API
       new Notification('Try Local Gresham', {
-        body: 'Notifications are working! You\'ll receive updates about local businesses.',
+        body: 'Notifications are working! You\'ll receive updates about orders and local businesses.',
         icon: '/icon-192x192.png',
       });
     }
@@ -132,7 +245,10 @@ export function useNotifications(): UseNotificationsReturn {
     permission,
     platform,
     isLoading,
+    isSubscribed,
     requestPermission,
+    subscribeToPush,
+    unsubscribeFromPush,
     sendTestNotification,
   };
 }

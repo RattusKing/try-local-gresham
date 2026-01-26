@@ -126,13 +126,14 @@ export default function BusinessOrdersPage() {
           }
         }
 
-        // Send status update email (non-blocking)
+        // Send status update email and push notification (non-blocking)
         fetch('/api/emails/order-status', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customerEmail: order.userEmail,
             customerName: order.userName,
+            customerId: order.userId, // For push notifications
             orderId: order.id,
             businessName: order.businessName,
             status: emailStatus,

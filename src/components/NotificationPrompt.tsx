@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useAuth } from '@/lib/firebase/auth-context';
 
 export default function NotificationPrompt() {
-  const { permission, platform, isLoading, requestPermission, sendTestNotification } = useNotifications();
+  const { permission, platform, isLoading, requestPermission, subscribeToPush, sendTestNotification } = useNotifications();
+  const { user, userProfile } = useAuth();
   const [showPrompt, setShowPrompt] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
 
@@ -44,6 +46,13 @@ export default function NotificationPrompt() {
     try {
       const result = await requestPermission();
       if (result === 'granted') {
+        // Subscribe to push notifications if user is logged in
+        if (user && userProfile) {
+          const userType = userProfile.role === 'business_owner' ? 'business_owner' : 'customer';
+          const businessId = userProfile.businessId;
+          await subscribeToPush(user.uid, userType, businessId);
+        }
+
         // Send a test notification to confirm it's working
         setTimeout(() => {
           sendTestNotification();
