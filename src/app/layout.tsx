@@ -4,6 +4,7 @@ import CookieConsent from '@/components/CookieConsent'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import IOSInstallPrompt from '@/components/IOSInstallPrompt'
 import NotificationPrompt from '@/components/NotificationPrompt'
+import PWAInstallAfterSignup from '@/components/PWAInstallAfterSignup'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -96,6 +97,7 @@ export default function RootLayout({
           <PWAInstallPrompt />
           <IOSInstallPrompt />
           <NotificationPrompt />
+          <PWAInstallAfterSignup />
         </Providers>
       </body>
     </html>

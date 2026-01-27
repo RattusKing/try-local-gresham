@@ -26,6 +26,8 @@ interface AuthContextType {
   user: AuthUser | null
   userProfile: UserProfile | null
   loading: boolean
+  justSignedUp: boolean
+  clearJustSignedUp: () => void
   signUp: (email: string, password: string, role: UserRole, displayName?: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
@@ -39,6 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [justSignedUp, setJustSignedUp] = useState(false)
+
+  const clearJustSignedUp = () => setJustSignedUp(false)
 
   useEffect(() => {
     // If Firebase is not initialized, just set loading to false
@@ -109,6 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     })
+
+    // Mark that user just signed up (for PWA install prompt)
+    setJustSignedUp(true)
   }
 
   const signIn = async (email: string, password: string) => {
@@ -143,6 +151,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })
+
+      // Mark that user just signed up (for PWA install prompt)
+      setJustSignedUp(true)
     }
   }
 
@@ -164,6 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     userProfile,
     loading,
+    justSignedUp,
+    clearJustSignedUp,
     signUp,
     signIn,
     signInWithGoogle,
