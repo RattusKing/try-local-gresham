@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#99edc3">
+  <title>Offline - Try Local Gresham</title>
+  <link rel="icon" href="/icon-192x192.png">
+  <link rel="apple-touch-icon" href="/icon-192x192.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #99edc3;
+      --primary-dark: #7dd4ab;
+      --secondary: #c2aff0;
+      --dark: #373737;
+      --muted: #6b7280;
+      --bg: #f8fafb;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--dark);
+      background: var(--bg);
+      background-image: radial-gradient(circle, rgba(153, 237, 195, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .icon-wrapper {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 10px 30px rgba(153, 237, 195, 0.3);
+    }
+
+    .icon-wrapper svg {
+      width: 50px;
+      height: 50px;
+      color: var(--dark);
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(55, 55, 55, 0.08);
+    }
+
+    .card h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .list {
+      list-style: none;
+      text-align: left;
+    }
+
+    .list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--muted);
+    }
+
+    .list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .check {
+      color: var(--primary-dark);
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(153, 237, 195, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .logo {
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    .logo strong {
+      color: var(--dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon-wrapper">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414" />
+      </svg>
+    </div>
+
+    <h1>You're Offline</h1>
+    <p class="subtitle">
+      It looks like you're not connected to the internet. Some features may be limited until you're back online.
+    </p>
+
+    <div class="card">
+      <h2>What you can do:</h2>
+      <ul class="list">
+        <li>
+          <span class="check">&#10003;</span>
+          <span>View previously loaded businesses</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Browse cached content</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Check your saved favorites</span>
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn" onclick="window.location.reload()">
+      Try Again
+    </button>
+
+    <p class="logo">
+      <strong>Try Local</strong> Gresham
+    </p>
+  </div>
+</body>
+</html>
