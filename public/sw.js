@@ -1,24 +1,38 @@
 // Try Local Gresham - Service Worker
-// Version: 1.2.0
+// Version: 1.3.0
 
-const CACHE_NAME = 'try-local-v1.2';
-const RUNTIME_CACHE = 'try-local-runtime-v1.2';
+const CACHE_NAME = 'try-local-v1.3';
+const RUNTIME_CACHE = 'try-local-runtime-v1.3';
 
-// Assets to cache on install
+// Assets to cache on install (only static files)
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/offline',
+  '/offline.html',
+  '/logo.jpeg',
 ];
 
-// Install event - cache essential assets
+// Install event - cache essential assets with error handling
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then((cache) => {
+        // Cache each URL individually to prevent one failure from breaking all
+        return Promise.allSettled(
+          PRECACHE_URLS.map(url =>
+            cache.add(url).catch(err => {
+              console.warn(`Failed to cache ${url}:`, err);
+              return null;
+            })
+          )
+        );
+      })
       .then(() => self.skipWaiting())
+      .catch(err => {
+        console.error('Service worker installation failed:', err);
+      })
   );
 });
 
@@ -77,7 +91,7 @@ self.addEventListener('fetch', (event) => {
               .catch(() => {
                 // Return offline page for navigation requests
                 if (event.request.mode === 'navigate') {
-                  return caches.match('/offline');
+                  return caches.match('/offline.html');
                 }
               });
           });
