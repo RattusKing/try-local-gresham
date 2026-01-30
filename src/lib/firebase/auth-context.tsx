@@ -61,8 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
+          displayName: profile?.displayName || firebaseUser.displayName,
+          photoURL: profile?.photoURL || firebaseUser.photoURL,
           role: profile?.role,
         })
         setUserProfile(profile || null)
@@ -106,6 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
       displayName: displayName || undefined,
+      photoURL: undefined,
+      coverPhotoURL: undefined,
       role,
     }
 
@@ -143,6 +145,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         uid: result.user.uid,
         email: result.user.email!,
         displayName: result.user.displayName || undefined,
+        photoURL: result.user.photoURL || undefined,
+        coverPhotoURL: undefined,
         role: 'customer', // Default role
       }
 
