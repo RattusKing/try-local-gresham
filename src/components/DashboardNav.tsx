@@ -18,6 +18,7 @@ export default function DashboardNav() {
     { href: '/dashboard/admin/users', label: 'User Management', icon: '👥' },
     { href: '/dashboard/admin/orders', label: 'All Orders', icon: '📦' },
     { href: '/dashboard/admin/banners', label: 'Promo Banners', icon: '📢' },
+    { href: '/dashboard/admin/sponsored', label: 'Sponsored Banners', icon: '⭐' },
   ]
 
   const businessLinks = [

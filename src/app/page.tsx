@@ -8,6 +8,7 @@ import CategoryCard from '@/components/CategoryCard'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
 import PromoBanner from '@/components/PromoBanner'
+import SponsoredBannerCarousel from '@/components/SponsoredBannerCarousel'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
@@ -321,6 +322,9 @@ export default function Home() {
 
       <main id="main-content">
         <Hero onSearch={handleSearch} categories={categories} />
+
+        {/* Sponsored Business Carousel */}
+        <SponsoredBannerCarousel />
 
         <section id="discover" className="section section-alt-light container">
           <div className="section-head">

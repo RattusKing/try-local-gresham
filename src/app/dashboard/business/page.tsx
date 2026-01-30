@@ -11,6 +11,7 @@ import StatusBadge from '@/components/StatusBadge'
 import SubscriptionManager from '@/components/SubscriptionManager'
 import SubscriptionRequiredBanner from '@/components/SubscriptionRequiredBanner'
 import BusinessPreview from '@/components/BusinessPreview'
+import SponsoredPlacementManager from '@/components/SponsoredPlacementManager'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -416,6 +417,11 @@ export default function BusinessDashboard() {
         <div id="subscription-section">
           <SubscriptionManager business={business} onSubscriptionUpdate={loadBusiness} />
         </div>
+      )}
+
+      {/* Sponsored Placement Section */}
+      {business && business.status === 'approved' && (
+        <SponsoredPlacementManager business={business} />
       )}
 
       {/* Quick Setup Tips */}
