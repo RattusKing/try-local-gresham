@@ -46,6 +46,8 @@ export interface UserProfile {
   email: string
   displayName?: string
   phone?: string
+  photoURL?: string // Profile picture URL
+  coverPhotoURL?: string // Background/cover photo URL
   role: UserRole
   createdAt: Date
   updatedAt: Date

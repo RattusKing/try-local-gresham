@@ -55,6 +55,20 @@ service firebase.storage {
       allow update, delete: if isOwner(userId) || isAdmin();
     }
 
+    // User profile pictures: users/{userId}/{filename}
+    // Includes profile photos and cover/background photos
+    match /users/{userId}/{filename} {
+      // Anyone can read (public profile images)
+      allow read: if true;
+
+      // Users can upload to their own folder
+      allow create: if isOwner(userId) && isValidImage();
+
+      // Users can update/delete their own images
+      // Admins can update/delete any image
+      allow update, delete: if isOwner(userId) || isAdmin();
+    }
+
     // Block all other paths by default
     match /{allPaths=**} {
       allow read, write: if false;
