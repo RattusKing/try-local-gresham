@@ -176,6 +176,31 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Sponsored Banners collection (Paid Business Promotions)
+    match /sponsoredBanners/{bannerId} {
+      // Anyone can read active sponsored banners (for carousel display)
+      // Business owners can read their own banners
+      // Admins can read all banners
+      allow read: if resource.data.status == 'active' ||
+                     (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                     isAdmin();
+
+      // Business owners can create sponsored banner requests for their own business
+      allow create: if isBusinessOwner() &&
+                       request.resource.data.businessId == request.auth.uid &&
+                       request.resource.data.status == 'pending';
+
+      // Business owners can update their own pending banners (cancel, update headline)
+      // Admins can update any banner (approve, reject, etc.)
+      allow update: if isAdmin() ||
+                       (isBusinessOwner() &&
+                        resource.data.businessId == request.auth.uid &&
+                        resource.data.status == 'pending');
+
+      // Only admins can delete sponsored banners
+      allow delete: if isAdmin();
+    }
+
     // Favorites collection
     match /favorites/{favoriteId} {
       // Users can read their own favorites

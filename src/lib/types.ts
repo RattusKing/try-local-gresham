@@ -365,3 +365,41 @@ export interface PushNotificationPayload {
   tag?: string
   data?: Record<string, unknown>
 }
+
+// Sponsored Banner Types (Paid Business Promotions)
+
+export type SponsoredBannerStatus = 'pending' | 'approved' | 'rejected' | 'active' | 'expired' | 'cancelled'
+
+export interface SponsoredBanner {
+  id: string
+  businessId: string
+  businessName: string // Denormalized for display
+  businessCover?: string // Business cover image
+  headline?: string // Optional custom promotional headline
+  status: SponsoredBannerStatus
+  isPaid: boolean
+  // Payment details
+  stripePaymentIntentId?: string
+  amountPaid?: number // In cents
+  // Scheduling
+  startDate: Date
+  endDate: Date
+  durationDays: number // 7, 14, or 30 days
+  // Admin notes
+  adminNotes?: string
+  rejectionReason?: string
+  approvedBy?: string
+  approvedAt?: Date
+  // Timestamps
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Sponsored banner pricing (in cents)
+export const SPONSORED_BANNER_PRICING = {
+  '7': { days: 7, price: 2500, displayPrice: '$25', label: '1 Week' },
+  '14': { days: 14, price: 4500, displayPrice: '$45', label: '2 Weeks' },
+  '30': { days: 30, price: 7500, displayPrice: '$75', label: '1 Month' },
+} as const
+
+export type SponsoredBannerDuration = keyof typeof SPONSORED_BANNER_PRICING
