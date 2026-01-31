@@ -9,25 +9,12 @@ import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
 import PromoBanner from '@/components/PromoBanner'
 import SponsoredBannerCarousel from '@/components/SponsoredBannerCarousel'
+import CategoryFilterDropdown from '@/components/CategoryFilterDropdown'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import type { Business } from '@/lib/types'
-
-// Popular filter chips for quick category filtering
-const FILTER_CHIPS = [
-  // Food & Dining
-  'Restaurant', 'Coffee', 'Cafe', 'Bakery', 'Food Truck', 'Pizza', 'Mexican', 'Asian',
-  // Shopping
-  'Boutique', 'Vintage', 'Gift Shop', 'Florist', 'Books',
-  // Health & Beauty
-  'Gym', 'Yoga', 'Spa', 'Hair Salon', 'Barbershop', 'Nail Salon',
-  // Services
-  'Services', 'Auto Repair', 'Cleaning', 'Photography',
-  // Lifestyle
-  'Outdoors', 'Wellness', 'Pets', 'Family', 'Entertainment',
-]
 
 export default function Home() {
   const { user } = useAuth()
@@ -523,16 +510,11 @@ export default function Home() {
                 Some of the local businesses we're highlighting right now.
               </p>
 
-              <div className="chip-row" aria-label="Quick filters" style={{ marginBottom: '1.5rem' }}>
-                {FILTER_CHIPS.map((chip) => (
-                  <button
-                    key={chip}
-                    className={`chip ${activeChips.has(chip) ? 'active' : ''}`}
-                    onClick={() => toggleChip(chip)}
-                  >
-                    {chip}
-                  </button>
-                ))}
+              <div style={{ marginBottom: '1.5rem', maxWidth: '500px' }}>
+                <CategoryFilterDropdown
+                  activeChips={activeChips}
+                  onToggleChip={toggleChip}
+                />
               </div>
             </div>
           )}
