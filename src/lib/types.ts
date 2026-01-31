@@ -403,3 +403,209 @@ export const SPONSORED_BANNER_PRICING = {
 } as const
 
 export type SponsoredBannerDuration = keyof typeof SPONSORED_BANNER_PRICING
+
+// Business Tags System - Comprehensive categorized tags for business visibility
+
+export interface BusinessTagCategory {
+  name: string
+  icon: string
+  tags: string[]
+}
+
+export const BUSINESS_TAG_CATEGORIES: BusinessTagCategory[] = [
+  {
+    name: 'Food & Dining',
+    icon: '🍽️',
+    tags: [
+      'Restaurant', 'Cafe', 'Coffee Shop', 'Bakery', 'Deli', 'Food Truck',
+      'Pizza', 'Mexican', 'Asian', 'Italian', 'American', 'Thai', 'Chinese',
+      'Japanese', 'Sushi', 'BBQ', 'Seafood', 'Vegetarian', 'Vegan',
+      'Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Fine Dining', 'Casual Dining',
+      'Fast Food', 'Takeout', 'Delivery', 'Catering', 'Food Vendor',
+      'Ice Cream', 'Desserts', 'Donuts', 'Sandwiches', 'Burgers', 'Tacos',
+      'Smoothies', 'Juice Bar', 'Tea House', 'Wine Bar', 'Sports Bar',
+      'Brewery', 'Pub', 'Cocktails', 'Happy Hour'
+    ]
+  },
+  {
+    name: 'Shopping & Retail',
+    icon: '🛍️',
+    tags: [
+      'Boutique', 'Clothing', 'Shoes', 'Accessories', 'Jewelry', 'Watches',
+      'Vintage', 'Thrift Store', 'Consignment', 'Antiques', 'Collectibles',
+      'Gift Shop', 'Home Decor', 'Furniture', 'Art Gallery', 'Craft Supplies',
+      'Florist', 'Plants', 'Garden Center', 'Hardware Store', 'Electronics',
+      'Phone Repair', 'Computer Store', 'Books', 'Records', 'Music Store',
+      'Toys', 'Games', 'Sports Equipment', 'Outdoor Gear', 'Camping',
+      'Bike Shop', 'Skate Shop', 'Smoke Shop', 'CBD', 'Supplements',
+      'Grocery', 'Specialty Foods', 'Organic', 'Farmers Market', 'Butcher',
+      'Seafood Market', 'Liquor Store', 'Wine Shop', 'Party Supplies'
+    ]
+  },
+  {
+    name: 'Health & Wellness',
+    icon: '💆',
+    tags: [
+      'Gym', 'Fitness Center', 'Yoga', 'Pilates', 'CrossFit', 'Personal Training',
+      'Martial Arts', 'Boxing', 'Dance Studio', 'Spa', 'Massage', 'Acupuncture',
+      'Chiropractic', 'Physical Therapy', 'Mental Health', 'Counseling',
+      'Meditation', 'Wellness Center', 'Nutrition', 'Weight Loss', 'Health Food',
+      'Pharmacy', 'Medical Clinic', 'Urgent Care', 'Dental', 'Orthodontist',
+      'Eye Care', 'Optometrist', 'Dermatology', 'Primary Care', 'Pediatrics',
+      'Veterinarian', 'Alternative Medicine', 'Holistic Health', 'Reiki',
+      'Hypnotherapy', 'Life Coaching', 'Recovery', 'Addiction Services'
+    ]
+  },
+  {
+    name: 'Beauty & Personal Care',
+    icon: '💇',
+    tags: [
+      'Hair Salon', 'Barbershop', 'Nail Salon', 'Manicure', 'Pedicure',
+      'Skincare', 'Facial', 'Waxing', 'Lash Extensions', 'Brow Bar',
+      'Makeup Artist', 'Tanning', 'Tattoo', 'Piercing', 'Beauty Supply',
+      'Cosmetics', 'Fragrance', 'Mens Grooming', 'Braiding', 'Extensions',
+      'Color Specialist', 'Blowout Bar', 'Hair Removal', 'Permanent Makeup'
+    ]
+  },
+  {
+    name: 'Professional Services',
+    icon: '💼',
+    tags: [
+      'Accountant', 'Tax Services', 'Bookkeeping', 'Financial Advisor',
+      'Insurance', 'Real Estate', 'Property Management', 'Mortgage',
+      'Attorney', 'Legal Services', 'Notary', 'Immigration', 'Consulting',
+      'Marketing', 'Web Design', 'Graphic Design', 'Photography', 'Videography',
+      'Printing', 'Signs', 'IT Services', 'Tech Support', 'Software',
+      'Staffing', 'HR Services', 'Business Coach', 'Translation', 'Interpreter'
+    ]
+  },
+  {
+    name: 'Home Services',
+    icon: '🏠',
+    tags: [
+      'Cleaning', 'House Cleaning', 'Carpet Cleaning', 'Pressure Washing',
+      'Landscaping', 'Lawn Care', 'Tree Service', 'Pest Control', 'Plumbing',
+      'Electrician', 'HVAC', 'Roofing', 'Painting', 'Handyman', 'Contractor',
+      'Remodeling', 'Kitchen Remodel', 'Bathroom Remodel', 'Flooring',
+      'Windows', 'Doors', 'Garage Door', 'Locksmith', 'Security', 'Smart Home',
+      'Pool Service', 'Moving', 'Storage', 'Junk Removal', 'Appliance Repair',
+      'Furniture Repair', 'Upholstery', 'Curtains', 'Blinds', 'Interior Design'
+    ]
+  },
+  {
+    name: 'Automotive',
+    icon: '🚗',
+    tags: [
+      'Auto Repair', 'Mechanic', 'Oil Change', 'Brakes', 'Tires', 'Auto Body',
+      'Collision Repair', 'Detailing', 'Car Wash', 'Towing', 'Roadside Assistance',
+      'Auto Parts', 'Auto Glass', 'Muffler', 'Transmission', 'Alignment',
+      'Car Dealership', 'Used Cars', 'Motorcycle', 'RV', 'Boat', 'Rental Car',
+      'EV Charging', 'Electric Vehicle', 'Fleet Services', 'Truck Repair'
+    ]
+  },
+  {
+    name: 'Pets & Animals',
+    icon: '🐾',
+    tags: [
+      'Pet Store', 'Pet Supplies', 'Dog Grooming', 'Cat Grooming', 'Pet Salon',
+      'Dog Training', 'Obedience', 'Pet Boarding', 'Kennel', 'Pet Daycare',
+      'Dog Walking', 'Pet Sitting', 'Veterinarian', 'Animal Hospital',
+      'Pet Adoption', 'Rescue', 'Aquarium', 'Fish Store', 'Bird Store',
+      'Reptiles', 'Pet Photography', 'Pet Bakery', 'Pet Food', 'Raw Diet'
+    ]
+  },
+  {
+    name: 'Entertainment & Recreation',
+    icon: '🎉',
+    tags: [
+      'Movie Theater', 'Bowling', 'Arcade', 'Escape Room', 'Laser Tag',
+      'Mini Golf', 'Go Karts', 'Trampoline Park', 'Amusement', 'Skating Rink',
+      'Pool Hall', 'Karaoke', 'Comedy Club', 'Live Music', 'Concert Venue',
+      'Nightclub', 'Dance Club', 'Casino', 'Bingo', 'Axe Throwing',
+      'Golf Course', 'Driving Range', 'Batting Cages', 'Sports Complex',
+      'Recreation Center', 'Community Center', 'Museum', 'Art Museum',
+      'Science Center', 'Zoo', 'Aquarium', 'Theme Park', 'Water Park'
+    ]
+  },
+  {
+    name: 'Education & Learning',
+    icon: '📚',
+    tags: [
+      'Tutoring', 'Test Prep', 'SAT Prep', 'ACT Prep', 'GED', 'ESL',
+      'Language School', 'Music Lessons', 'Art Classes', 'Dance Lessons',
+      'Driving School', 'Cooking Class', 'Sewing Class', 'Craft Workshop',
+      'STEM Education', 'Coding Bootcamp', 'Trade School', 'Vocational',
+      'College Prep', 'Early Learning', 'Preschool', 'Daycare', 'After School',
+      'Summer Camp', 'Sports Camp', 'Art Camp', 'Music Camp', 'Online Courses',
+      'Library', 'Study Space', 'Coworking', 'Professional Development'
+    ]
+  },
+  {
+    name: 'Events & Celebrations',
+    icon: '🎊',
+    tags: [
+      'Event Venue', 'Wedding Venue', 'Banquet Hall', 'Conference Center',
+      'Event Planning', 'Wedding Planner', 'Party Planner', 'Catering',
+      'DJ', 'Band', 'Entertainment', 'Photo Booth', 'Balloon Artist',
+      'Face Painting', 'Magician', 'Clown', 'Bounce House', 'Party Rentals',
+      'Tent Rental', 'Chair Rental', 'Table Rental', 'Linens', 'Wedding Dress',
+      'Tuxedo Rental', 'Invitations', 'Flowers', 'Wedding Cake', 'Party Cake',
+      'Bartender', 'Officiant', 'Wedding Photography', 'Event Photography'
+    ]
+  },
+  {
+    name: 'Family & Kids',
+    icon: '👨‍👩‍👧‍👦',
+    tags: [
+      'Family Friendly', 'Kid Friendly', 'Playground', 'Play Place',
+      'Indoor Playground', 'Kids Activities', 'Kids Classes', 'Kids Sports',
+      'Birthday Parties', 'Family Entertainment', 'Baby Store', 'Kids Clothing',
+      'Maternity', 'Toy Store', 'Kids Haircut', 'Pediatric', 'Family Dining',
+      'Kids Menu', 'Stroller Friendly', 'Nursing Room', 'Diaper Changing',
+      'Family Photography', 'Newborn Photography', 'Tutoring'
+    ]
+  },
+  {
+    name: 'Community & Nonprofit',
+    icon: '🤝',
+    tags: [
+      'Nonprofit', 'Charity', 'Community Organization', 'Church', 'Mosque',
+      'Synagogue', 'Temple', 'Religious', 'Food Bank', 'Homeless Services',
+      'Youth Services', 'Senior Services', 'Disability Services', 'Veterans',
+      'Women Services', 'LGBTQ+', 'Cultural Center', 'Community Garden',
+      'Volunteer', 'Donation Center', 'Thrift Benefiting Charity', 'Fundraising'
+    ]
+  },
+  {
+    name: 'Outdoors & Nature',
+    icon: '🌲',
+    tags: [
+      'Outdoors', 'Hiking', 'Camping', 'Fishing', 'Hunting', 'Outdoor Sports',
+      'Rock Climbing', 'Kayaking', 'Paddleboarding', 'Surfing', 'Skiing',
+      'Snowboarding', 'Mountain Biking', 'Trail Running', 'Parks', 'Nature',
+      'Wildlife', 'Bird Watching', 'Scenic Views', 'River', 'Lake', 'Beach',
+      'Adventure', 'Tours', 'Guide Services', 'Outdoor Gear', 'Rentals'
+    ]
+  },
+  {
+    name: 'Travel & Lodging',
+    icon: '✈️',
+    tags: [
+      'Hotel', 'Motel', 'Bed & Breakfast', 'Inn', 'Resort', 'Vacation Rental',
+      'Airbnb', 'Hostel', 'Campground', 'RV Park', 'Travel Agency',
+      'Tour Operator', 'Airport Shuttle', 'Limo Service', 'Charter Bus',
+      'Passport Services', 'Visa Services', 'Travel Insurance', 'Currency Exchange'
+    ]
+  }
+]
+
+// Flatten all tags for easy access
+export const ALL_BUSINESS_TAGS: string[] = BUSINESS_TAG_CATEGORIES.flatMap(
+  category => category.tags
+)
+
+// Maximum number of tags a business can select
+export const MAX_BUSINESS_TAGS = 10
+
+// Minimum number of tags required
+export const MIN_BUSINESS_TAGS = 1

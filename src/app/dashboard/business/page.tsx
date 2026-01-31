@@ -12,6 +12,7 @@ import SubscriptionManager from '@/components/SubscriptionManager'
 import SubscriptionRequiredBanner from '@/components/SubscriptionRequiredBanner'
 import BusinessPreview from '@/components/BusinessPreview'
 import SponsoredPlacementManager from '@/components/SponsoredPlacementManager'
+import TagSelector from '@/components/TagSelector'
 import './business.css'
 
 export default function BusinessDashboard() {
@@ -28,7 +29,7 @@ export default function BusinessDashboard() {
 
   const [formData, setFormData] = useState({
     name: '',
-    tags: '',
+    tags: [] as string[],
     neighborhood: '',
     hours: '',
     phone: '',
@@ -53,7 +54,7 @@ export default function BusinessDashboard() {
         setBusiness({ ...data, id: businessSnap.id })
         setFormData({
           name: data.name || '',
-          tags: (data.tags || []).join(', '),
+          tags: data.tags || [],
           neighborhood: data.neighborhood || '',
           hours: data.hours || '',
           phone: data.phone || '',
@@ -87,7 +88,7 @@ export default function BusinessDashboard() {
 
       const businessData = {
         name: formData.name,
-        tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        tags: formData.tags,
         neighborhood: formData.neighborhood,
         hours: formData.hours,
         phone: formData.phone,
@@ -482,21 +483,20 @@ export default function BusinessDashboard() {
 
             <div className="form-group">
               <label htmlFor="tags">
-                Categories (comma-separated) *
+                Business Categories *
                 <span className="form-hint">
-                  e.g., Coffee, Breakfast, Bakery
+                  Select tags that best describe your business (min 1, max 10)
                 </span>
               </label>
-              <input
-                type="text"
-                id="tags"
-                value={formData.tags}
-                onChange={(e) =>
-                  setFormData({ ...formData, tags: e.target.value })
-                }
-                placeholder="Coffee, Breakfast, Bakery"
-                required
+              <TagSelector
+                selectedTags={formData.tags}
+                onChange={(tags) => setFormData({ ...formData, tags })}
               />
+              {formData.tags.length === 0 && (
+                <p style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                  Please select at least one category tag
+                </p>
+              )}
             </div>
 
             <div className="form-group">
