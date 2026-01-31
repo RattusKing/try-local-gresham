@@ -15,15 +15,18 @@ import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import type { Business } from '@/lib/types'
 
+// Popular filter chips for quick category filtering
 const FILTER_CHIPS = [
-  'Coffee',
-  'Food',
-  'Boutique',
-  'Services',
-  'Outdoors',
-  'Wellness',
-  'Pets',
-  'Family',
+  // Food & Dining
+  'Restaurant', 'Coffee', 'Cafe', 'Bakery', 'Food Truck', 'Pizza', 'Mexican', 'Asian',
+  // Shopping
+  'Boutique', 'Vintage', 'Gift Shop', 'Florist', 'Books',
+  // Health & Beauty
+  'Gym', 'Yoga', 'Spa', 'Hair Salon', 'Barbershop', 'Nail Salon',
+  // Services
+  'Services', 'Auto Repair', 'Cleaning', 'Photography',
+  // Lifestyle
+  'Outdoors', 'Wellness', 'Pets', 'Family', 'Entertainment',
 ]
 
 export default function Home() {
