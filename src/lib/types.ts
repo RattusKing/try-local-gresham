@@ -485,8 +485,12 @@ export const BUSINESS_TAG_CATEGORIES: BusinessTagCategory[] = [
     tags: [
       'Cleaning', 'House Cleaning', 'Carpet Cleaning', 'Pressure Washing',
       'Landscaping', 'Lawn Care', 'Tree Service', 'Pest Control', 'Plumbing',
-      'Electrician', 'HVAC', 'Roofing', 'Painting', 'Handyman', 'Contractor',
-      'Remodeling', 'Kitchen Remodel', 'Bathroom Remodel', 'Flooring',
+      'Electrician', 'HVAC', 'HVAC Repair', 'Heating', 'Cooling', 'Air Conditioning',
+      'Furnace', 'Heat Pump', 'Roofing', 'Roof Repair', 'Roofing Contractor',
+      'Painting', 'Handyman', 'Contractor', 'General Contractor', 'Construction',
+      'Home Builder', 'Builder', 'Commercial Construction', 'Remodeling',
+      'Kitchen Remodel', 'Bathroom Remodel', 'Flooring', 'Concrete', 'Masonry',
+      'Framing', 'Drywall', 'Siding', 'Insulation', 'Excavation', 'Demolition',
       'Windows', 'Doors', 'Garage Door', 'Locksmith', 'Security', 'Smart Home',
       'Pool Service', 'Moving', 'Storage', 'Junk Removal', 'Appliance Repair',
       'Furniture Repair', 'Upholstery', 'Curtains', 'Blinds', 'Interior Design'
@@ -499,8 +503,10 @@ export const BUSINESS_TAG_CATEGORIES: BusinessTagCategory[] = [
       'Auto Repair', 'Mechanic', 'Oil Change', 'Brakes', 'Tires', 'Auto Body',
       'Collision Repair', 'Detailing', 'Car Wash', 'Towing', 'Roadside Assistance',
       'Auto Parts', 'Auto Glass', 'Muffler', 'Transmission', 'Alignment',
-      'Car Dealership', 'Used Cars', 'Motorcycle', 'RV', 'Boat', 'Rental Car',
-      'EV Charging', 'Electric Vehicle', 'Fleet Services', 'Truck Repair'
+      'Car Dealership', 'Car Dealer', 'Auto Dealer', 'New Cars', 'Used Cars',
+      'Pre-Owned Cars', 'Auto Sales', 'Car Sales', 'Truck Sales', 'SUV',
+      'Motorcycle', 'Motorcycle Dealer', 'RV', 'RV Dealer', 'Boat', 'Boat Dealer',
+      'Rental Car', 'EV Charging', 'Electric Vehicle', 'Fleet Services', 'Truck Repair'
     ]
   },
   {
