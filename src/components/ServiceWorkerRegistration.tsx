@@ -1,11 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import UpdateNotification from './UpdateNotification';
 
 export default function ServiceWorkerRegistration() {
   const [showUpdateNotification, setShowUpdateNotification] = useState(false);
   const [waitingServiceWorker, setWaitingServiceWorker] = useState<ServiceWorker | null>(null);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+
+  // Force check for updates
+  const checkForUpdates = useCallback(() => {
+    if (registration) {
+      console.log('[SW] Checking for updates...');
+      registration.update().catch(err => {
+        console.warn('[SW] Update check failed:', err);
+      });
+    }
+  }, [registration]);
 
   useEffect(() => {
     if (
@@ -15,12 +26,17 @@ export default function ServiceWorkerRegistration() {
     ) {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((registration) => {
-          console.log('Service Worker registered:', registration);
+        .then((reg) => {
+          console.log('[SW] Service Worker registered');
+          setRegistration(reg);
+
+          // Check immediately on registration
+          reg.update();
 
           // Listen for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            console.log('[SW] Update found, installing...');
 
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
@@ -29,7 +45,7 @@ export default function ServiceWorkerRegistration() {
                   navigator.serviceWorker.controller
                 ) {
                   // New service worker available
-                  console.log('New service worker available!');
+                  console.log('[SW] New version ready!');
                   setWaitingServiceWorker(newWorker);
                   setShowUpdateNotification(true);
                 }
@@ -37,31 +53,49 @@ export default function ServiceWorkerRegistration() {
             }
           });
 
-          // Check for updates more frequently (every 10 minutes)
-          setInterval(() => {
-            registration.update();
-          }, 10 * 60 * 1000); // Check every 10 minutes
+          // Check for updates very frequently (every 60 seconds)
+          const updateInterval = setInterval(() => {
+            reg.update();
+          }, 60 * 1000); // Every 1 minute
 
           // Check for updates when page becomes visible
-          document.addEventListener('visibilitychange', () => {
+          const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-              registration.update();
+              reg.update();
             }
-          });
+          };
+          document.addEventListener('visibilitychange', handleVisibilityChange);
 
           // Check for updates on page focus
-          window.addEventListener('focus', () => {
-            registration.update();
-          });
+          const handleFocus = () => {
+            reg.update();
+          };
+          window.addEventListener('focus', handleFocus);
+
+          // Check for updates on online event (when coming back online)
+          const handleOnline = () => {
+            console.log('[SW] Back online, checking for updates...');
+            reg.update();
+          };
+          window.addEventListener('online', handleOnline);
 
           // Check if there's already a waiting service worker
-          if (registration.waiting) {
-            setWaitingServiceWorker(registration.waiting);
+          if (reg.waiting) {
+            console.log('[SW] Update already waiting');
+            setWaitingServiceWorker(reg.waiting);
             setShowUpdateNotification(true);
           }
+
+          // Cleanup on unmount
+          return () => {
+            clearInterval(updateInterval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('online', handleOnline);
+          };
         })
         .catch((error) => {
-          console.error('Service Worker registration failed:', error);
+          console.error('[SW] Registration failed:', error);
         });
 
       // Listen for controller change (when new SW takes over)
@@ -69,6 +103,7 @@ export default function ServiceWorkerRegistration() {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
           refreshing = true;
+          console.log('[SW] New service worker activated, reloading...');
           window.location.reload();
         }
       });
@@ -84,7 +119,15 @@ export default function ServiceWorkerRegistration() {
   };
 
   const handleDismiss = () => {
+    // Still hide the notification but it will reappear on next check
     setShowUpdateNotification(false);
+
+    // Show again after 5 minutes if still not updated
+    setTimeout(() => {
+      if (waitingServiceWorker) {
+        setShowUpdateNotification(true);
+      }
+    }, 5 * 60 * 1000);
   };
 
   return (
