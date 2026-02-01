@@ -431,10 +431,10 @@ export const BUSINESS_TAG_CATEGORIES: BusinessTagCategory[] = [
     name: 'Shopping & Retail',
     icon: '🛍️',
     tags: [
-      'Boutique', 'Clothing', 'Shoes', 'Accessories', 'Jewelry', 'Watches',
+      'Retail', 'Boutique', 'Clothing', 'Shoes', 'Accessories', 'Jewelry', 'Watches',
       'Vintage', 'Thrift Store', 'Consignment', 'Antiques', 'Collectibles',
       'Gift Shop', 'Home Decor', 'Furniture', 'Art Gallery', 'Craft Supplies',
-      'Florist', 'Plants', 'Garden Center', 'Hardware Store', 'Electronics',
+      'Florist', 'Plants', 'Garden Center', 'Home and Garden', 'Hardware Store', 'Electronics',
       'Phone Repair', 'Computer Store', 'Books', 'Records', 'Music Store',
       'Toys', 'Games', 'Sports Equipment', 'Outdoor Gear', 'Camping',
       'Bike Shop', 'Skate Shop', 'Smoke Shop', 'CBD', 'Supplements',
