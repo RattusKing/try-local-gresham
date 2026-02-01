@@ -184,24 +184,24 @@ service cloud.firestore {
 
     // Sponsored Banners collection (Paid Business Promotions)
     match /sponsoredBanners/{bannerId} {
+      // Admins can read ALL banners (for management dashboard)
       // Anyone can read active sponsored banners (for carousel display)
       // Business owners can read their own banners
-      // Admins can read all banners
-      allow read: if resource.data.status == 'active' ||
-                     (isSignedIn() && isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
-                     isAdmin();
+      allow read: if isAdmin() ||
+                     resource.data.status == 'active' ||
+                     (isSignedIn() && resource.data.businessId == request.auth.uid);
 
-      // Business owners can create sponsored banner requests for their own business
       // Admins can create banners for any business (for testing or on behalf of businesses)
+      // Business owners can create sponsored banner requests for their own business
       allow create: if isAdmin() ||
-                       (isBusinessOwner() &&
+                       (isSignedIn() &&
                         request.resource.data.businessId == request.auth.uid &&
                         request.resource.data.status == 'pending');
 
-      // Business owners can update their own pending banners (cancel, update headline)
       // Admins can update any banner (approve, reject, etc.)
+      // Business owners can update their own pending banners (cancel, update headline)
       allow update: if isAdmin() ||
-                       (isBusinessOwner() &&
+                       (isSignedIn() &&
                         resource.data.businessId == request.auth.uid &&
                         resource.data.status == 'pending');
 
