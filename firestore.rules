@@ -7,8 +7,14 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? getUserData().role
+        : null;
     }
 
     function isAdmin() {
@@ -16,7 +22,7 @@ service cloud.firestore {
     }
 
     function isBusinessOwner() {
-      return isSignedIn() && getUserRole() == 'business_owner';
+      return isSignedIn() && (getUserRole() == 'business_owner' || getUserRole() == 'admin');
     }
 
     function isOwner(userId) {
@@ -182,13 +188,15 @@ service cloud.firestore {
       // Business owners can read their own banners
       // Admins can read all banners
       allow read: if resource.data.status == 'active' ||
-                     (isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
+                     (isSignedIn() && isBusinessOwner() && resource.data.businessId == request.auth.uid) ||
                      isAdmin();
 
       // Business owners can create sponsored banner requests for their own business
-      allow create: if isBusinessOwner() &&
-                       request.resource.data.businessId == request.auth.uid &&
-                       request.resource.data.status == 'pending';
+      // Admins can create banners for any business (for testing or on behalf of businesses)
+      allow create: if isAdmin() ||
+                       (isBusinessOwner() &&
+                        request.resource.data.businessId == request.auth.uid &&
+                        request.resource.data.status == 'pending');
 
       // Business owners can update their own pending banners (cancel, update headline)
       // Admins can update any banner (approve, reject, etc.)
