@@ -1,8 +1,8 @@
 // Try Local Gresham - Service Worker
-// Version: 1.3.0
+// Version: 1.4.0 - Auto-update enabled
 
-const CACHE_NAME = 'try-local-v1.3';
-const RUNTIME_CACHE = 'try-local-runtime-v1.3';
+const CACHE_NAME = 'try-local-v1.4';
+const RUNTIME_CACHE = 'try-local-runtime-v1.4';
 
 // Assets to cache on install (only static files)
 const PRECACHE_URLS = [
@@ -14,8 +14,9 @@ const PRECACHE_URLS = [
   '/logo.jpeg',
 ];
 
-// Install event - cache essential assets with error handling
+// Install event - cache essential assets and immediately activate
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing new version...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -29,15 +30,20 @@ self.addEventListener('install', (event) => {
           )
         );
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('[SW] Installation complete, skipping waiting...');
+        // Skip waiting immediately - don't wait for user action
+        return self.skipWaiting();
+      })
       .catch(err => {
         console.error('Service worker installation failed:', err);
       })
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and take control immediately
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating new version...');
   const currentCaches = [CACHE_NAME, RUNTIME_CACHE];
   event.waitUntil(
     caches.keys()
@@ -45,13 +51,26 @@ self.addEventListener('activate', (event) => {
         return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
       })
       .then((cachesToDelete) => {
+        console.log('[SW] Deleting old caches:', cachesToDelete);
         return Promise.all(
           cachesToDelete.map((cacheToDelete) => {
             return caches.delete(cacheToDelete);
           })
         );
       })
-      .then(() => self.clients.claim())
+      .then(() => {
+        console.log('[SW] Taking control of all clients...');
+        // Immediately claim all clients - this triggers the update
+        return self.clients.claim();
+      })
+      .then(() => {
+        // Notify all clients that an update has occurred
+        return self.clients.matchAll({ type: 'window' }).then(clients => {
+          clients.forEach(client => {
+            client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+          });
+        });
+      })
   );
 });
 

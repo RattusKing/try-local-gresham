@@ -1,22 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import UpdateNotification from './UpdateNotification';
+import { useEffect, useState } from 'react';
 
 export default function ServiceWorkerRegistration() {
-  const [showUpdateNotification, setShowUpdateNotification] = useState(false);
-  const [waitingServiceWorker, setWaitingServiceWorker] = useState<ServiceWorker | null>(null);
-  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
-
-  // Force check for updates
-  const checkForUpdates = useCallback(() => {
-    if (registration) {
-      console.log('[SW] Checking for updates...');
-      registration.update().catch(err => {
-        console.warn('[SW] Update check failed:', err);
-      });
-    }
-  }, [registration]);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (
@@ -28,9 +15,8 @@ export default function ServiceWorkerRegistration() {
         .register('/sw.js')
         .then((reg) => {
           console.log('[SW] Service Worker registered');
-          setRegistration(reg);
 
-          // Check immediately on registration
+          // Check for updates immediately on page load
           reg.update();
 
           // Listen for updates
@@ -40,50 +26,52 @@ export default function ServiceWorkerRegistration() {
 
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
-                if (
-                  newWorker.state === 'installed' &&
-                  navigator.serviceWorker.controller
-                ) {
-                  // New service worker available
-                  console.log('[SW] New version ready!');
-                  setWaitingServiceWorker(newWorker);
-                  setShowUpdateNotification(true);
+                if (newWorker.state === 'installed') {
+                  if (navigator.serviceWorker.controller) {
+                    // New service worker available - auto-activate it
+                    console.log('[SW] New version ready, auto-activating...');
+                    setUpdating(true);
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  } else {
+                    // First install
+                    console.log('[SW] Service worker installed for the first time');
+                  }
                 }
               });
             }
           });
 
-          // Check for updates very frequently (every 60 seconds)
+          // Check for updates frequently (every 30 seconds)
           const updateInterval = setInterval(() => {
-            reg.update();
-          }, 60 * 1000); // Every 1 minute
+            reg.update().catch(() => {});
+          }, 30 * 1000);
 
           // Check for updates when page becomes visible
           const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-              reg.update();
+              reg.update().catch(() => {});
             }
           };
           document.addEventListener('visibilitychange', handleVisibilityChange);
 
           // Check for updates on page focus
           const handleFocus = () => {
-            reg.update();
+            reg.update().catch(() => {});
           };
           window.addEventListener('focus', handleFocus);
 
-          // Check for updates on online event (when coming back online)
+          // Check for updates when coming back online
           const handleOnline = () => {
             console.log('[SW] Back online, checking for updates...');
-            reg.update();
+            reg.update().catch(() => {});
           };
           window.addEventListener('online', handleOnline);
 
-          // Check if there's already a waiting service worker
+          // If there's already a waiting service worker, activate it immediately
           if (reg.waiting) {
-            console.log('[SW] Update already waiting');
-            setWaitingServiceWorker(reg.waiting);
-            setShowUpdateNotification(true);
+            console.log('[SW] Update already waiting, auto-activating...');
+            setUpdating(true);
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
           }
 
           // Cleanup on unmount
@@ -103,38 +91,52 @@ export default function ServiceWorkerRegistration() {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
           refreshing = true;
-          console.log('[SW] New service worker activated, reloading...');
-          window.location.reload();
+          console.log('[SW] New service worker activated, reloading page...');
+          // Brief delay to show updating message, then reload
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+      });
+
+      // Listen for messages from service worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          console.log('[SW] Received update notification:', event.data.version);
         }
       });
     }
   }, []);
 
-  const handleUpdate = () => {
-    if (waitingServiceWorker) {
-      // Tell the waiting service worker to skip waiting and take over
-      waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
-      setShowUpdateNotification(false);
-    }
-  };
+  // Show a brief updating indicator
+  if (updating) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          background: 'linear-gradient(135deg, var(--primary, #99edc3), var(--secondary, #c2aff0))',
+          color: 'var(--dark, #373737)',
+          padding: '0.75rem',
+          textAlign: 'center',
+          zIndex: 99999,
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          animation: 'pulse 1.5s ease-in-out infinite',
+        }}
+      >
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+          }
+        `}</style>
+        Updating app... Please wait
+      </div>
+    );
+  }
 
-  const handleDismiss = () => {
-    // Still hide the notification but it will reappear on next check
-    setShowUpdateNotification(false);
-
-    // Show again after 5 minutes if still not updated
-    setTimeout(() => {
-      if (waitingServiceWorker) {
-        setShowUpdateNotification(true);
-      }
-    }, 5 * 60 * 1000);
-  };
-
-  return (
-    <UpdateNotification
-      show={showUpdateNotification}
-      onUpdate={handleUpdate}
-      onDismiss={handleDismiss}
-    />
-  );
+  return null;
 }
