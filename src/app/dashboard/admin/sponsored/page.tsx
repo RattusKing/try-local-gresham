@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
-import { collection, query, getDocs, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore'
+import { collection, query, getDocs, updateDoc, doc, Timestamp, orderBy, addDoc, deleteDoc } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { SponsoredBanner, SPONSORED_BANNER_PRICING } from '@/lib/types'
@@ -20,6 +20,13 @@ export default function SponsoredBannersAdmin() {
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [newBanner, setNewBanner] = useState({
+    businessName: '',
+    headline: '',
+    durationDays: 7,
+  })
 
   useEffect(() => {
     if (user?.role !== 'admin') return
@@ -156,6 +163,62 @@ export default function SponsoredBannersAdmin() {
     }
   }
 
+  const handleCreateTestBanner = async () => {
+    if (!db || !newBanner.businessName) return
+
+    try {
+      setCreating(true)
+      setError('')
+
+      const startDate = new Date()
+      const endDate = new Date()
+      endDate.setDate(endDate.getDate() + newBanner.durationDays)
+
+      await addDoc(collection(db, 'sponsoredBanners'), {
+        businessId: 'test-' + Date.now(),
+        businessName: newBanner.businessName,
+        businessCover: '', // No cover for test
+        headline: newBanner.headline || '',
+        status: 'active',
+        isPaid: true, // Mark as paid for testing
+        amountPaid: 0, // Free test banner
+        startDate,
+        endDate,
+        durationDays: newBanner.durationDays,
+        adminNotes: 'Test banner created by admin',
+        approvedBy: user?.uid,
+        approvedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+
+      setSuccess('Test banner created and is now active!')
+      setShowCreateModal(false)
+      setNewBanner({ businessName: '', headline: '', durationDays: 7 })
+      await loadBanners()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleDelete = async (bannerId: string) => {
+    if (!db) return
+    if (!confirm('Are you sure you want to permanently delete this banner?')) return
+
+    try {
+      setProcessingId(bannerId)
+      await deleteDoc(doc(db, 'sponsoredBanners', bannerId))
+      setSuccess('Banner deleted')
+      await loadBanners()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
   const getFilteredBanners = (tab: TabType) => {
     const now = new Date()
     switch (tab) {
@@ -241,7 +304,18 @@ export default function SponsoredBannersAdmin() {
   return (
     <div className="admin-dashboard">
       <div className="admin-dashboard-header">
-        <h1>Sponsored Banner Management</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <h1 style={{ margin: 0 }}>Sponsored Banner Management</h1>
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            + Create Test Banner
+          </button>
+        </div>
+        <p style={{ color: 'var(--muted)', marginTop: '0.5rem', marginBottom: '1rem' }}>
+          Sponsored banners appear in a scrolling carousel on the homepage. Businesses pay to be featured.
+        </p>
         <div className="admin-stats">
           <div className="admin-stat">
             <span className="admin-stat-value">{pendingCount}</span>
@@ -398,16 +472,139 @@ export default function SponsoredBannersAdmin() {
                     className="btn-unapprove"
                     onClick={() => handleExpire(banner.id)}
                     disabled={processingId === banner.id}
-                    style={{ width: '100%' }}
+                    style={{ flex: 1 }}
                   >
                     End Early
                   </button>
                 )}
+                <button
+                  onClick={() => handleDelete(banner.id)}
+                  disabled={processingId === banner.id}
+                  style={{
+                    padding: '0.5rem',
+                    background: '#fee2e2',
+                    color: '#991b1b',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                  }}
+                  title="Delete banner"
+                >
+                  🗑️ Delete
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Create Test Banner Modal */}
+      {showCreateModal && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              zIndex: 1000,
+            }}
+            onClick={() => setShowCreateModal(false)}
+          />
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '2rem',
+            borderRadius: 'var(--radius)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            zIndex: 1001,
+            width: '90%',
+            maxWidth: '450px',
+          }}>
+            <h3 style={{ marginTop: 0 }}>Create Test Sponsored Banner</h3>
+            <p style={{ color: 'var(--muted)', fontSize: '0.875rem' }}>
+              Create a test banner to see how it looks in the homepage carousel.
+            </p>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Business Name *
+              </label>
+              <input
+                type="text"
+                value={newBanner.businessName}
+                onChange={(e) => setNewBanner({ ...newBanner, businessName: e.target.value })}
+                placeholder="e.g., Joe's Coffee Shop"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  border: '2px solid #e5e7eb',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Promotional Headline (optional)
+              </label>
+              <input
+                type="text"
+                value={newBanner.headline}
+                onChange={(e) => setNewBanner({ ...newBanner, headline: e.target.value })}
+                placeholder="e.g., Grand Opening - 20% Off!"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  border: '2px solid #e5e7eb',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Duration
+              </label>
+              <select
+                value={newBanner.durationDays}
+                onChange={(e) => setNewBanner({ ...newBanner, durationDays: Number(e.target.value) })}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  border: '2px solid #e5e7eb',
+                }}
+              >
+                <option value={7}>1 Week (7 days)</option>
+                <option value={14}>2 Weeks (14 days)</option>
+                <option value={30}>1 Month (30 days)</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="btn btn-outline"
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateTestBanner}
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+                disabled={creating || !newBanner.businessName}
+              >
+                {creating ? 'Creating...' : 'Create & Activate'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Rejection Modal */}
       {showRejectModal && (
