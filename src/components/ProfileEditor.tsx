@@ -137,13 +137,15 @@ export default function ProfileEditor() {
       // Get download URL
       const downloadURL = await getDownloadURL(storageRef)
 
-      // Update Firestore
+      // Update Firestore - use setDoc with merge to handle case where user doc doesn't exist
       const profileRef = doc(db, 'users', user.uid)
       const updateField = type === 'profile' ? 'photoURL' : 'coverPhotoURL'
-      await updateDoc(profileRef, {
+      await setDoc(profileRef, {
+        uid: user.uid,
+        email: user.email || '',
         [updateField]: downloadURL,
         updatedAt: new Date(),
-      })
+      }, { merge: true })
 
       setSuccess(`${type === 'profile' ? 'Profile photo' : 'Cover photo'} updated!`)
       await loadProfile()
@@ -258,6 +260,8 @@ export default function ProfileEditor() {
         {/* Profile Photo and Name Row */}
         <div style={{
           display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
           alignItems: 'flex-end',
           gap: '1.5rem',
           marginTop: '-50px',
@@ -342,11 +346,19 @@ export default function ProfileEditor() {
           </div>
 
           {/* Name and Role */}
-          <div style={{ paddingBottom: '0.5rem', flex: 1 }}>
+          <div style={{
+            paddingBottom: '0.5rem',
+            flex: '1 1 auto',
+            minWidth: '200px',
+            maxWidth: '100%',
+          }}>
             <h1 style={{
               margin: '0 0 0.25rem',
-              fontSize: '1.75rem',
+              fontSize: 'clamp(1.25rem, 4vw, 1.75rem)',
               color: 'var(--dark)',
+              lineHeight: 1.3,
+              wordBreak: 'break-word',
+              whiteSpace: 'normal',
             }}>
               {profile?.displayName || 'No name set'}
             </h1>
@@ -354,6 +366,7 @@ export default function ProfileEditor() {
               color: 'var(--muted)',
               margin: 0,
               fontSize: '1rem',
+              lineHeight: 1.4,
             }}>
               {profile?.role?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'User'}
             </p>
