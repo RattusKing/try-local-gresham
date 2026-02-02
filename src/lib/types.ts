@@ -670,3 +670,33 @@ export interface BusinessAnalyticsSummary {
   // Computed
   lastUpdated: Date
 }
+
+// Quote Request Types (for service businesses)
+
+export type QuoteRequestStatus = 'pending' | 'contacted' | 'quoted' | 'won' | 'lost' | 'archived'
+
+export type QuoteUrgency = 'urgent' | 'standard' | 'flexible'
+
+export interface QuoteRequest {
+  id: string
+  businessId: string
+  businessName: string
+  // Customer info
+  customerId?: string // If logged in
+  customerName: string
+  customerEmail: string
+  customerPhone?: string
+  preferredContact: 'email' | 'phone'
+  // Request details
+  serviceType: string
+  description: string
+  urgency: QuoteUrgency
+  // Status tracking
+  status: QuoteRequestStatus
+  businessNotes?: string // Internal notes
+  quotedAmount?: number // If business provided quote
+  quotedAt?: Date
+  // Timestamps
+  createdAt: Date
+  updatedAt: Date
+}
