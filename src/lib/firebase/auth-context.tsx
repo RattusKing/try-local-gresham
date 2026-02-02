@@ -33,6 +33,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -175,6 +176,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await sendPasswordResetEmail(auth, email)
   }
 
+  const refreshProfile = async () => {
+    if (!auth?.currentUser || !db) return
+
+    const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid))
+    const profile = userDoc.data() as UserProfile | undefined
+
+    if (profile) {
+      setUser({
+        uid: auth.currentUser.uid,
+        email: auth.currentUser.email,
+        displayName: profile.displayName || auth.currentUser.displayName,
+        photoURL: profile.photoURL || auth.currentUser.photoURL,
+        role: profile.role,
+      })
+      setUserProfile(profile)
+    }
+  }
+
   const value = {
     user,
     userProfile,
@@ -186,6 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signInWithGoogle,
     signOut,
     resetPassword,
+    refreshProfile,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
