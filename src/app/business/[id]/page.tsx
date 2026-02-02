@@ -16,6 +16,7 @@ import StarRating from '@/components/StarRating'
 import PromoBanner from '@/components/PromoBanner'
 import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
 import AppointmentBookingModal from '@/components/AppointmentBookingModal'
+import QuoteRequestForm from '@/components/QuoteRequestForm'
 import Head from 'next/head'
 import './business-profile.css'
 
@@ -37,6 +38,8 @@ export default function BusinessProfilePage() {
   const [addedToCart, setAddedToCart] = useState<string | null>(null)
   const [favoritedProductIds, setFavoritedProductIds] = useState<Set<string>>(new Set())
   const [showBookingModal, setShowBookingModal] = useState(false)
+  const [showQuoteModal, setShowQuoteModal] = useState(false)
+  const [quoteSuccess, setQuoteSuccess] = useState(false)
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0)
 
   const [reviewForm, setReviewForm] = useState({
@@ -1178,6 +1181,43 @@ export default function BusinessProfilePage() {
             </div>
           )}
 
+          {/* Request a Quote Button - shown for all businesses */}
+          <div className="business-info-card quote-cta">
+            <h3>Request a Quote</h3>
+            <p style={{ margin: '0.5rem 0 1rem', fontSize: '0.875rem', color: '#6b7280' }}>
+              Get a personalized quote for your project or service needs
+            </p>
+            {quoteSuccess ? (
+              <div style={{
+                padding: '1rem',
+                backgroundColor: '#d1fae5',
+                borderRadius: '8px',
+                textAlign: 'center',
+                color: '#065f46'
+              }}>
+                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '0.5rem' }}>✓</span>
+                <strong>Quote request sent!</strong>
+                <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem' }}>
+                  The business will contact you soon.
+                </p>
+              </div>
+            ) : (
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowQuoteModal(true)}
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #059669, #10b981)',
+                  color: 'white',
+                  border: 'none'
+                }}
+              >
+                📋 Request a Quote
+              </button>
+            )}
+          </div>
+
           {/* Contact Info */}
           <div className="business-info-card">
             <h3>Contact Information</h3>
@@ -1324,6 +1364,20 @@ export default function BusinessProfilePage() {
           onSuccess={() => {
             alert('Appointment booked successfully! The business will confirm your appointment soon.')
             setShowBookingModal(false)
+          }}
+        />
+      )}
+
+      {/* Quote Request Modal */}
+      {showQuoteModal && business && (
+        <QuoteRequestForm
+          businessId={business.id}
+          businessName={business.name}
+          onClose={() => setShowQuoteModal(false)}
+          onSuccess={() => {
+            setQuoteSuccess(true)
+            // Reset success message after 10 seconds
+            setTimeout(() => setQuoteSuccess(false), 10000)
           }}
         />
       )}

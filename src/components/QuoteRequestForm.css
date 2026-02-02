@@ -1,0 +1,178 @@
+.quote-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.quote-business-name {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.quote-business-name strong {
+  color: #111827;
+}
+
+.quote-form {
+  padding: 1.5rem;
+}
+
+.quote-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .quote-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quote-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.quote-form label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.quote-form input,
+.quote-form select,
+.quote-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.quote-form input:focus,
+.quote-form select:focus,
+.quote-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+}
+
+.quote-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Urgency Options */
+.urgency-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .urgency-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.urgency-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.urgency-option:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.urgency-option.selected {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(255, 122, 0, 0.05), rgba(255, 153, 51, 0.05));
+}
+
+.urgency-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.urgency-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.urgency-label {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.urgency-desc {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.quote-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.quote-form .btn-primary {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: var(--dark);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quote-form .btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+}
+
+.quote-form .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quote-form .btn-secondary {
+  padding: 0.875rem 1.5rem;
+  background: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.quote-form .btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}

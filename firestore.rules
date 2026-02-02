@@ -312,6 +312,27 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Quote Requests collection (for service business lead generation)
+    match /quoteRequests/{quoteId} {
+      // Business owners can read quote requests for their own business
+      // Admins can read all quote requests
+      allow read: if isSignedIn() &&
+                     (resource.data.businessId == request.auth.uid || isAdmin());
+
+      // Anyone can create quote requests (customers submitting inquiries)
+      allow create: if true;
+
+      // Business owners can update quote requests for their business (status, notes, quote amount)
+      // Admins can update any quote request
+      allow update: if isSignedIn() &&
+                       (resource.data.businessId == request.auth.uid || isAdmin());
+
+      // Business owners can delete quote requests for their business
+      // Admins can delete any quote request
+      allow delete: if isSignedIn() &&
+                       (resource.data.businessId == request.auth.uid || isAdmin());
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
