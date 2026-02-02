@@ -10,6 +10,7 @@ import AuthModal from '@/components/AuthModal'
 import PromoBanner from '@/components/PromoBanner'
 import SponsoredBannerCarousel from '@/components/SponsoredBannerCarousel'
 import CategoryFilterDropdown from '@/components/CategoryFilterDropdown'
+import SmartSearch from '@/components/SmartSearch'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
@@ -330,15 +331,22 @@ export default function Home() {
           {/* Search and Filters - Only show if businesses exist */}
           {!loading && businesses.length > 0 && (
             <div style={{ marginBottom: '2rem' }}>
-              <div className="filter-controls">
-                  <input
-                    type="text"
-                    placeholder="Search businesses, products, or tags..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    aria-label="Search businesses"
-                  />
+              {/* Smart Search with Autocomplete */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <SmartSearch
+                  businesses={businesses}
+                  categories={categories}
+                  onSearch={(query, category) => {
+                    setSearchQuery(query)
+                    if (category) setSelectedCategory(category)
+                    setActiveChips(new Set())
+                  }}
+                  showPopularTags={true}
+                />
+              </div>
 
+              {/* Additional Filters */}
+              <div className="filter-controls">
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -578,31 +586,80 @@ export default function Home() {
                       padding: '3rem 2rem',
                       textAlign: 'center',
                       background: 'white',
-                      borderRadius: '12px'
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}>
                       <div style={{
-                        fontSize: '3rem',
-                        marginBottom: '1rem',
-                        opacity: 0.5
+                        fontSize: '3.5rem',
+                        marginBottom: '1rem'
                       }}>
                         🔍
                       </div>
-                      <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>No matches found</h3>
-                      <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
-                        Try adjusting your filters or search terms to find what you're looking for.
+                      <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 700 }}>
+                        No results for "{searchQuery || selectedCategory || 'your search'}"
+                      </h3>
+                      <p style={{ color: 'var(--muted)', marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto 1.5rem' }}>
+                        We couldn't find any businesses matching your search. Try one of these suggestions:
                       </p>
-                      <button
-                        onClick={() => {
-                          setSearchQuery('')
-                          setSelectedCategory('')
-                          setSelectedNeighborhood('')
-                          setActiveChips(new Set())
-                          setSortBy('name')
-                        }}
-                        className="btn btn-outline"
-                      >
-                        Clear All Filters
-                      </button>
+
+                      {/* Search suggestions */}
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '0.5rem',
+                        justifyContent: 'center',
+                        marginBottom: '1.5rem'
+                      }}>
+                        {['Restaurant', 'Auto Repair', 'HVAC', 'Salon', 'Coffee'].map(suggestion => (
+                          <button
+                            key={suggestion}
+                            onClick={() => {
+                              setSearchQuery(suggestion)
+                              setSelectedCategory('')
+                              setSelectedNeighborhood('')
+                              setActiveChips(new Set())
+                            }}
+                            style={{
+                              padding: '0.5rem 1rem',
+                              background: '#f3f4f6',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '100px',
+                              fontSize: '0.875rem',
+                              color: '#374151',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = '#fef3c7'
+                              e.currentTarget.style.borderColor = '#fbbf24'
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = '#f3f4f6'
+                              e.currentTarget.style.borderColor = '#e5e7eb'
+                            }}
+                          >
+                            Try "{suggestion}"
+                          </button>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button
+                          onClick={() => {
+                            setSearchQuery('')
+                            setSelectedCategory('')
+                            setSelectedNeighborhood('')
+                            setActiveChips(new Set())
+                            setSortBy('name')
+                          }}
+                          className="btn btn-primary"
+                        >
+                          View All Businesses
+                        </button>
+                        <a href="/get-listed" className="btn btn-outline">
+                          List Your Business
+                        </a>
+                      </div>
                     </div>
                   )}
                 </>
