@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { db, storage } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -1073,7 +1074,11 @@ export default function BusinessProfilePage() {
                 reviews.map((review) => (
                   <div key={review.id} className="review-item">
                     <div className="review-header">
-                      <div className="review-author">
+                      <Link
+                        href={`/profile/${review.userId}`}
+                        className="review-author"
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                      >
                         {review.userPhotoURL ? (
                           <Image
                             src={review.userPhotoURL}
@@ -1089,12 +1094,12 @@ export default function BusinessProfilePage() {
                           </div>
                         )}
                         <div className="review-author-info">
-                          <strong>{review.userName}</strong>
+                          <strong style={{ color: 'var(--dark)' }}>{review.userName}</strong>
                           <div className="review-rating">
                             <StarRating rating={review.rating} readonly size="small" />
                           </div>
                         </div>
-                      </div>
+                      </Link>
                       {review.createdAt && (
                         <span className="review-date">
                           {new Date(review.createdAt).toLocaleDateString()}

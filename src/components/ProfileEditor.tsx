@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db, storage } from '@/lib/firebase/config'
+import Link from 'next/link'
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useEffect, useState, useRef } from 'react'
@@ -9,7 +10,7 @@ import { UserProfile } from '@/lib/types'
 import PaymentMethodsManager from '@/components/stripe/PaymentMethodsManager'
 
 export default function ProfileEditor() {
-  const { user } = useAuth()
+  const { user, refreshProfile } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -149,6 +150,8 @@ export default function ProfileEditor() {
 
       setSuccess(`${type === 'profile' ? 'Profile photo' : 'Cover photo'} updated!`)
       await loadProfile()
+      // Refresh the auth context so header updates immediately
+      await refreshProfile()
     } catch (err: any) {
       setError(`Failed to upload ${type} photo: ${err.message}`)
     } finally {
@@ -372,16 +375,28 @@ export default function ProfileEditor() {
             </p>
           </div>
 
-          {/* Edit Profile Button */}
-          {!editing && (
-            <button
-              className="btn btn-primary"
-              onClick={() => setEditing(true)}
-              style={{ marginBottom: '0.5rem' }}
+          {/* Profile Actions */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+            {!editing && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setEditing(true)}
+              >
+                Edit Profile
+              </button>
+            )}
+            <Link
+              href={`/profile/${user?.uid}`}
+              className="btn btn-outline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              Edit Profile
-            </button>
-          )}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              View Public Profile
+            </Link>
+          </div>
         </div>
 
         {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{error}</div>}
