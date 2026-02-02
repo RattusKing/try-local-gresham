@@ -10,6 +10,7 @@ import { Business, Product, Review, Service } from '@/lib/types'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
+import { trackPageView, trackEvent } from '@/lib/analytics'
 import StarRating from '@/components/StarRating'
 import PromoBanner from '@/components/PromoBanner'
 import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
@@ -200,6 +201,13 @@ export default function BusinessProfilePage() {
   useEffect(() => {
     loadBusiness()
   }, [params.id, loadBusiness])
+
+  // Track page view when business loads
+  useEffect(() => {
+    if (business && business.id) {
+      trackPageView(business.id, user?.uid)
+    }
+  }, [business?.id, user?.uid])
 
   useEffect(() => {
     if (user) {
@@ -1184,7 +1192,12 @@ export default function BusinessProfilePage() {
                 <span className="info-icon">📞</span>
                 <div className="info-content">
                   <strong>Phone</strong>
-                  <a href={`tel:${business.phone}`}>{business.phone}</a>
+                  <a
+                    href={`tel:${business.phone}`}
+                    onClick={() => trackEvent(business.id, 'phone_click', { userId: user?.uid })}
+                  >
+                    {business.phone}
+                  </a>
                 </div>
               </div>
             )}
@@ -1194,7 +1207,12 @@ export default function BusinessProfilePage() {
                 <span className="info-icon">✉️</span>
                 <div className="info-content">
                   <strong>Email</strong>
-                  <a href={`mailto:${business.email}`}>{business.email}</a>
+                  <a
+                    href={`mailto:${business.email}`}
+                    onClick={() => trackEvent(business.id, 'email_click', { userId: user?.uid })}
+                  >
+                    {business.email}
+                  </a>
                 </div>
               </div>
             )}
@@ -1214,7 +1232,12 @@ export default function BusinessProfilePage() {
                 <span className="info-icon">🌐</span>
                 <div className="info-content">
                   <strong>Website</strong>
-                  <a href={business.website} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={business.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackEvent(business.id, 'website_click', { userId: user?.uid })}
+                  >
                     Visit Website
                   </a>
                 </div>
@@ -1242,7 +1265,12 @@ export default function BusinessProfilePage() {
                 <span className="info-icon">🗺️</span>
                 <div className="info-content">
                   <strong>Location</strong>
-                  <a href={business.map} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={business.map}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackEvent(business.id, 'map_click', { userId: user?.uid })}
+                  >
                     View on Map
                   </a>
                 </div>

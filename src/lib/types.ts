@@ -615,3 +615,58 @@ export const MAX_BUSINESS_TAGS = 10
 
 // Minimum number of tags required
 export const MIN_BUSINESS_TAGS = 1
+
+// Analytics Types for Business Performance Tracking
+
+export type AnalyticsEventType =
+  | 'page_view'           // Someone viewed the business page
+  | 'phone_click'         // Someone clicked the phone number
+  | 'email_click'         // Someone clicked the email
+  | 'website_click'       // Someone clicked external website
+  | 'map_click'           // Someone clicked to view map
+  | 'favorite_added'      // Someone favorited the business
+  | 'favorite_removed'    // Someone unfavorited
+  | 'appointment_request' // Someone submitted appointment request
+  | 'contact_form'        // Someone submitted contact form
+  | 'search_appearance'   // Business appeared in search results
+  | 'product_view'        // Someone viewed a product
+  | 'add_to_cart'         // Someone added product to cart
+
+export interface AnalyticsEvent {
+  id: string
+  businessId: string
+  eventType: AnalyticsEventType
+  timestamp: Date
+  // Optional context
+  userId?: string           // If user is logged in
+  sessionId?: string        // Browser session ID
+  referrer?: string         // Where they came from
+  searchQuery?: string      // If from search, what they searched
+  productId?: string        // If product-related event
+  serviceName?: string      // If appointment-related
+  // Device info
+  deviceType?: 'mobile' | 'tablet' | 'desktop'
+  userAgent?: string
+}
+
+export interface BusinessAnalyticsSummary {
+  businessId: string
+  // Totals (all time)
+  totalPageViews: number
+  totalPhoneClicks: number
+  totalEmailClicks: number
+  totalWebsiteClicks: number
+  totalMapClicks: number
+  totalFavorites: number
+  totalAppointmentRequests: number
+  totalSearchAppearances: number
+  // Period data (last 30 days by default)
+  periodPageViews: number
+  periodPhoneClicks: number
+  periodEmailClicks: number
+  periodWebsiteClicks: number
+  periodMapClicks: number
+  periodAppointmentRequests: number
+  // Computed
+  lastUpdated: Date
+}

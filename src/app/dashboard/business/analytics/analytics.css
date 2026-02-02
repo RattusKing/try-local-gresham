@@ -343,6 +343,288 @@
   padding: 2rem;
 }
 
+/* Views Chart */
+.views-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 220px;
+  padding: 1rem 0;
+  overflow-x: auto;
+}
+
+.empty-chart {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Section subtitle */
+.section-subtitle {
+  margin: -1rem 0 1.5rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Click Breakdown */
+.click-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.click-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.click-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  text-align: center;
+}
+
+.click-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.click-info strong {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.click-count {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.click-bar {
+  width: 80px;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.click-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.click-bar-fill.phone {
+  background: #10b981;
+}
+
+.click-bar-fill.email {
+  background: #3b82f6;
+}
+
+.click-bar-fill.website {
+  background: #8b5cf6;
+}
+
+.click-bar-fill.map {
+  background: #f59e0b;
+}
+
+/* Device Breakdown */
+.device-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.device-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  text-align: center;
+}
+
+.device-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.device-info strong {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.device-percent {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ff7a00;
+}
+
+.device-count {
+  font-size: 0.75rem;
+  color: #6b7280;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Referrers List */
+.referrers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.referrer-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.referrer-rank {
+  width: 24px;
+  height: 24px;
+  background: #ff7a00;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.referrer-source {
+  flex: 1;
+  font-weight: 500;
+  color: #374151;
+}
+
+.referrer-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.activity-icon {
+  font-size: 1.25rem;
+}
+
+.activity-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activity-content strong {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.activity-detail {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.activity-date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.empty-activity {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+/* Tips Section */
+.tips-section {
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  border: 1px solid #fbbf24;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.tip-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tip-icon {
+  font-size: 1.5rem;
+}
+
+.tip-content {
+  flex: 1;
+}
+
+.tip-content strong {
+  display: block;
+  font-size: 0.875rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.tip-content p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Status badge for no_show */
+.status-badge.no_show {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
 @media (max-width: 768px) {
   .analytics-header {
     flex-direction: column;

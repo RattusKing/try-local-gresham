@@ -298,6 +298,20 @@ service cloud.firestore {
                         isAdmin());
     }
 
+    // Analytics Events collection (for business performance tracking)
+    match /analyticsEvents/{eventId} {
+      // Business owners can read analytics for their own business
+      // Admins can read all analytics
+      allow read: if isSignedIn() &&
+                     (resource.data.businessId == request.auth.uid || isAdmin());
+
+      // Anyone can create analytics events (anonymous tracking allowed)
+      allow create: if true;
+
+      // No updates or deletes allowed (analytics are immutable)
+      allow update, delete: if false;
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
