@@ -91,6 +91,61 @@ export const trackSearchAppearance = async (
   await trackEvent(businessId, 'search_appearance', { searchQuery })
 }
 
+// Track search queries (for understanding what users are looking for)
+export const trackSearchQuery = async (
+  searchQuery: string
+): Promise<void> => {
+  if (!db || !searchQuery.trim()) return
+
+  try {
+    // Store search queries in a separate collection for analysis
+    addDoc(collection(db, 'searchQueries'), {
+      query: searchQuery.trim().toLowerCase(),
+      timestamp: Timestamp.fromDate(new Date()),
+      sessionId: getSessionId(),
+      deviceType: getDeviceType(),
+    }).catch((err) => {
+      console.warn('Search tracking failed:', err)
+    })
+  } catch (err) {
+    console.warn('Search tracking error:', err)
+  }
+}
+
+// Fetch popular search queries (for admin dashboard)
+export const fetchPopularSearchQueries = async (
+  daysBack: number = 30,
+  limitCount: number = 20
+): Promise<Array<{ query: string; count: number }>> => {
+  if (!db) return []
+
+  try {
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - daysBack)
+
+    const searchQuery = query(
+      collection(db, 'searchQueries'),
+      where('timestamp', '>=', Timestamp.fromDate(startDate))
+    )
+
+    const snapshot = await getDocs(searchQuery)
+    const queryCounts = new Map<string, number>()
+
+    snapshot.forEach(doc => {
+      const q = doc.data().query
+      queryCounts.set(q, (queryCounts.get(q) || 0) + 1)
+    })
+
+    return Array.from(queryCounts.entries())
+      .map(([query, count]) => ({ query, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limitCount)
+  } catch (err) {
+    console.error('Error fetching search queries:', err)
+    return []
+  }
+}
+
 // Fetch analytics data for a business
 export interface AnalyticsData {
   // Today

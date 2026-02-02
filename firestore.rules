@@ -333,6 +333,18 @@ service cloud.firestore {
                        (resource.data.businessId == request.auth.uid || isAdmin());
     }
 
+    // Search Queries collection (for tracking what users search for)
+    match /searchQueries/{queryId} {
+      // Only admins can read search queries (for analytics)
+      allow read: if isAdmin();
+
+      // Anyone can create search queries (anonymous tracking)
+      allow create: if true;
+
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
+
     // Block all other collections by default
     match /{document=**} {
       allow read, write: if false;
