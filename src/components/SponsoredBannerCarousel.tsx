@@ -101,6 +101,45 @@ export default function SponsoredBannerCarousel() {
   }
 
   const currentBanner = banners[currentIndex]
+  const isTestBanner = currentBanner?.businessId?.startsWith('test-')
+
+  // Render the banner content (used for both test and real banners)
+  const renderBannerContent = () => (
+    <>
+      <div
+        className="sponsored-banner-image"
+        style={{
+          backgroundImage: currentBanner.businessCover
+            ? `url(${currentBanner.businessCover})`
+            : 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)'
+        }}
+      >
+        <div className="sponsored-banner-overlay" />
+        {isTestBanner && (
+          <span className="test-banner-badge">Test Banner</span>
+        )}
+      </div>
+      <div className="sponsored-banner-content">
+        <h3 className="sponsored-banner-name">{currentBanner.businessName}</h3>
+        {currentBanner.headline && (
+          <p className="sponsored-banner-headline">{currentBanner.headline}</p>
+        )}
+        {!isTestBanner && (
+          <span className="sponsored-banner-cta">
+            Visit Business
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </span>
+        )}
+        {isTestBanner && (
+          <span className="sponsored-banner-cta" style={{ color: 'var(--muted)' }}>
+            Sponsored Placement Preview
+          </span>
+        )}
+      </div>
+    </>
+  )
 
   return (
     <section
@@ -132,34 +171,19 @@ export default function SponsoredBannerCarousel() {
             </button>
           )}
 
-          {/* Banner Content */}
-          <Link
-            href={`/business/${currentBanner.businessId}`}
-            className={`sponsored-banner-card ${isTransitioning ? 'transitioning' : ''}`}
-          >
-            <div
-              className="sponsored-banner-image"
-              style={{
-                backgroundImage: currentBanner.businessCover
-                  ? `url(${currentBanner.businessCover})`
-                  : 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)'
-              }}
+          {/* Banner Content - Link for real banners, div for test banners */}
+          {isTestBanner ? (
+            <div className={`sponsored-banner-card ${isTransitioning ? 'transitioning' : ''}`}>
+              {renderBannerContent()}
+            </div>
+          ) : (
+            <Link
+              href={`/business/${currentBanner.businessId}`}
+              className={`sponsored-banner-card ${isTransitioning ? 'transitioning' : ''}`}
             >
-              <div className="sponsored-banner-overlay" />
-            </div>
-            <div className="sponsored-banner-content">
-              <h3 className="sponsored-banner-name">{currentBanner.businessName}</h3>
-              {currentBanner.headline && (
-                <p className="sponsored-banner-headline">{currentBanner.headline}</p>
-              )}
-              <span className="sponsored-banner-cta">
-                Visit Business
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            </div>
-          </Link>
+              {renderBannerContent()}
+            </Link>
+          )}
 
           {/* Next Button */}
           {banners.length > 1 && (
@@ -300,6 +324,21 @@ export default function SponsoredBannerCarousel() {
           position: absolute;
           inset: 0;
           background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 100%);
+        }
+
+        .test-banner-badge {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background: #fbbf24;
+          color: #78350f;
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          z-index: 5;
         }
 
         .sponsored-banner-content {
