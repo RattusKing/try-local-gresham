@@ -557,6 +557,32 @@ export default function BusinessProfilePage() {
         </div>
         <div className="business-hero-overlay">
           <div className="business-hero-content">
+            {business.logo && (
+              <motion.div
+                className="business-hero-logo"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15 }}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '3px solid white',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  marginBottom: '0.75rem',
+                  position: 'relative',
+                }}
+              >
+                <Image
+                  src={business.logo}
+                  alt={`${business.name} logo`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="80px"
+                />
+              </motion.div>
+            )}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
