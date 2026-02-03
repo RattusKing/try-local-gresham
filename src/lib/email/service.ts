@@ -377,6 +377,124 @@ export async function sendBusinessRejected(params: {
   })
 }
 
+// New quote request notification to business
+export async function sendNewQuoteRequestNotification(params: {
+  businessEmail: string
+  businessName: string
+  customerName: string
+  customerEmail: string
+  customerPhone?: string
+  serviceType: string
+  description: string
+  urgency: 'urgent' | 'standard' | 'flexible'
+  preferredContact: 'email' | 'phone'
+}) {
+  const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/business/quotes`
+    : 'https://try-local.com/dashboard/business/quotes'
+
+  const urgencyColors = {
+    urgent: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', label: 'URGENT - Needs help ASAP' },
+    standard: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', label: 'Standard - Within a week' },
+    flexible: { bg: '#d1fae5', border: '#10b981', text: '#065f46', label: 'Flexible - No rush' },
+  }
+
+  const urgencyStyle = urgencyColors[params.urgency]
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>New Quote Request</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f9fafb; margin: 0; padding: 0;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 24px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 24px;">New Quote Request!</h1>
+              <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">Someone is interested in your services</p>
+            </div>
+
+            <!-- Body -->
+            <div style="padding: 24px;">
+
+              <!-- Urgency Badge -->
+              <div style="background: ${urgencyStyle.bg}; border-left: 4px solid ${urgencyStyle.border}; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0; color: ${urgencyStyle.text}; font-weight: bold; font-size: 14px;">${urgencyStyle.label}</p>
+              </div>
+
+              <!-- Service Type -->
+              <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Service Requested</p>
+                <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${params.serviceType}</p>
+              </div>
+
+              <!-- Description -->
+              <div style="margin-bottom: 20px;">
+                <p style="margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Project Details</p>
+                <p style="margin: 0; color: #374151; line-height: 1.6;">${params.description}</p>
+              </div>
+
+              <!-- Customer Info -->
+              <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600;">Customer Contact</p>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 4px 0; color: #6b7280; font-size: 14px; width: 120px;">Name:</td>
+                    <td style="padding: 4px 0; font-weight: 600; font-size: 14px;">${params.customerName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">Email:</td>
+                    <td style="padding: 4px 0; font-size: 14px;"><a href="mailto:${params.customerEmail}" style="color: #059669;">${params.customerEmail}</a></td>
+                  </tr>
+                  ${params.customerPhone ? `
+                  <tr>
+                    <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">Phone:</td>
+                    <td style="padding: 4px 0; font-size: 14px;"><a href="tel:${params.customerPhone}" style="color: #059669;">${params.customerPhone}</a></td>
+                  </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="padding: 4px 0; color: #6b7280; font-size: 14px;">Prefers:</td>
+                    <td style="padding: 4px 0; font-weight: 600; font-size: 14px;">${params.preferredContact === 'phone' ? 'Phone Call' : 'Email'}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- CTA -->
+              <div style="text-align: center; margin: 24px 0;">
+                <a href="${dashboardUrl}"
+                   style="display: inline-block; background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                  View Quote Request
+                </a>
+              </div>
+
+              <p style="text-align: center; color: #9ca3af; font-size: 13px; margin: 0;">
+                Respond quickly to improve your chances of winning the job!
+              </p>
+            </div>
+
+            <!-- Footer -->
+            <div style="background: #f9fafb; padding: 16px 24px; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; font-size: 12px; color: #9ca3af; text-align: center;">
+                Sent via <a href="https://try-local.com" style="color: #059669;">Try Local Gresham</a> &bull; Supporting local businesses
+              </p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+
+  return sendEmail({
+    to: params.businessEmail,
+    subject: `New Quote Request - ${params.serviceType} (${params.customerName})`,
+    html,
+  })
+}
+
 // Appointment confirmation email to customer
 export async function sendAppointmentConfirmation(params: {
   customerEmail: string
