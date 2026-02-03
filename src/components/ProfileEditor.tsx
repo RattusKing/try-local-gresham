@@ -132,8 +132,10 @@ export default function ProfileEditor() {
       const filename = `${type}_${timestamp}_${file.name}`
       const storageRef = ref(storage, `users/${user.uid}/${filename}`)
 
-      // Upload file
-      await uploadBytes(storageRef, file)
+      // Upload file with explicit content type metadata
+      await uploadBytes(storageRef, file, {
+        contentType: file.type,
+      })
 
       // Get download URL
       const downloadURL = await getDownloadURL(storageRef)

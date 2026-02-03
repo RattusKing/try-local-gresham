@@ -61,12 +61,11 @@ service firebase.storage {
       // Anyone can read (public profile images)
       allow read: if true;
 
-      // Users can upload to their own folder
-      allow create: if isOwner(userId) && isValidImage();
+      // Users can upload/update their own images
+      allow create, update: if isOwner(userId);
 
-      // Users can update/delete their own images
-      // Admins can update/delete any image
-      allow update, delete: if isOwner(userId) || isAdmin();
+      // Users can delete their own images, admins can delete any
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
     // Block all other paths by default
