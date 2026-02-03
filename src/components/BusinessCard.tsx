@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Business } from '@/lib/types'
 import StarRating from './StarRating'
 
@@ -30,11 +31,34 @@ export default function BusinessCard({
     >
       <div
         className="cover"
-        style={{ backgroundImage: `url('${bg}')` }}
+        style={{ backgroundImage: `url('${bg}')`, position: 'relative' }}
         role="img"
         aria-label={business.name}
-      />
-      <div className="content">
+      >
+        {business.logo && (
+          <div style={{
+            position: 'absolute',
+            bottom: '-24px',
+            left: '16px',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            border: '2px solid white',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            zIndex: 2,
+          }}>
+            <Image
+              src={business.logo}
+              alt={`${business.name} logo`}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="48px"
+            />
+          </div>
+        )}
+      </div>
+      <div className="content" style={business.logo ? { paddingTop: '1.75rem' } : undefined}>
         <h3>{business.name}</h3>
         {business.averageRating && business.reviewCount ? (
           <div className="card-rating">

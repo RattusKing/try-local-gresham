@@ -25,6 +25,7 @@ export default function BusinessDashboard() {
   const [uploading, setUploading] = useState(false)
   const [uploadingHeader, setUploadingHeader] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -305,6 +306,45 @@ export default function BusinessDashboard() {
       }
     } catch (err: any) {
       setError(err.message)
+    }
+  }
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !user || !storage || !db)
+      return
+
+    const file = e.target.files[0]
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size must be less than 5MB')
+      return
+    }
+
+    try {
+      setUploadingLogo(true)
+      setError('')
+
+      const storageRef = ref(storage, `businesses/${user.uid}/logo_${Date.now()}_${file.name}`)
+      await uploadBytes(storageRef, file)
+      const downloadURL = await getDownloadURL(storageRef)
+
+      const businessRef = doc(db, 'businesses', user.uid)
+      await updateDoc(businessRef, {
+        logo: downloadURL,
+        updatedAt: new Date(),
+      })
+
+      setSuccess('Business logo uploaded successfully!')
+      await loadBusiness()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setUploadingLogo(false)
     }
   }
 
@@ -635,6 +675,35 @@ export default function BusinessDashboard() {
                 }
                 placeholder="@yourbusiness"
               />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2>Business Logo / Profile Picture</h2>
+            <p className="form-hint" style={{ marginBottom: '1rem' }}>
+              Your business logo or profile picture. This appears on your business card and profile. Recommended: square image, at least 200x200px.
+            </p>
+            {business?.logo && (
+              <div className="current-image" style={{ position: 'relative', width: '150px', height: '150px', marginBottom: '1rem' }}>
+                <Image
+                  src={business.logo}
+                  alt={`${business.name} logo`}
+                  fill
+                  style={{ objectFit: 'cover', borderRadius: '50%', border: '3px solid var(--primary)' }}
+                  sizes="150px"
+                />
+              </div>
+            )}
+            <div className="form-group">
+              <label htmlFor="logo">Upload Logo / Profile Picture</label>
+              <input
+                type="file"
+                id="logo"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                disabled={uploadingLogo}
+              />
+              {uploadingLogo && <p className="upload-status">Uploading...</p>}
             </div>
           </div>
 

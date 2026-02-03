@@ -8,6 +8,7 @@ export interface Business {
   website: string
   map: string
   cover: string
+  logo?: string // Business logo/profile picture
   headerImage?: string // Header/banner image separate from cover
   gallery?: string[] // Array of additional business images
   description?: string
