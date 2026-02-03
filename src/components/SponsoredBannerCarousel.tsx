@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs, getDoc, doc, Timestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
 import { SponsoredBanner } from '@/lib/types'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import Image from 'next/image'
 interface SponsoredBannerWithBusiness extends SponsoredBanner {
   businessTags?: string[]
   businessNeighborhood?: string
+  businessLogo?: string
 }
 
 export default function SponsoredBannerCarousel() {
@@ -37,8 +38,8 @@ export default function SponsoredBannerCarousel() {
       const snapshot = await getDocs(q)
       const activeBanners: SponsoredBannerWithBusiness[] = []
 
-      snapshot.forEach((doc) => {
-        const data = doc.data()
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data()
         const startDate = data.startDate instanceof Timestamp
           ? data.startDate.toDate()
           : new Date(data.startDate)
@@ -46,20 +47,35 @@ export default function SponsoredBannerCarousel() {
           ? data.endDate.toDate()
           : new Date(data.endDate)
 
-        // Only include banners within their active date range
         if (now >= startDate && now <= endDate) {
+          // Fetch business data for logo
+          let businessLogo: string | undefined
+          let businessTags: string[] | undefined
+          let businessNeighborhood: string | undefined
+          try {
+            const bizDoc = await getDoc(doc(db, 'businesses', data.businessId))
+            if (bizDoc.exists()) {
+              const bizData = bizDoc.data()
+              businessLogo = bizData.logo
+              businessTags = bizData.tags
+              businessNeighborhood = bizData.neighborhood
+            }
+          } catch {}
+
           activeBanners.push({
-            id: doc.id,
+            id: docSnap.id,
             ...data,
             startDate,
             endDate,
+            businessLogo,
+            businessTags,
+            businessNeighborhood,
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
             updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(data.updatedAt),
           } as SponsoredBannerWithBusiness)
         }
-      })
+      }
 
-      // Shuffle the banners for variety
       const shuffled = activeBanners.sort(() => Math.random() - 0.5)
       setBanners(shuffled)
     } catch (error) {
@@ -73,7 +89,7 @@ export default function SponsoredBannerCarousel() {
     setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % banners.length)
       setIsTransitioning(false)
-    }, 400)
+    }, 300)
   }, [banners.length])
 
   const goToPrev = useCallback(() => {
@@ -82,134 +98,121 @@ export default function SponsoredBannerCarousel() {
     setTimeout(() => {
       setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length)
       setIsTransitioning(false)
-    }, 400)
+    }, 300)
   }, [banners.length])
 
-  // Auto-rotate every 6 seconds
+  // Auto-rotate every 5 seconds
   useEffect(() => {
     if (banners.length <= 1 || isPaused) return
-
-    const interval = setInterval(() => {
-      goToNext()
-    }, 6000)
-
+    const interval = setInterval(goToNext, 5000)
     return () => clearInterval(interval)
   }, [banners.length, isPaused, goToNext])
 
-  // Don't render if no active banners
-  if (banners.length === 0) {
-    return null
-  }
+  if (banners.length === 0) return null
 
-  const currentBanner = banners[currentIndex]
-  const isTestBanner = currentBanner?.businessId?.startsWith('test-')
+  const banner = banners[currentIndex]
+  const isTest = banner?.businessId?.startsWith('test-')
 
-  // Render the banner content
-  const renderBannerContent = () => (
-    <div className="sponsored-hero">
-      {/* Background Image with Parallax Effect */}
-      <div className="sponsored-bg">
-        {currentBanner.businessCover ? (
+  const content = (
+    <div className="sp-banner-inner">
+      {/* Background image */}
+      <div className="sp-banner-bg">
+        {banner.businessCover ? (
           <Image
-            src={currentBanner.businessCover}
-            alt={currentBanner.businessName}
+            src={banner.businessCover}
+            alt={banner.businessName}
             fill
             style={{ objectFit: 'cover' }}
-            priority
+            sizes="(max-width: 768px) 100vw, 1200px"
           />
         ) : (
-          <div className="sponsored-bg-gradient" />
+          <div className="sp-banner-bg-fallback" />
         )}
-        <div className="sponsored-overlay" />
-        <div className="sponsored-shimmer" />
+        <div className="sp-banner-overlay" />
       </div>
 
-      {/* Content */}
-      <div className="sponsored-content">
-        {/* Premium Badge */}
-        <div className="sponsored-badge-wrapper">
-          <span className="sponsored-badge">
-            <svg className="sponsored-star" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-            Featured Business
-            <svg className="sponsored-star" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-          </span>
-          {isTestBanner && (
-            <span className="test-badge">Preview Mode</span>
-          )}
-        </div>
-
-        {/* Business Info Card */}
-        <div className="sponsored-card">
-          <h2 className="sponsored-name">{currentBanner.businessName}</h2>
-          {currentBanner.headline && (
-            <p className="sponsored-headline">{currentBanner.headline}</p>
-          )}
-          <div className="sponsored-cta-wrapper">
-            {!isTestBanner ? (
-              <span className="sponsored-cta">
-                Discover More
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            ) : (
-              <span className="sponsored-cta-preview">
-                This is how your business could look
-              </span>
-            )}
+      {/* Content row */}
+      <div className="sp-banner-content">
+        {/* Logo */}
+        {(banner.businessLogo || banner.businessCover) && (
+          <div className="sp-banner-logo">
+            <Image
+              src={banner.businessLogo || banner.businessCover || ''}
+              alt={`${banner.businessName} logo`}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="56px"
+            />
           </div>
+        )}
+
+        {/* Text */}
+        <div className="sp-banner-text">
+          <div className="sp-banner-label">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            </svg>
+            Featured
+          </div>
+          <h3 className="sp-banner-name">{banner.businessName}</h3>
+          {banner.headline && (
+            <p className="sp-banner-headline">{banner.headline}</p>
+          )}
         </div>
 
-        {/* Decorative Elements */}
-        <div className="sponsored-decor sponsored-decor-1" />
-        <div className="sponsored-decor sponsored-decor-2" />
+        {/* CTA */}
+        <div className="sp-banner-cta-area">
+          {!isTest ? (
+            <span className="sp-banner-cta">
+              Visit
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </span>
+          ) : (
+            <span className="sp-banner-preview">Preview</span>
+          )}
+        </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation arrows */}
       {banners.length > 1 && (
         <>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToPrev(); }}
-            className="sponsored-nav sponsored-nav-prev"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToPrev() }}
+            className="sp-banner-nav sp-banner-nav-prev"
             aria-label="Previous"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToNext(); }}
-            className="sponsored-nav sponsored-nav-next"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToNext() }}
+            className="sp-banner-nav sp-banner-nav-next"
             aria-label="Next"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
         </>
       )}
 
-      {/* Progress Dots */}
+      {/* Dots */}
       {banners.length > 1 && (
-        <div className="sponsored-progress">
-          {banners.map((_, index) => (
+        <div className="sp-banner-dots">
+          {banners.map((_, i) => (
             <button
-              key={index}
+              key={i}
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
                 setIsTransitioning(true)
-                setTimeout(() => {
-                  setCurrentIndex(index)
-                  setIsTransitioning(false)
-                }, 400)
+                setTimeout(() => { setCurrentIndex(i); setIsTransitioning(false) }, 300)
               }}
-              className={`sponsored-dot ${index === currentIndex ? 'active' : ''}`}
-              aria-label={`Go to slide ${index + 1}`}
+              className={`sp-banner-dot ${i === currentIndex ? 'active' : ''}`}
+              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
@@ -219,309 +222,238 @@ export default function SponsoredBannerCarousel() {
 
   return (
     <section
-      className="sponsored-section"
+      className="sp-banner-section"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {isTestBanner ? (
-        <div className={`sponsored-wrapper ${isTransitioning ? 'transitioning' : ''}`}>
-          {renderBannerContent()}
+      {isTest ? (
+        <div className={`sp-banner-wrapper ${isTransitioning ? 'transitioning' : ''}`}>
+          {content}
         </div>
       ) : (
         <Link
-          href={`/business/${currentBanner.businessId}`}
-          className={`sponsored-wrapper ${isTransitioning ? 'transitioning' : ''}`}
+          href={`/business/${banner.businessId}`}
+          className={`sp-banner-wrapper ${isTransitioning ? 'transitioning' : ''}`}
         >
-          {renderBannerContent()}
+          {content}
         </Link>
       )}
 
       <style jsx>{`
-        .sponsored-section {
-          padding: 0;
-          margin: 0 auto 2rem;
-          max-width: 1400px;
+        .sp-banner-section {
+          max-width: 800px;
+          margin: 0 auto 1.5rem;
           padding: 0 1rem;
         }
 
-        .sponsored-wrapper {
+        .sp-banner-wrapper {
           display: block;
           text-decoration: none;
           color: inherit;
-          border-radius: 24px;
+          border-radius: 14px;
           overflow: hidden;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow:
-            0 4px 6px -1px rgba(0, 0, 0, 0.1),
-            0 20px 50px -12px rgba(0, 0, 0, 0.25);
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
         }
 
-        .sponsored-wrapper:hover {
-          transform: translateY(-4px);
-          box-shadow:
-            0 8px 12px -1px rgba(0, 0, 0, 0.15),
-            0 30px 60px -12px rgba(0, 0, 0, 0.35);
+        .sp-banner-wrapper:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
         }
 
-        .sponsored-wrapper.transitioning {
+        .sp-banner-wrapper.transitioning {
           opacity: 0;
           transform: scale(0.98);
         }
 
-        .sponsored-hero {
+        .sp-banner-inner {
           position: relative;
-          min-height: 320px;
+          height: 120px;
           display: flex;
           align-items: center;
-          justify-content: center;
           overflow: hidden;
         }
 
-        .sponsored-bg {
+        .sp-banner-bg {
           position: absolute;
           inset: 0;
           z-index: 0;
         }
 
-        .sponsored-bg :global(img) {
-          transition: transform 8s ease-out;
+        .sp-banner-bg :global(img) {
+          transition: transform 6s ease-out;
         }
 
-        .sponsored-wrapper:hover .sponsored-bg :global(img) {
+        .sp-banner-wrapper:hover .sp-banner-bg :global(img) {
           transform: scale(1.05);
         }
 
-        .sponsored-bg-gradient {
+        .sp-banner-bg-fallback {
           position: absolute;
           inset: 0;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .sponsored-overlay {
+        .sp-banner-overlay {
           position: absolute;
           inset: 0;
           background: linear-gradient(
-            135deg,
-            rgba(0, 0, 0, 0.7) 0%,
-            rgba(0, 0, 0, 0.4) 50%,
-            rgba(0, 0, 0, 0.6) 100%
+            90deg,
+            rgba(0, 0, 0, 0.75) 0%,
+            rgba(0, 0, 0, 0.5) 50%,
+            rgba(0, 0, 0, 0.3) 100%
           );
           z-index: 1;
         }
 
-        .sponsored-shimmer {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            110deg,
-            transparent 20%,
-            rgba(255, 255, 255, 0.05) 40%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.05) 60%,
-            transparent 80%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 3s ease-in-out infinite;
-          z-index: 2;
-        }
-
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        .sponsored-content {
+        .sp-banner-content {
           position: relative;
           z-index: 10;
-          text-align: center;
-          padding: 3rem 2rem;
-          max-width: 700px;
-        }
-
-        .sponsored-badge-wrapper {
           display: flex;
           align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          margin-bottom: 1.5rem;
+          gap: 1rem;
+          padding: 0 1.5rem;
+          width: 100%;
         }
 
-        .sponsored-badge {
+        .sp-banner-logo {
+          position: relative;
+          width: 56px;
+          height: 56px;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 2px solid rgba(255, 255, 255, 0.4);
+          flex-shrink: 0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .sp-banner-text {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .sp-banner-label {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.9), rgba(245, 158, 11, 0.9));
-          color: #78350f;
-          font-size: 0.7rem;
+          gap: 0.3rem;
+          font-size: 0.6rem;
           font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.15em;
-          padding: 0.5rem 1rem;
-          border-radius: 100px;
-          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+          letter-spacing: 0.12em;
+          color: #fbbf24;
+          margin-bottom: 0.2rem;
         }
 
-        .sponsored-star {
-          width: 12px;
-          height: 12px;
+        .sp-banner-label svg {
+          width: 9px;
+          height: 9px;
         }
 
-        .test-badge {
-          background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(10px);
-          color: white;
-          font-size: 0.65rem;
+        .sp-banner-name {
+          margin: 0;
+          font-size: 1.25rem;
           font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 0.4rem 0.8rem;
-          border-radius: 100px;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .sponsored-card {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 20px;
-          padding: 2rem 2.5rem;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .sponsored-name {
-          margin: 0 0 0.75rem;
-          font-size: 2.5rem;
-          font-weight: 800;
           color: white;
-          text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.3;
         }
 
-        .sponsored-headline {
-          margin: 0 0 1.25rem;
-          font-size: 1.1rem;
-          color: rgba(255, 255, 255, 0.9);
-          line-height: 1.6;
-          font-weight: 400;
+        .sp-banner-headline {
+          margin: 0.15rem 0 0;
+          font-size: 0.8rem;
+          color: rgba(255, 255, 255, 0.75);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.4;
         }
 
-        .sponsored-cta-wrapper {
-          display: flex;
-          justify-content: center;
+        .sp-banner-cta-area {
+          flex-shrink: 0;
         }
 
-        .sponsored-cta {
+        .sp-banner-cta {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.35rem;
           background: linear-gradient(135deg, #fbbf24, #f59e0b);
           color: #78350f;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-weight: 700;
-          padding: 0.75rem 1.5rem;
+          padding: 0.5rem 1rem;
           border-radius: 100px;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+          transition: all 0.2s ease;
         }
 
-        .sponsored-cta svg {
-          width: 18px;
-          height: 18px;
-          transition: transform 0.3s ease;
+        .sp-banner-cta svg {
+          width: 14px;
+          height: 14px;
+          transition: transform 0.2s;
         }
 
-        .sponsored-wrapper:hover .sponsored-cta {
-          transform: scale(1.05);
-          box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+        .sp-banner-wrapper:hover .sp-banner-cta svg {
+          transform: translateX(2px);
         }
 
-        .sponsored-wrapper:hover .sponsored-cta svg {
-          transform: translateX(4px);
-        }
-
-        .sponsored-cta-preview {
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 0.85rem;
+        .sp-banner-preview {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.5);
           font-style: italic;
         }
 
-        .sponsored-decor {
-          position: absolute;
-          border-radius: 50%;
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.1));
-          filter: blur(40px);
-          pointer-events: none;
-        }
-
-        .sponsored-decor-1 {
-          width: 200px;
-          height: 200px;
-          top: -50px;
-          left: -50px;
-        }
-
-        .sponsored-decor-2 {
-          width: 150px;
-          height: 150px;
-          bottom: -30px;
-          right: -30px;
-        }
-
-        .sponsored-nav {
+        /* Nav Arrows */
+        .sp-banner-nav {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
           z-index: 20;
-          width: 48px;
-          height: 48px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(4px);
           border: 1px solid rgba(255, 255, 255, 0.2);
           color: white;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s ease;
           opacity: 0;
+          transition: all 0.2s ease;
         }
 
-        .sponsored-hero:hover .sponsored-nav {
+        .sp-banner-inner:hover .sp-banner-nav {
           opacity: 1;
         }
 
-        .sponsored-nav:hover {
-          background: rgba(255, 255, 255, 0.25);
-          transform: translateY(-50%) scale(1.1);
+        .sp-banner-nav:hover {
+          background: rgba(255, 255, 255, 0.3);
         }
 
-        .sponsored-nav svg {
-          width: 24px;
-          height: 24px;
+        .sp-banner-nav svg {
+          width: 14px;
+          height: 14px;
         }
 
-        .sponsored-nav-prev {
-          left: 1.5rem;
-        }
+        .sp-banner-nav-prev { left: 0.5rem; }
+        .sp-banner-nav-next { right: 0.5rem; }
 
-        .sponsored-nav-next {
-          right: 1.5rem;
-        }
-
-        .sponsored-progress {
+        /* Dots */
+        .sp-banner-dots {
           position: absolute;
-          bottom: 1.5rem;
+          bottom: 0.5rem;
           left: 50%;
           transform: translateX(-50%);
           z-index: 20;
           display: flex;
-          gap: 0.5rem;
+          gap: 0.35rem;
         }
 
-        .sponsored-dot {
-          width: 32px;
-          height: 4px;
+        .sp-banner-dot {
+          width: 20px;
+          height: 3px;
           border-radius: 100px;
           background: rgba(255, 255, 255, 0.3);
           border: none;
@@ -530,114 +462,66 @@ export default function SponsoredBannerCarousel() {
           transition: all 0.3s ease;
         }
 
-        .sponsored-dot.active {
-          background: linear-gradient(135deg, #fbbf24, #f59e0b);
-          width: 48px;
+        .sp-banner-dot.active {
+          background: #fbbf24;
+          width: 32px;
         }
 
-        .sponsored-dot:hover {
+        .sp-banner-dot:hover {
           background: rgba(255, 255, 255, 0.5);
         }
 
-        .sponsored-dot.active:hover {
-          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        .sp-banner-dot.active:hover {
+          background: #fbbf24;
         }
 
-        @media (max-width: 768px) {
-          .sponsored-section {
+        @media (max-width: 640px) {
+          .sp-banner-section {
             padding: 0 0.75rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
           }
 
-          .sponsored-wrapper {
-            border-radius: 16px;
+          .sp-banner-wrapper {
+            border-radius: 10px;
           }
 
-          .sponsored-hero {
-            min-height: 280px;
+          .sp-banner-inner {
+            height: 100px;
           }
 
-          .sponsored-content {
-            padding: 2rem 1.5rem;
+          .sp-banner-content {
+            gap: 0.75rem;
+            padding: 0 1rem;
           }
 
-          .sponsored-badge {
-            font-size: 0.6rem;
-            padding: 0.4rem 0.8rem;
+          .sp-banner-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
           }
 
-          .sponsored-star {
-            width: 10px;
-            height: 10px;
+          .sp-banner-name {
+            font-size: 1rem;
           }
 
-          .sponsored-card {
-            padding: 1.5rem;
-            border-radius: 16px;
+          .sp-banner-headline {
+            font-size: 0.75rem;
           }
 
-          .sponsored-name {
-            font-size: 1.75rem;
+          .sp-banner-cta {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.75rem;
           }
 
-          .sponsored-headline {
-            font-size: 0.95rem;
-          }
-
-          .sponsored-cta {
-            font-size: 0.85rem;
-            padding: 0.65rem 1.25rem;
-          }
-
-          .sponsored-nav {
-            width: 40px;
-            height: 40px;
+          .sp-banner-nav {
             opacity: 1;
-          }
-
-          .sponsored-nav svg {
-            width: 20px;
-            height: 20px;
-          }
-
-          .sponsored-nav-prev {
-            left: 0.75rem;
-          }
-
-          .sponsored-nav-next {
-            right: 0.75rem;
-          }
-
-          .sponsored-progress {
-            bottom: 1rem;
-          }
-
-          .sponsored-dot {
             width: 24px;
-            height: 3px;
+            height: 24px;
           }
 
-          .sponsored-dot.active {
-            width: 36px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .sponsored-hero {
-            min-height: 260px;
-          }
-
-          .sponsored-badge-wrapper {
-            flex-direction: column;
-            gap: 0.5rem;
-          }
-
-          .sponsored-name {
-            font-size: 1.5rem;
-          }
-
-          .sponsored-headline {
-            font-size: 0.9rem;
+          .sp-banner-nav svg {
+            width: 12px;
+            height: 12px;
           }
         }
       `}</style>

@@ -311,62 +311,28 @@ export default function Home() {
       </div>
 
       <main id="main-content">
-        <Hero onSearch={handleSearch} categories={categories} businesses={businesses} />
+        <Hero
+          onSearch={handleSearch}
+          categories={categories}
+          businesses={businesses}
+          neighborhoods={neighborhoods}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedNeighborhood={selectedNeighborhood}
+          onNeighborhoodChange={setSelectedNeighborhood}
+          sortBy={sortBy}
+          onSortChange={(val) => setSortBy(val as 'name' | 'rating' | 'newest')}
+        />
 
         {/* Sponsored Business Carousel */}
         <SponsoredBannerCarousel />
 
         <section id="discover" className="section section-alt-light container">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">Discover</span>
-              <h2>Find Something Local</h2>
-              <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>
-                Explore businesses in Gresham
-              </p>
-            </div>
-          </div>
-
-          {/* Filters - Only show if businesses exist */}
+          {/* Active Filters and Result Count */}
           {!loading && businesses.length > 0 && (
-            <div style={{ marginBottom: '2rem' }}>
-              {/* Filter Controls */}
-              <div className="filter-controls">
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    aria-label="Filter by category"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={selectedNeighborhood}
-                    onChange={(e) => setSelectedNeighborhood(e.target.value)}
-                    aria-label="Filter by neighborhood"
-                  >
-                    <option value="">All Neighborhoods</option>
-                    {neighborhoods.map((hood) => (
-                      <option key={hood} value={hood}>{hood}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'name' | 'rating' | 'newest')}
-                    aria-label="Sort businesses"
-                  >
-                    <option value="name">Sort: A-Z</option>
-                    <option value="rating">Sort: Highest Rated</option>
-                    <option value="newest">Sort: Newest</option>
-                  </select>
-                </div>
-
-                {/* Active Filters and Clear - Only show if filters are actually active */}
-                {(searchQuery || selectedCategory || selectedNeighborhood || activeChips.size > 0) && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              {/* Active Filters and Clear - Only show if filters are actually active */}
+              {(searchQuery || selectedCategory || selectedNeighborhood || activeChips.size > 0) && (
                 <div style={{
                   display: 'flex',
                   gap: '0.5rem',
