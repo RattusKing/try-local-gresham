@@ -10,7 +10,6 @@ import AuthModal from '@/components/AuthModal'
 import PromoBanner from '@/components/PromoBanner'
 import SponsoredBannerCarousel from '@/components/SponsoredBannerCarousel'
 import CategoryFilterDropdown from '@/components/CategoryFilterDropdown'
-import SmartSearch from '@/components/SmartSearch'
 import { WebsiteSchema, OrganizationSchema } from '@/components/StructuredData'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
@@ -312,7 +311,7 @@ export default function Home() {
       </div>
 
       <main id="main-content">
-        <Hero onSearch={handleSearch} categories={categories} />
+        <Hero onSearch={handleSearch} categories={categories} businesses={businesses} />
 
         {/* Sponsored Business Carousel */}
         <SponsoredBannerCarousel />
@@ -328,24 +327,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Search and Filters - Only show if businesses exist */}
+          {/* Filters - Only show if businesses exist */}
           {!loading && businesses.length > 0 && (
             <div style={{ marginBottom: '2rem' }}>
-              {/* Smart Search with Autocomplete */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <SmartSearch
-                  businesses={businesses}
-                  categories={categories}
-                  onSearch={(query, category) => {
-                    setSearchQuery(query)
-                    if (category) setSelectedCategory(category)
-                    setActiveChips(new Set())
-                  }}
-                  showPopularTags={true}
-                />
-              </div>
-
-              {/* Additional Filters */}
+              {/* Filter Controls */}
               <div className="filter-controls">
                   <select
                     value={selectedCategory}

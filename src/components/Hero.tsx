@@ -1,21 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import SmartSearch from './SmartSearch'
+import type { Business } from '@/lib/types'
 
 interface HeroProps {
   onSearch: (query: string, category: string) => void
   categories: string[]
+  businesses: Business[]
 }
 
-export default function Hero({ onSearch, categories }: HeroProps) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const query = formData.get('search') as string
-    const category = formData.get('category') as string
-    onSearch(query, category)
-  }
-
+export default function Hero({ onSearch, categories, businesses }: HeroProps) {
   return (
     <section
       className="hero"
@@ -50,33 +45,19 @@ export default function Hero({ onSearch, categories }: HeroProps) {
             List My Business
           </a>
         </motion.div>
-        <motion.form
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          onSubmit={handleSubmit}
-          className="search-bar"
-          role="search"
-          aria-label="Search businesses"
         >
-          <input
-            name="search"
-            type="search"
-            placeholder="Search Gresham shops, restaurants, and services…"
-            aria-label="Search businesses"
+          <SmartSearch
+            businesses={businesses}
+            categories={categories}
+            onSearch={onSearch}
+            showPopularTags={true}
+            placeholder="Search Gresham shops, restaurants, and services..."
           />
-          <select name="category" aria-label="Filter by category">
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <button className="btn btn-primary" type="submit">
-            Search
-          </button>
-        </motion.form>
+        </motion.div>
       </motion.div>
     </section>
   )
