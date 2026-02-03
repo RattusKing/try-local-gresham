@@ -27,6 +27,7 @@ export default function DashboardNav() {
     if (!user || !db || user.role !== 'business_owner') return
 
     const fetchCounts = async () => {
+      if (!db) return
       try {
         // Count pending quote requests
         const quotesQuery = query(
