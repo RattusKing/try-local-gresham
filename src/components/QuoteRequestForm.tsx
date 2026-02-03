@@ -66,6 +66,25 @@ export default function QuoteRequestForm({
         serviceName: formData.serviceType,
       })
 
+      // Send email + push notification to business owner (fire and forget)
+      fetch('/api/notify/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          businessId,
+          businessName,
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          serviceType: formData.serviceType,
+          description: formData.description,
+          urgency: formData.urgency,
+          preferredContact: formData.preferredContact,
+        }),
+      }).catch(() => {
+        // Notification failures shouldn't block the user
+      })
+
       if (onSuccess) {
         onSuccess()
       }

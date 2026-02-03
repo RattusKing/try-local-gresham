@@ -3,15 +3,60 @@
 import { useAuth } from '@/lib/firebase/auth-context'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { db } from '@/lib/firebase/config'
+import { collection, query, where, getDocs } from 'firebase/firestore'
 import './DashboardNav.css'
+
+interface NavLink {
+  href: string
+  label: string
+  icon: string
+  badge?: number
+}
 
 export default function DashboardNav() {
   const { user } = useAuth()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [pendingQuotes, setPendingQuotes] = useState(0)
+  const [pendingAppointments, setPendingAppointments] = useState(0)
 
-  const adminLinks = [
+  // Fetch notification counts for business owners
+  useEffect(() => {
+    if (!user || !db || user.role !== 'business_owner') return
+
+    const fetchCounts = async () => {
+      try {
+        // Count pending quote requests
+        const quotesQuery = query(
+          collection(db, 'quoteRequests'),
+          where('businessId', '==', user.uid),
+          where('status', '==', 'pending')
+        )
+        const quotesSnap = await getDocs(quotesQuery)
+        setPendingQuotes(quotesSnap.size)
+
+        // Count pending appointments
+        const appointmentsQuery = query(
+          collection(db, 'appointments'),
+          where('businessId', '==', user.uid),
+          where('status', '==', 'pending')
+        )
+        const appointmentsSnap = await getDocs(appointmentsQuery)
+        setPendingAppointments(appointmentsSnap.size)
+      } catch (err) {
+        console.warn('Error fetching notification counts:', err)
+      }
+    }
+
+    fetchCounts()
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchCounts, 60000)
+    return () => clearInterval(interval)
+  }, [user])
+
+  const adminLinks: NavLink[] = [
     { href: '/dashboard/admin/profile', label: 'My Profile', icon: '👤' },
     { href: '/dashboard/admin', label: 'Business Approvals', icon: '✓' },
     { href: '/dashboard/admin/applications', label: 'Applications', icon: '📋' },
@@ -21,19 +66,20 @@ export default function DashboardNav() {
     { href: '/dashboard/admin/sponsored', label: 'Sponsored Banners', icon: '⭐' },
   ]
 
-  const businessLinks = [
+  const businessLinks: NavLink[] = [
     { href: '/dashboard/business/profile', label: 'My Profile', icon: '👤' },
     { href: '/dashboard/business', label: 'My Business', icon: '🏪' },
     { href: '/dashboard/business/products', label: 'Products', icon: '📦' },
     { href: '/dashboard/business/services', label: 'Services', icon: '📅' },
-    { href: '/dashboard/business/appointments', label: 'Appointments', icon: '🗓️' },
+    { href: '/dashboard/business/appointments', label: 'Appointments', icon: '🗓️', badge: pendingAppointments },
+    { href: '/dashboard/business/quotes', label: 'Quote Requests', icon: '📋', badge: pendingQuotes },
     { href: '/dashboard/business/orders', label: 'Orders', icon: '🛒' },
     { href: '/dashboard/business/analytics', label: 'Analytics', icon: '📊' },
     { href: '/dashboard/business/discounts', label: 'Discount Codes', icon: '🎟️' },
     { href: '/dashboard/business/settings', label: 'Settings', icon: '⚙️' },
   ]
 
-  const customerLinks = [
+  const customerLinks: NavLink[] = [
     { href: '/dashboard/customer', label: 'My Profile', icon: '👤' },
     { href: '/dashboard/customer/appointments', label: 'My Appointments', icon: '📅' },
     { href: '/dashboard/customer/orders', label: 'Order History', icon: '📦' },
@@ -46,6 +92,8 @@ export default function DashboardNav() {
       : user?.role === 'business_owner'
       ? businessLinks
       : customerLinks
+
+  const totalBadge = pendingQuotes + pendingAppointments
 
   return (
     <>
@@ -60,6 +108,9 @@ export default function DashboardNav() {
           <span></span>
           <span></span>
         </span>
+        {totalBadge > 0 && (
+          <span className="nav-toggle-badge">{totalBadge}</span>
+        )}
       </button>
 
       {/* Overlay for mobile */}
@@ -111,6 +162,9 @@ export default function DashboardNav() {
               >
                 <span className="dashboard-nav-link-icon">{link.icon}</span>
                 <span className="dashboard-nav-link-label">{link.label}</span>
+                {link.badge && link.badge > 0 ? (
+                  <span className="dashboard-nav-badge">{link.badge}</span>
+                ) : null}
               </Link>
             </li>
           ))}
