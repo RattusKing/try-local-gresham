@@ -122,8 +122,8 @@ export default function SponsoredBannerCarousel() {
             src={banner.businessCover}
             alt={banner.businessName}
             fill
-            style={{ objectFit: 'cover' }}
-            sizes="(max-width: 768px) 100vw, 1200px"
+            style={{ objectFit: 'contain' }}
+            sizes="(max-width: 768px) 100vw, 800px"
           />
         ) : (
           <div className="sp-banner-bg-fallback" />
@@ -272,6 +272,7 @@ export default function SponsoredBannerCarousel() {
           display: flex;
           align-items: center;
           overflow: hidden;
+          background: #1a1a2e;
         }
 
         .sp-banner-bg {
