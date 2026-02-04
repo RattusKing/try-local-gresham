@@ -97,11 +97,11 @@ export default function QuoteRequestForm({
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content quote-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="quote-overlay" onClick={onClose}>
+      <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="quote-modal-header">
           <h2>Request a Quote</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="quote-modal-close" onClick={onClose} aria-label="Close">×</button>
         </div>
 
         <div className="quote-business-name">
