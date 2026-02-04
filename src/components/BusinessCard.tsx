@@ -31,10 +31,17 @@ export default function BusinessCard({
     >
       <div
         className="cover"
-        style={{ backgroundImage: `url('${bg}')`, position: 'relative' }}
+        style={{ position: 'relative', backgroundColor: '#f3f4f6' }}
         role="img"
         aria-label={business.name}
       >
+        <Image
+          src={bg}
+          alt={business.name}
+          fill
+          style={{ objectFit: 'contain' }}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        />
         {business.logo && (
           <div style={{
             position: 'absolute',

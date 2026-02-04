@@ -529,10 +529,9 @@ body {
 }
 
 .card .cover {
-  height: 9.375rem;
-  background: #ddd;
-  background-size: cover;
-  background-position: center;
+  height: 11rem;
+  background: #f3f4f6;
+  overflow: hidden;
 }
 
 .card .content {
