@@ -1,12 +1,12 @@
 // Try Local Gresham - Service Worker
-// Version: 1.4.0 - Auto-update enabled
+// Version: 2.0.0 - Fixed caching strategy for proper updates
 
-const CACHE_NAME = 'try-local-v1.4';
-const RUNTIME_CACHE = 'try-local-runtime-v1.4';
+const CACHE_VERSION = '2.0.0';
+const CACHE_NAME = `try-local-v${CACHE_VERSION}`;
+const RUNTIME_CACHE = `try-local-runtime-v${CACHE_VERSION}`;
 
-// Assets to cache on install (only static files)
+// Only cache truly static assets that rarely change
 const PRECACHE_URLS = [
-  '/',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
@@ -14,9 +14,17 @@ const PRECACHE_URLS = [
   '/logo.jpeg',
 ];
 
+// URLs that should NEVER be cached
+const NEVER_CACHE = [
+  '/sw.js',           // Service worker itself
+  '/api/',            // API routes
+  '/_next/',          // Next.js internals
+  '/manifest.json',   // Manifest can change
+];
+
 // Install event - cache essential assets and immediately activate
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing new version...');
+  console.log(`[SW] Installing version ${CACHE_VERSION}...`);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -43,15 +51,18 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches and take control immediately
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating new version...');
+  console.log(`[SW] Activating version ${CACHE_VERSION}...`);
   const currentCaches = [CACHE_NAME, RUNTIME_CACHE];
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
+        // Find all caches that don't match current version
         return cacheNames.filter((cacheName) => !currentCaches.includes(cacheName));
       })
       .then((cachesToDelete) => {
-        console.log('[SW] Deleting old caches:', cachesToDelete);
+        if (cachesToDelete.length > 0) {
+          console.log('[SW] Deleting old caches:', cachesToDelete);
+        }
         return Promise.all(
           cachesToDelete.map((cacheToDelete) => {
             return caches.delete(cacheToDelete);
@@ -66,62 +77,138 @@ self.addEventListener('activate', (event) => {
       .then(() => {
         // Notify all clients that an update has occurred
         return self.clients.matchAll({ type: 'window' }).then(clients => {
+          console.log(`[SW] Notifying ${clients.length} client(s) of update`);
           clients.forEach(client => {
-            client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+            client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
           });
         });
       })
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Check if URL should never be cached
+function shouldNeverCache(url) {
+  return NEVER_CACHE.some(pattern => url.includes(pattern));
+}
+
+// Check if URL is a precached asset
+function isPrecachedAsset(url) {
+  const path = new URL(url).pathname;
+  return PRECACHE_URLS.includes(path);
+}
+
+// Fetch event - Network-first for pages, stale-while-revalidate for assets
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
+  if (!url.startsWith(self.location.origin)) {
     return;
   }
 
-  // Skip API routes and dynamic content
-  if (
-    event.request.url.includes('/api/') ||
-    event.request.url.includes('/_next/') ||
-    event.request.method !== 'GET'
-  ) {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
     return;
   }
 
+  // Never cache these - let them go straight to network
+  if (shouldNeverCache(url)) {
+    return;
+  }
+
+  // Navigation requests (HTML pages) - Network first, cache fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Cache the fresh response
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Offline - try cache, then offline page
+          return caches.match(event.request)
+            .then((cachedResponse) => {
+              return cachedResponse || caches.match('/offline.html');
+            });
+        })
+    );
+    return;
+  }
+
+  // Precached static assets - Cache first (these rarely change)
+  if (isPrecachedAsset(url)) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((cachedResponse) => {
+          return cachedResponse || fetch(event.request);
+        })
+    );
+    return;
+  }
+
+  // Other assets - Stale-while-revalidate
+  // Serve from cache immediately, but fetch update in background
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return caches.open(RUNTIME_CACHE)
-          .then((cache) => {
-            return fetch(event.request)
-              .then((response) => {
-                // Cache successful responses
-                if (response.status === 200) {
-                  cache.put(event.request, response.clone());
-                }
-                return response;
-              })
-              .catch(() => {
-                // Return offline page for navigation requests
-                if (event.request.mode === 'navigate') {
-                  return caches.match('/offline.html');
-                }
-              });
+    caches.open(RUNTIME_CACHE).then((cache) => {
+      return cache.match(event.request).then((cachedResponse) => {
+        const fetchPromise = fetch(event.request)
+          .then((networkResponse) => {
+            // Update cache with fresh response
+            if (networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => {
+            // Network failed, but we might have cache
+            return cachedResponse;
           });
-      })
+
+        // Return cached response immediately, or wait for network
+        return cachedResponse || fetchPromise;
+      });
+    })
   );
 });
 
 // Handle messages from clients
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+  if (event.data) {
+    switch (event.data.type) {
+      case 'SKIP_WAITING':
+        self.skipWaiting();
+        break;
+
+      case 'CLEAR_CACHE':
+        // Force clear all caches - useful for debugging or forcing updates
+        event.waitUntil(
+          caches.keys().then((cacheNames) => {
+            return Promise.all(
+              cacheNames.map((cacheName) => caches.delete(cacheName))
+            );
+          }).then(() => {
+            console.log('[SW] All caches cleared');
+            // Notify the client
+            if (event.source) {
+              event.source.postMessage({ type: 'CACHE_CLEARED' });
+            }
+          })
+        );
+        break;
+
+      case 'GET_VERSION':
+        // Return current service worker version
+        if (event.source) {
+          event.source.postMessage({ type: 'VERSION', version: CACHE_VERSION });
+        }
+        break;
+    }
   }
 });
 
