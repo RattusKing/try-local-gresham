@@ -252,6 +252,7 @@
 .review-rating {
   display: flex;
   gap: 2px;
+  margin-bottom: 0.5rem;
 }
 
 .review-rating .star {
@@ -266,6 +267,17 @@
 .review-date {
   font-size: 0.75rem;
   color: #9ca3af;
+}
+
+.review-business-link a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.review-business-link a:hover {
+  text-decoration: underline;
 }
 
 .review-comment {

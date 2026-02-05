@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
 import { getApps, initializeApp } from 'firebase/app'
 import { UserProfile, Review, Business } from '@/lib/types'
-import { formatDate, formatDateShort, formatDateMonthYear } from '@/lib/utils'
+import { formatDateShort, formatDateMonthYear } from '@/lib/utils'
 import Link from 'next/link'
 import './profile.css'
 
@@ -23,7 +23,6 @@ const getDb = () => {
   }
 
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    console.error('Firebase config missing:', { hasApiKey: !!firebaseConfig.apiKey, hasProjectId: !!firebaseConfig.projectId })
     return null
   }
 
@@ -37,23 +36,17 @@ export default function PublicProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
+  const [businessNames, setBusinessNames] = useState<Record<string, string>>({})
   const [favoritedBusinesses, setFavoritedBusinesses] = useState<Business[]>([])
   const [ownedBusiness, setOwnedBusiness] = useState<Business | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [debugInfo, setDebugInfo] = useState<string[]>(['Component mounted'])
 
   useEffect(() => {
     loadProfile()
   }, [userId])
 
-  const addDebug = (msg: string) => {
-    setDebugInfo(prev => [...prev, `${new Date().toISOString().slice(11,19)}: ${msg}`])
-  }
-
   const loadProfile = async () => {
-    addDebug(`userId: ${userId || 'MISSING'}`)
-
     if (!userId) {
       setLoading(false)
       setError('No user ID provided')
@@ -61,7 +54,6 @@ export default function PublicProfilePage() {
     }
 
     const db = getDb()
-    addDebug(`db initialized: ${!!db}`)
 
     if (!db) {
       setLoading(false)
@@ -74,10 +66,8 @@ export default function PublicProfilePage() {
       setError('')
 
       // Fetch user profile
-      addDebug('Fetching profile...')
       const profileRef = doc(db, 'users', userId)
       const profileSnap = await getDoc(profileRef)
-      addDebug(`Profile exists: ${profileSnap.exists()}`)
 
       if (!profileSnap.exists()) {
         setError('Profile not found')
@@ -86,7 +76,6 @@ export default function PublicProfilePage() {
       }
 
       const profileData = profileSnap.data() as UserProfile
-      addDebug(`Profile loaded: ${profileData.displayName || profileData.email || 'no name'}`)
       setProfile(profileData)
 
       // Fetch business owner's business if applicable
@@ -116,10 +105,27 @@ export default function PublicProfilePage() {
           id: d.id,
           createdAt: d.data().createdAt?.toDate() || new Date(),
         })) as Review[]
-        addDebug(`Reviews loaded: ${reviewsList.length}`)
         setReviews(reviewsList)
-      } catch (reviewErr: any) {
-        addDebug(`Reviews failed: ${reviewErr?.message?.slice(0, 50)}...`)
+
+        // Fetch business names for each review
+        const names: Record<string, string> = {}
+        await Promise.all(
+          reviewsList.map(async (review) => {
+            if (review.businessId && !names[review.businessId]) {
+              try {
+                const businessRef = doc(db, 'businesses', review.businessId)
+                const businessSnap = await getDoc(businessRef)
+                if (businessSnap.exists()) {
+                  names[review.businessId] = businessSnap.data().name || 'Unknown Business'
+                }
+              } catch {
+                // Silently fail
+              }
+            }
+          })
+        )
+        setBusinessNames(names)
+      } catch {
         // Continue - profile can still show without reviews
       }
 
@@ -145,18 +151,14 @@ export default function PublicProfilePage() {
         })
 
         const businesses = (await Promise.all(businessPromises)).filter(Boolean) as Business[]
-        addDebug(`Favorites loaded: ${businesses.length}`)
         setFavoritedBusinesses(businesses)
-      } catch (favErr: any) {
-        addDebug(`Favorites failed: ${favErr?.message?.slice(0, 50)}...`)
+      } catch {
         // Continue - profile can still show without favorites
       }
 
-    } catch (err: any) {
-      addDebug(`Error: ${err?.message || String(err)}`)
+    } catch {
       setError('Failed to load profile')
     } finally {
-      addDebug('loadProfile complete')
       setLoading(false)
     }
   }
@@ -167,13 +169,6 @@ export default function PublicProfilePage() {
         <div className="profile-loading">
           <div className="spinner"></div>
           <p>Loading profile...</p>
-          {/* Debug info - visible in production */}
-          <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px', fontSize: '0.75rem', fontFamily: 'monospace', textAlign: 'left', maxWidth: '400px' }}>
-            <strong>Debug:</strong>
-            {debugInfo.map((msg, i) => (
-              <div key={i}>{msg}</div>
-            ))}
-          </div>
         </div>
       </div>
     )
@@ -185,15 +180,7 @@ export default function PublicProfilePage() {
         <div className="profile-error">
           <h1>Profile Not Found</h1>
           <p>This user profile doesn&apos;t exist or has been removed.</p>
-          <p style={{ fontSize: '0.85rem', color: '#666' }}>Error: {error || 'No profile data'}</p>
-          {/* Debug info - visible in production */}
-          <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px', fontSize: '0.75rem', fontFamily: 'monospace', textAlign: 'left', maxWidth: '400px' }}>
-            <strong>Debug:</strong>
-            {debugInfo.map((msg, i) => (
-              <div key={i}>{msg}</div>
-            ))}
-          </div>
-          <Link href="/" className="btn btn-primary" style={{ marginTop: '1rem' }}>
+          <Link href="/" className="btn btn-primary">
             Back to Home
           </Link>
         </div>
@@ -334,18 +321,23 @@ export default function PublicProfilePage() {
               {reviews.map((review) => (
                 <div key={review.id} className="review-card">
                   <div className="review-header">
-                    <div className="review-rating">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={i < review.rating ? 'star filled' : 'star'}>
-                          ★
-                        </span>
-                      ))}
+                    <div className="review-business-link">
+                      <Link href={`/business/${review.businessId}`}>
+                        {businessNames[review.businessId] || 'View Business'}
+                      </Link>
                     </div>
                     <span className="review-date">
                       {review.createdAt
                         ? formatDateShort(review.createdAt)
                         : 'Recent'}
                     </span>
+                  </div>
+                  <div className="review-rating">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} className={i < review.rating ? 'star filled' : 'star'}>
+                        ★
+                      </span>
+                    ))}
                   </div>
                   <p className="review-comment">{review.comment}</p>
                   {review.photos && review.photos.length > 0 && (
