@@ -287,6 +287,134 @@
   border-radius: 8px;
 }
 
+/* Owned Business Card */
+.owned-business-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid var(--primary);
+}
+
+.owned-business-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.owned-business-image {
+  position: relative;
+  width: 120px;
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.owned-business-logo {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.owned-business-info {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem 0;
+}
+
+.owned-business-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owned-business-tags {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.owned-business-location {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.owned-business-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.owned-business-rating .star.filled {
+  color: #fbbf24;
+}
+
+.owned-business-rating .review-count {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.owned-business-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.25rem;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.owned-business-cta svg {
+  transition: transform 0.2s;
+}
+
+.owned-business-card:hover .owned-business-cta svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 640px) {
+  .owned-business-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .owned-business-image {
+    width: 100%;
+    height: 120px;
+  }
+
+  .owned-business-info {
+    padding: 1rem;
+  }
+
+  .owned-business-cta {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    justify-content: center;
+  }
+}
+
 /* Empty State */
 .profile-empty {
   text-align: center;

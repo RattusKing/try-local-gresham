@@ -56,8 +56,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser && db) {
         // Fetch user profile from Firestore
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        const profile = userDoc.data() as UserProfile | undefined
+        const userDocRef = doc(db, 'users', firebaseUser.uid)
+        const userDoc = await getDoc(userDocRef)
+        let profile = userDoc.data() as UserProfile | undefined
+
+        // Auto-create profile if user is authenticated but has no Firestore document
+        if (!userDoc.exists()) {
+          const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email!,
+            displayName: firebaseUser.displayName || undefined,
+            photoURL: firebaseUser.photoURL || undefined,
+            coverPhotoURL: undefined,
+            role: 'customer',
+          }
+          await setDoc(userDocRef, {
+            ...newProfile,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          })
+          profile = newProfile as UserProfile
+        }
 
         setUser({
           uid: firebaseUser.uid,
