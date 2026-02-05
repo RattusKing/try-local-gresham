@@ -7,6 +7,7 @@ import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { useEffect, useState, useRef } from 'react'
 import { UserProfile } from '@/lib/types'
+import { formatDateMonthYear } from '@/lib/utils'
 import PaymentMethodsManager from '@/components/stripe/PaymentMethodsManager'
 
 export default function ProfileEditor() {
@@ -643,11 +644,7 @@ export default function ProfileEditor() {
                 color: 'var(--dark)'
               }}>
                 {profile?.createdAt
-                  ? new Date(profile.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })
+                  ? formatDateMonthYear(profile.createdAt)
                   : 'Unknown'}
               </p>
             </div>

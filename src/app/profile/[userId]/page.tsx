@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { db } from '@/lib/firebase/config'
 import { doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
 import { UserProfile, Review, Business } from '@/lib/types'
+import { formatDate, formatDateShort, formatDateMonthYear } from '@/lib/utils'
 import Link from 'next/link'
 import './profile.css'
 
@@ -114,10 +115,7 @@ export default function PublicProfilePage() {
   }
 
   const memberSince = profile.createdAt
-    ? new Date(profile.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-      })
+    ? formatDateMonthYear(profile.createdAt)
     : 'Unknown'
 
   return (
@@ -217,11 +215,7 @@ export default function PublicProfilePage() {
                     </div>
                     <span className="review-date">
                       {review.createdAt
-                        ? new Date(review.createdAt).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          })
+                        ? formatDateShort(review.createdAt)
                         : 'Recent'}
                     </span>
                   </div>

@@ -12,6 +12,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { useCart } from '@/lib/cart-context'
 import { trackPageView, trackEvent } from '@/lib/analytics'
+import { formatDate } from '@/lib/utils'
 import StarRating from '@/components/StarRating'
 import PromoBanner from '@/components/PromoBanner'
 import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/components/StructuredData'
@@ -1099,7 +1100,7 @@ export default function BusinessProfilePage() {
                       </Link>
                       {review.createdAt && (
                         <span className="review-date">
-                          {new Date(review.createdAt).toLocaleDateString()}
+                          {formatDate(review.createdAt)}
                         </span>
                       )}
                     </div>
