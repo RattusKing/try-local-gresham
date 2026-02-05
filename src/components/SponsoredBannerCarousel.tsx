@@ -11,6 +11,8 @@ interface SponsoredBannerWithBusiness extends SponsoredBanner {
   businessTags?: string[]
   businessNeighborhood?: string
   businessLogo?: string
+  businessHeaderImage?: string
+  businessCoverLive?: string // Live cover from business profile
 }
 
 export default function SponsoredBannerCarousel() {
@@ -48,10 +50,12 @@ export default function SponsoredBannerCarousel() {
           : new Date(data.endDate)
 
         if (now >= startDate && now <= endDate) {
-          // Fetch business data for logo
+          // Fetch business data for logo and images
           let businessLogo: string | undefined
           let businessTags: string[] | undefined
           let businessNeighborhood: string | undefined
+          let businessHeaderImage: string | undefined
+          let businessCoverLive: string | undefined
           try {
             const bizDoc = await getDoc(doc(db, 'businesses', data.businessId))
             if (bizDoc.exists()) {
@@ -59,6 +63,8 @@ export default function SponsoredBannerCarousel() {
               businessLogo = bizData.logo
               businessTags = bizData.tags
               businessNeighborhood = bizData.neighborhood
+              businessHeaderImage = bizData.headerImage
+              businessCoverLive = bizData.cover
             }
           } catch {}
 
@@ -70,6 +76,8 @@ export default function SponsoredBannerCarousel() {
             businessLogo,
             businessTags,
             businessNeighborhood,
+            businessHeaderImage,
+            businessCoverLive,
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
             updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(data.updatedAt),
           } as SponsoredBannerWithBusiness)
@@ -113,16 +121,20 @@ export default function SponsoredBannerCarousel() {
   const banner = banners[currentIndex]
   const isTest = banner?.businessId?.startsWith('test-')
 
+  // Prioritize live business images over stored ones
+  const headerImage = banner.businessHeaderImage || banner.businessCoverLive || banner.businessCover
+  const logoImage = banner.businessLogo
+
   const content = (
     <div className="sp-banner-inner">
-      {/* Background image */}
+      {/* Background image - uses header/cover from live business profile */}
       <div className="sp-banner-bg">
-        {banner.businessCover ? (
+        {headerImage ? (
           <Image
-            src={banner.businessCover}
+            src={headerImage}
             alt={banner.businessName}
             fill
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: 'cover' }}
             sizes="(max-width: 768px) 100vw, 800px"
           />
         ) : (
@@ -133,11 +145,11 @@ export default function SponsoredBannerCarousel() {
 
       {/* Content row */}
       <div className="sp-banner-content">
-        {/* Logo */}
-        {(banner.businessLogo || banner.businessCover) && (
+        {/* Logo - uses business profile picture */}
+        {(logoImage || headerImage) && (
           <div className="sp-banner-logo">
             <Image
-              src={banner.businessLogo || banner.businessCover || ''}
+              src={logoImage || headerImage || ''}
               alt={`${banner.businessName} logo`}
               fill
               style={{ objectFit: 'cover' }}
