@@ -25,7 +25,11 @@ export default function PublicProfilePage() {
   }, [userId])
 
   const loadProfile = async () => {
-    if (!db || !userId) return
+    console.log('Loading profile for userId:', userId, 'db initialized:', !!db)
+    if (!db || !userId) {
+      console.log('Early return - db or userId missing')
+      return
+    }
 
     try {
       setLoading(true)
@@ -33,7 +37,9 @@ export default function PublicProfilePage() {
 
       // Fetch user profile
       const profileRef = doc(db, 'users', userId)
+      console.log('Fetching profile from:', `users/${userId}`)
       const profileSnap = await getDoc(profileRef)
+      console.log('Profile exists:', profileSnap.exists())
 
       if (!profileSnap.exists()) {
         setError('Profile not found')
