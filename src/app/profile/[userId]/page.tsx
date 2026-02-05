@@ -32,8 +32,13 @@ const getDb = () => {
 }
 
 export default function PublicProfilePage() {
+  // Debug: This should log on EVERY render
+  console.log('=== PublicProfilePage RENDER ===')
+
   const params = useParams()
+  console.log('=== params:', params)
   const userId = params.userId as string
+  console.log('=== userId:', userId)
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
