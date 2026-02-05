@@ -62,20 +62,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Auto-create profile if user is authenticated but has no Firestore document
         if (!userDoc.exists()) {
-          const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email!,
-            displayName: firebaseUser.displayName || undefined,
-            photoURL: firebaseUser.photoURL || undefined,
-            coverPhotoURL: undefined,
-            role: 'customer',
+          try {
+            const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || undefined,
+              photoURL: firebaseUser.photoURL || undefined,
+              coverPhotoURL: undefined,
+              role: 'customer',
+            }
+            await setDoc(userDocRef, {
+              ...newProfile,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            })
+            profile = newProfile as UserProfile
+            console.log('Auto-created user profile for:', firebaseUser.uid)
+          } catch (err) {
+            console.error('Failed to auto-create user profile:', err)
           }
-          await setDoc(userDocRef, {
-            ...newProfile,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          })
-          profile = newProfile as UserProfile
         }
 
         setUser({
