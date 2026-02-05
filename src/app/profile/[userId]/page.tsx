@@ -174,7 +174,15 @@ export default function PublicProfilePage() {
         <div className="profile-error">
           <h1>Profile Not Found</h1>
           <p>This user profile doesn&apos;t exist or has been removed.</p>
-          <Link href="/" className="btn btn-primary">
+          <p style={{ fontSize: '0.85rem', color: '#666' }}>Error: {error || 'No profile data'}</p>
+          {/* Debug info - visible in production */}
+          <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px', fontSize: '0.75rem', fontFamily: 'monospace', textAlign: 'left', maxWidth: '400px' }}>
+            <strong>Debug:</strong>
+            {debugInfo.map((msg, i) => (
+              <div key={i}>{msg}</div>
+            ))}
+          </div>
+          <Link href="/" className="btn btn-primary" style={{ marginTop: '1rem' }}>
             Back to Home
           </Link>
         </div>
