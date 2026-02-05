@@ -523,7 +523,7 @@ export default function BusinessProfilePage() {
               src={business.gallery?.[0] || business.cover}
               alt={`${business.name} banner`}
               fill
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'contain' }}
               priority
             />
             <div className="business-banner-overlay" />
