@@ -2,12 +2,34 @@
 
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { db } from '@/lib/firebase/config'
-import { doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
+import { getApps, initializeApp } from 'firebase/app'
 import { UserProfile, Review, Business } from '@/lib/types'
 import { formatDate, formatDateShort, formatDateMonthYear } from '@/lib/utils'
 import Link from 'next/link'
 import './profile.css'
+
+// Initialize Firebase directly in this component to avoid SSR issues
+const getDb = () => {
+  if (typeof window === 'undefined') return null
+
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  }
+
+  if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+    console.error('Firebase config missing:', { hasApiKey: !!firebaseConfig.apiKey, hasProjectId: !!firebaseConfig.projectId })
+    return null
+  }
+
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
+  return getFirestore(app)
+}
 
 export default function PublicProfilePage() {
   const params = useParams()
@@ -25,18 +47,19 @@ export default function PublicProfilePage() {
   }, [userId])
 
   const loadProfile = async () => {
-    console.log('Loading profile for userId:', userId, 'db initialized:', !!db)
     if (!userId) {
-      console.log('No userId provided')
       setLoading(false)
       setError('No user ID provided')
       return
     }
 
+    const db = getDb()
+    console.log('Loading profile for userId:', userId, 'db initialized:', !!db)
+
     if (!db) {
-      console.log('DB not initialized, retrying in 500ms...')
-      // Retry after a short delay - Firebase might still be initializing
-      setTimeout(() => loadProfile(), 500)
+      console.error('Firebase db not initialized')
+      setLoading(false)
+      setError('Unable to connect to database')
       return
     }
 
