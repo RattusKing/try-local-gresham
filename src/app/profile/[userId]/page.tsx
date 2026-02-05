@@ -26,8 +26,17 @@ export default function PublicProfilePage() {
 
   const loadProfile = async () => {
     console.log('Loading profile for userId:', userId, 'db initialized:', !!db)
-    if (!db || !userId) {
-      console.log('Early return - db or userId missing')
+    if (!userId) {
+      console.log('No userId provided')
+      setLoading(false)
+      setError('No user ID provided')
+      return
+    }
+
+    if (!db) {
+      console.log('DB not initialized, retrying in 500ms...')
+      // Retry after a short delay - Firebase might still be initializing
+      setTimeout(() => loadProfile(), 500)
       return
     }
 
