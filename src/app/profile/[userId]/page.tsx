@@ -16,6 +16,7 @@ export default function PublicProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [favoritedBusinesses, setFavoritedBusinesses] = useState<Business[]>([])
+  const [ownedBusiness, setOwnedBusiness] = useState<Business | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -42,6 +43,19 @@ export default function PublicProfilePage() {
 
       const profileData = profileSnap.data() as UserProfile
       setProfile(profileData)
+
+      // Fetch business owner's business if applicable
+      if (profileData.businessId) {
+        try {
+          const businessRef = doc(db, 'businesses', profileData.businessId)
+          const businessSnap = await getDoc(businessRef)
+          if (businessSnap.exists() && businessSnap.data().status === 'approved') {
+            setOwnedBusiness({ ...businessSnap.data(), id: businessSnap.id } as Business)
+          }
+        } catch {
+          // Silently fail - business might not exist
+        }
+      }
 
       // Fetch user's reviews
       const reviewsQuery = query(
@@ -168,6 +182,47 @@ export default function PublicProfilePage() {
             <span className="stat-label">Favorites</span>
           </div>
         </div>
+
+        {/* Business Owner Card */}
+        {ownedBusiness && (
+          <section className="profile-section">
+            <h2>Business Owner</h2>
+            <Link href={`/business/${ownedBusiness.id}`} className="owned-business-card">
+              <div
+                className="owned-business-image"
+                style={{
+                  backgroundImage: ownedBusiness.cover
+                    ? `url(${ownedBusiness.cover})`
+                    : 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                }}
+              >
+                {ownedBusiness.logo && (
+                  <img src={ownedBusiness.logo} alt="" className="owned-business-logo" />
+                )}
+              </div>
+              <div className="owned-business-info">
+                <h3>{ownedBusiness.name}</h3>
+                <p className="owned-business-tags">{ownedBusiness.tags?.slice(0, 3).join(' • ')}</p>
+                {ownedBusiness.neighborhood && (
+                  <p className="owned-business-location">{ownedBusiness.neighborhood}</p>
+                )}
+                {ownedBusiness.averageRating && ownedBusiness.reviewCount ? (
+                  <div className="owned-business-rating">
+                    <span className="star filled">★</span>
+                    <span>{ownedBusiness.averageRating.toFixed(1)}</span>
+                    <span className="review-count">({ownedBusiness.reviewCount} reviews)</span>
+                  </div>
+                ) : null}
+              </div>
+              <div className="owned-business-cta">
+                Visit Business
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </section>
+        )}
 
         {/* Favorite Businesses */}
         {favoritedBusinesses.length > 0 && (
