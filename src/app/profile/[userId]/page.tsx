@@ -32,13 +32,8 @@ const getDb = () => {
 }
 
 export default function PublicProfilePage() {
-  // Debug: This should log on EVERY render
-  console.log('=== PublicProfilePage RENDER ===')
-
   const params = useParams()
-  console.log('=== params:', params)
   const userId = params.userId as string
-  console.log('=== userId:', userId)
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
@@ -46,12 +41,19 @@ export default function PublicProfilePage() {
   const [ownedBusiness, setOwnedBusiness] = useState<Business | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [debugInfo, setDebugInfo] = useState<string[]>(['Component mounted'])
 
   useEffect(() => {
     loadProfile()
   }, [userId])
 
+  const addDebug = (msg: string) => {
+    setDebugInfo(prev => [...prev, `${new Date().toISOString().slice(11,19)}: ${msg}`])
+  }
+
   const loadProfile = async () => {
+    addDebug(`userId: ${userId || 'MISSING'}`)
+
     if (!userId) {
       setLoading(false)
       setError('No user ID provided')
@@ -59,10 +61,9 @@ export default function PublicProfilePage() {
     }
 
     const db = getDb()
-    console.log('Loading profile for userId:', userId, 'db initialized:', !!db)
+    addDebug(`db initialized: ${!!db}`)
 
     if (!db) {
-      console.error('Firebase db not initialized')
       setLoading(false)
       setError('Unable to connect to database')
       return
@@ -73,10 +74,10 @@ export default function PublicProfilePage() {
       setError('')
 
       // Fetch user profile
+      addDebug('Fetching profile...')
       const profileRef = doc(db, 'users', userId)
-      console.log('Fetching profile from:', `users/${userId}`)
       const profileSnap = await getDoc(profileRef)
-      console.log('Profile exists:', profileSnap.exists())
+      addDebug(`Profile exists: ${profileSnap.exists()}`)
 
       if (!profileSnap.exists()) {
         setError('Profile not found')
@@ -85,6 +86,7 @@ export default function PublicProfilePage() {
       }
 
       const profileData = profileSnap.data() as UserProfile
+      addDebug(`Profile loaded: ${profileData.displayName || profileData.email || 'no name'}`)
       setProfile(profileData)
 
       // Fetch business owner's business if applicable
@@ -113,6 +115,7 @@ export default function PublicProfilePage() {
         id: doc.id,
         createdAt: doc.data().createdAt?.toDate() || new Date(),
       })) as Review[]
+      addDebug(`Reviews loaded: ${reviewsList.length}`)
       setReviews(reviewsList)
 
       // Fetch user's favorited businesses (public favorites)
@@ -139,9 +142,10 @@ export default function PublicProfilePage() {
       setFavoritedBusinesses(businesses)
 
     } catch (err: any) {
-      console.error('Error loading profile:', err)
+      addDebug(`Error: ${err?.message || String(err)}`)
       setError('Failed to load profile')
     } finally {
+      addDebug('loadProfile complete')
       setLoading(false)
     }
   }
@@ -152,6 +156,13 @@ export default function PublicProfilePage() {
         <div className="profile-loading">
           <div className="spinner"></div>
           <p>Loading profile...</p>
+          {/* Debug info - visible in production */}
+          <div style={{ marginTop: '1rem', padding: '1rem', background: '#f0f0f0', borderRadius: '8px', fontSize: '0.75rem', fontFamily: 'monospace', textAlign: 'left', maxWidth: '400px' }}>
+            <strong>Debug:</strong>
+            {debugInfo.map((msg, i) => (
+              <div key={i}>{msg}</div>
+            ))}
+          </div>
         </div>
       </div>
     )
