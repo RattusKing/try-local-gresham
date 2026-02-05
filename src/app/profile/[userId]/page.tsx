@@ -102,44 +102,55 @@ export default function PublicProfilePage() {
         }
       }
 
-      // Fetch user's reviews
-      const reviewsQuery = query(
-        collection(db, 'reviews'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(10)
-      )
-      const reviewsSnap = await getDocs(reviewsQuery)
-      const reviewsList = reviewsSnap.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      })) as Review[]
-      addDebug(`Reviews loaded: ${reviewsList.length}`)
-      setReviews(reviewsList)
+      // Fetch user's reviews (wrapped in try-catch so profile still shows if this fails)
+      try {
+        const reviewsQuery = query(
+          collection(db, 'reviews'),
+          where('userId', '==', userId),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        )
+        const reviewsSnap = await getDocs(reviewsQuery)
+        const reviewsList = reviewsSnap.docs.map((d) => ({
+          ...d.data(),
+          id: d.id,
+          createdAt: d.data().createdAt?.toDate() || new Date(),
+        })) as Review[]
+        addDebug(`Reviews loaded: ${reviewsList.length}`)
+        setReviews(reviewsList)
+      } catch (reviewErr: any) {
+        addDebug(`Reviews failed: ${reviewErr?.message?.slice(0, 50)}...`)
+        // Continue - profile can still show without reviews
+      }
 
-      // Fetch user's favorited businesses (public favorites)
-      const favoritesQuery = query(
-        collection(db, 'favorites'),
-        where('userId', '==', userId),
-        where('itemType', '==', 'business'),
-        limit(6)
-      )
-      const favoritesSnap = await getDocs(favoritesQuery)
+      // Fetch user's favorited businesses (wrapped in try-catch)
+      try {
+        const favoritesQuery = query(
+          collection(db, 'favorites'),
+          where('userId', '==', userId),
+          where('itemType', '==', 'business'),
+          limit(6)
+        )
+        const favoritesSnap = await getDocs(favoritesQuery)
 
-      // Fetch business details for each favorite
-      const businessPromises = favoritesSnap.docs.map(async (favDoc) => {
-        if (!db) return null
-        const businessRef = doc(db, 'businesses', favDoc.data().itemId)
-        const businessSnap = await getDoc(businessRef)
-        if (businessSnap.exists() && businessSnap.data().status === 'approved') {
-          return { ...businessSnap.data(), id: businessSnap.id } as Business
-        }
-        return null
-      })
+        // Fetch business details for each favorite
+        const businessPromises = favoritesSnap.docs.map(async (favDoc) => {
+          if (!db) return null
+          const businessRef = doc(db, 'businesses', favDoc.data().itemId)
+          const businessSnap = await getDoc(businessRef)
+          if (businessSnap.exists() && businessSnap.data().status === 'approved') {
+            return { ...businessSnap.data(), id: businessSnap.id } as Business
+          }
+          return null
+        })
 
-      const businesses = (await Promise.all(businessPromises)).filter(Boolean) as Business[]
-      setFavoritedBusinesses(businesses)
+        const businesses = (await Promise.all(businessPromises)).filter(Boolean) as Business[]
+        addDebug(`Favorites loaded: ${businesses.length}`)
+        setFavoritedBusinesses(businesses)
+      } catch (favErr: any) {
+        addDebug(`Favorites failed: ${favErr?.message?.slice(0, 50)}...`)
+        // Continue - profile can still show without favorites
+      }
 
     } catch (err: any) {
       addDebug(`Error: ${err?.message || String(err)}`)
