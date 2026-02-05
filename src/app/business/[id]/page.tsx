@@ -510,109 +510,77 @@ export default function BusinessProfilePage() {
           <ProductSchema key={product.id} product={product} business={business} />
         ))}
 
-        {/* Header Banner Image */}
-        {business.headerImage && (
+        {/* Profile Header - Social Media Style Layout */}
+        <div className="business-profile-header">
+          {/* Banner Image */}
           <motion.div
-            className="business-header-banner"
+            className="business-banner"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            style={{
-              position: 'relative',
-              width: '100%',
-              minHeight: '200px',
-              maxHeight: '400px',
-              height: 'auto',
-              aspectRatio: '16/9',
-              marginBottom: '1rem',
-              backgroundColor: '#f3f4f6'
-            }}
           >
             <Image
-              src={business.headerImage}
-              alt={`${business.name} header`}
+              src={business.gallery?.[0] || business.cover}
+              alt={`${business.name} banner`}
               fill
-              style={{ objectFit: 'contain', borderRadius: '8px' }}
+              style={{ objectFit: 'cover' }}
               priority
             />
+            <div className="business-banner-overlay" />
           </motion.div>
-        )}
 
-        {/* Hero Section */}
-      <motion.div
-        className="business-hero"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Image
-            src={business.cover}
-            alt={business.name}
-            fill
-            className="business-hero-image"
-            style={{ objectFit: 'cover' }}
-            priority
-          />
-        </div>
-        <div className="business-hero-overlay">
-          <div className="business-hero-content">
-            {business.logo && (
+          {/* Profile Picture and Info */}
+          <div className="business-profile-info">
+            {/* Profile Picture */}
+            {(business.logo || business.headerImage) && (
               <motion.div
-                className="business-hero-logo"
+                className="business-profile-picture"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15 }}
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  border: '3px solid white',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  marginBottom: '0.75rem',
-                  position: 'relative',
-                }}
               >
                 <Image
-                  src={business.logo}
+                  src={business.logo || business.headerImage || ''}
                   alt={`${business.name} logo`}
                   fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="80px"
+                  style={{ objectFit: 'contain', backgroundColor: 'white' }}
+                  sizes="120px"
                 />
               </motion.div>
             )}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              {business.name}
-            </motion.h1>
-            <motion.div
-              className="business-hero-tags"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              {business.tags.map((tag, idx) => (
-                <span key={idx} className="tag">
-                  {tag}
-                </span>
-              ))}
-            </motion.div>
-            <motion.p
-              className="business-hero-neighborhood"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              📍 {business.neighborhood ? `${business.neighborhood}, ` : ''}Gresham, OR
-            </motion.p>
+
+            {/* Business Info */}
+            <div className="business-profile-details">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {business.name}
+              </motion.h1>
+              <motion.div
+                className="business-profile-tags"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                {business.tags.map((tag, idx) => (
+                  <span key={idx} className="tag">
+                    {tag}
+                  </span>
+                ))}
+              </motion.div>
+              <motion.p
+                className="business-profile-location"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                📍 {business.neighborhood ? `${business.neighborhood}, ` : ''}Gresham, OR
+              </motion.p>
+            </div>
           </div>
         </div>
-      </motion.div>
 
       <div className="business-profile-container">
         <div className="business-profile-main">
