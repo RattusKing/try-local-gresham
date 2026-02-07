@@ -74,6 +74,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Notify admins via push notification
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://try-local.com'
+      await fetch(`${baseUrl}/api/notify/admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_contact_message',
+          data: { name, email, subject, message },
+        }),
+      })
+    } catch (notifyErr) {
+      console.error('Failed to send admin notification:', notifyErr)
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     // Only log in development

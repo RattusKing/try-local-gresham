@@ -99,7 +99,19 @@ export default function NotificationSettings({ showTitle = true }: NotificationS
         })
 
         setSuccess('Push notifications enabled!')
-        sendTestNotification()
+
+        // Send test notification directly via service worker
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification('Try Local Gresham', {
+              body: 'Notifications are working! You\'ll receive updates about orders and local businesses.',
+              icon: '/icon-192x192.png',
+              badge: '/icon-192x192.png',
+              tag: 'test-notification',
+            })
+          }).catch(err => console.error('Test notification failed:', err))
+        }
+
         setTimeout(() => setSuccess(''), 3000)
       } else {
         setError('Failed to enable push notifications')

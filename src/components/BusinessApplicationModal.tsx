@@ -107,6 +107,22 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
         }).catch((err) => console.error('Email error:', err))
       }
 
+      // Notify admins of new application
+      fetch('/api/notify/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_business_application',
+          data: {
+            businessName: formData.businessName,
+            ownerName: formData.ownerName,
+            email: formData.email,
+            category: formData.category,
+            neighborhood: formData.neighborhood,
+          },
+        }),
+      }).catch((err) => console.error('Admin notification error:', err))
+
       setSuccess(true)
       setTimeout(() => {
         onClose()
