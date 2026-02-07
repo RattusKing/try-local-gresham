@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore'
 import { useEffect, useState } from 'react'
 import { BusinessAvailability, DayOfWeek, TimeSlot } from '@/lib/types'
+import NotificationSettings from '@/components/NotificationSettings'
 import './settings.css'
 
 const DAYS: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -241,6 +242,11 @@ export default function BusinessSettings() {
             />
           </label>
         </div>
+      </div>
+
+      {/* Notification Settings */}
+      <div style={{ marginBottom: '2rem' }}>
+        <NotificationSettings />
       </div>
 
       <div className="settings-container">

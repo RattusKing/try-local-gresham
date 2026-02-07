@@ -32,6 +32,11 @@ export default function CustomerDashboard() {
             <span className="quick-link-title">Appointments</span>
             <span className="quick-link-desc">Manage your appointments</span>
           </Link>
+          <Link href="/dashboard/customer/settings" className="quick-link-card">
+            <span className="quick-link-icon">⚙️</span>
+            <span className="quick-link-title">Settings</span>
+            <span className="quick-link-desc">Notifications & preferences</span>
+          </Link>
         </div>
       </div>
     </div>
