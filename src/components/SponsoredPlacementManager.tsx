@@ -101,6 +101,20 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
 
       await addDoc(collection(db, 'sponsoredBanners'), bannerData)
 
+      // Notify admins of new sponsored banner request
+      fetch('/api/notify/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_sponsored_banner_request',
+          data: {
+            businessName: business.name,
+            headline: headline.trim() || 'No headline',
+            duration: `${pricing.days} days`,
+          },
+        }),
+      }).catch((err) => console.error('Admin notification error:', err))
+
       setSuccess('Your sponsored placement request has been submitted! You will receive a notification once approved, and payment will be processed automatically.')
       setShowApplyForm(false)
       setHeadline('')
