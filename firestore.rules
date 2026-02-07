@@ -210,8 +210,8 @@ service cloud.firestore {
 
     // Favorites collection
     match /favorites/{favoriteId} {
-      // Users can read their own favorites
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Anyone can read favorites (needed for public profiles)
+      allow read: if true;
 
       // Users can create their own favorites
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
@@ -342,6 +342,24 @@ service cloud.firestore {
 
       // No updates or deletes allowed
       allow update, delete: if false;
+    }
+
+    // Push Subscriptions collection (for web push notifications)
+    match /pushSubscriptions/{subscriptionId} {
+      // Users can read their own subscriptions
+      // Admins can read all (for debugging)
+      allow read: if isSignedIn() &&
+                     (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Users can create subscriptions for themselves
+      allow create: if isSignedIn() &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Users can update their own subscriptions
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Users can delete their own subscriptions
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
     // Block all other collections by default
