@@ -53,6 +53,9 @@ export interface UserProfile {
   createdAt: Date
   updatedAt: Date
   businessId?: string // For business owners
+  // Notification preferences
+  emailNotifications?: boolean
+  pushNotifications?: boolean
 }
 
 export interface AuthUser {
