@@ -16,4 +16,4 @@ Allow: /help
 Allow: /business/
 
 # Sitemap location
-Sitemap: https://trylocalor.com/sitemap.xml
+Sitemap: https://try-local.com/sitemap.xml

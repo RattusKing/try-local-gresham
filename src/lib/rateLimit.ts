@@ -107,11 +107,11 @@ async function checkRateLimitRedis(
       resetTime: record.resetTime,
     }
   } catch (error) {
-    console.error('Redis rate limit error, falling back to allow:', error)
-    // On Redis error, allow the request (fail open)
+    console.error('Redis rate limit error, failing closed:', error)
+    // On Redis error, deny the request (fail closed) to prevent abuse
     return {
-      success: true,
-      remaining: config.limit,
+      success: false,
+      remaining: 0,
       resetTime: now + config.window,
     }
   }

@@ -1,15 +1,18 @@
 import webpush from 'web-push'
 import { PushNotificationPayload } from '@/lib/types'
 
-// VAPID keys for web push - these should be set in environment variables
+// VAPID keys for web push - REQUIRED for push notifications
 // Generate with: npx web-push generate-vapid-keys
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || ''
+// Then set NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in your .env
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:hello@try-local.com'
 
-// Configure web-push with VAPID details
+// Configure web-push with VAPID details (only if keys are configured)
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+} else if (process.env.NODE_ENV === 'production') {
+  console.warn('VAPID keys not configured - push notifications will be disabled. Set NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.')
 }
 
 export interface WebPushSubscription {

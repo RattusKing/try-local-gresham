@@ -1,5 +1,6 @@
 import Script from 'next/script'
 import { Business, Product } from '@/lib/types'
+import { SITE_URL } from '@/lib/site-config'
 
 export function WebsiteSchema() {
   const schema = {
@@ -8,12 +9,12 @@ export function WebsiteSchema() {
     name: 'Try Local Gresham',
     description:
       'A digital marketplace connecting local people with local businesses in Gresham, Oregon.',
-    url: 'https://try-local.com',
+    url: SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://try-local.com/?search={search_term_string}',
+        urlTemplate: `${SITE_URL}/?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -35,8 +36,8 @@ export function OrganizationSchema() {
     name: 'Try Local',
     description:
       'Building a stronger Gresham, one local business at a time. A community platform connecting residents with local businesses.',
-    url: 'https://try-local.com',
-    logo: 'https://try-local.com/logo.png',
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo.png`,
     sameAs: [
       // Add social media links here when available
       // 'https://facebook.com/trylocalgresham',
@@ -73,7 +74,7 @@ export function LocalBusinessSchema({ business }: { business: Business }) {
     description: business.description || `${business.name} - Local business in Gresham, Oregon`,
     image: business.cover || '/assets/gresham.jpg',
     telephone: business.phone,
-    url: business.website || `https://try-local.com/business/${business.id}`,
+    url: business.website || `${SITE_URL}/business/${business.id}`,
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Gresham',
@@ -166,7 +167,7 @@ export function BreadcrumbSchema({ items }: { items: Array<{ name: string; url: 
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: `https://try-local.com${item.url}`,
+      item: `${SITE_URL}${item.url}`,
     })),
   }
 

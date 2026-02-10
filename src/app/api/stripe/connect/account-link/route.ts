@@ -39,12 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      {
-        error: errorMessage,
-        details: errorDetails,
-        type: error.type || 'Unknown',
-        code: error.code || 'Unknown'
-      },
+      { error: errorMessage },
       { status: 500 }
     )
   }
