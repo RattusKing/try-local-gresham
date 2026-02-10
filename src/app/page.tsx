@@ -256,9 +256,13 @@ export default function Home() {
       categoryCounts[tag] = (categoryCounts[tag] || 0) + 1
     })
   })
-  const topCategories = Object.entries(categoryCounts)
+  const pinnedCategories = ['Home and Garden', 'Health and Wellness']
+  const pinned = pinnedCategories.map((name) => [name, categoryCounts[name] || 0] as [string, number])
+  const remaining = Object.entries(categoryCounts)
+    .filter(([name]) => !pinnedCategories.includes(name))
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
+    .slice(0, 8 - pinned.length)
+  const topCategories = [...pinned, ...remaining]
 
   return (
     <>
