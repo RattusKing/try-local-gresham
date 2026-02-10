@@ -450,7 +450,7 @@ export const BUSINESS_TAG_CATEGORIES: BusinessTagCategory[] = [
     name: 'Health & Wellness',
     icon: '💆',
     tags: [
-      'Gym', 'Fitness Center', 'Yoga', 'Pilates', 'CrossFit', 'Personal Training',
+      'Health and Wellness', 'Gym', 'Fitness Center', 'Yoga', 'Pilates', 'CrossFit', 'Personal Training',
       'Martial Arts', 'Boxing', 'Dance Studio', 'Spa', 'Massage', 'Acupuncture',
       'Chiropractic', 'Physical Therapy', 'Mental Health', 'Counseling',
       'Meditation', 'Wellness Center', 'Nutrition', 'Weight Loss', 'Health Food',
