@@ -256,7 +256,7 @@ export default function Home() {
       categoryCounts[tag] = (categoryCounts[tag] || 0) + 1
     })
   })
-  const pinnedCategories = ['Home and Garden', 'Health and Wellness']
+  const pinnedCategories = ['Home & Garden', 'Health & Wellness']
   const pinned = pinnedCategories.map((name) => [name, categoryCounts[name] || 0] as [string, number])
   const remaining = Object.entries(categoryCounts)
     .filter(([name]) => !pinnedCategories.includes(name))
