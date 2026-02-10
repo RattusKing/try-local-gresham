@@ -2,6 +2,7 @@
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 export default function PrivacyPage() {
   return (
@@ -140,7 +141,7 @@ export default function PrivacyPage() {
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
           <p style={{ lineHeight: '1.8' }}>
-            <strong>Email:</strong> privacy@try-local.com
+            <strong>Email:</strong> {CONTACT_EMAILS.privacy}
             <br />
             <strong>Address:</strong> Gresham, Oregon
           </p>

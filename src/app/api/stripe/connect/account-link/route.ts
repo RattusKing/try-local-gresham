@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
       message: 'Account link created successfully',
     })
   } catch (error: any) {
-    console.error('Error creating account link:', error)
+    logger.error('Error creating account link:', error)
 
     // Provide detailed error information
     let errorMessage = 'Failed to create account link'

@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { logger } from '@/lib/logger';
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -40,7 +42,7 @@ export default function ContactPage() {
       setTimeout(() => setStatus('idle'), 5000)
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error submitting form:', error)
+        logger.error('Error submitting form:', error)
       }
       setStatus('error')
       setTimeout(() => setStatus('idle'), 5000)
@@ -77,8 +79,8 @@ export default function ContactPage() {
           <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: 'var(--shadow)' }}>
             <h3 style={{ fontSize: '18px', marginBottom: '10px' }}>Email</h3>
             <p style={{ color: '#666' }}>
-              <a href="mailto:hello@try-local.com" style={{ color: 'var(--orange)' }}>
-                hello@try-local.com
+              <a href={`mailto:${CONTACT_EMAILS.hello}`} style={{ color: 'var(--orange)' }}>
+                {CONTACT_EMAILS.hello}
               </a>
             </p>
           </div>
@@ -248,14 +250,14 @@ export default function ContactPage() {
         <div style={{ marginTop: '40px', textAlign: 'center', color: '#666' }}>
           <p>
             <strong>Business Inquiries:</strong>{' '}
-            <a href="mailto:business@try-local.com" style={{ color: 'var(--orange)' }}>
-              business@try-local.com
+            <a href={`mailto:${CONTACT_EMAILS.business}`} style={{ color: 'var(--orange)' }}>
+              {CONTACT_EMAILS.business}
             </a>
           </p>
           <p style={{ marginTop: '10px' }}>
             <strong>Support:</strong>{' '}
-            <a href="mailto:support@try-local.com" style={{ color: 'var(--orange)' }}>
-              support@try-local.com
+            <a href={`mailto:${CONTACT_EMAILS.support}`} style={{ color: 'var(--orange)' }}>
+              {CONTACT_EMAILS.support}
             </a>
           </p>
         </div>

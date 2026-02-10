@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 export default function ServiceWorkerRegistration() {
   const [updating, setUpdating] = useState(false);
@@ -14,7 +15,7 @@ export default function ServiceWorkerRegistration() {
       navigator.serviceWorker
         .register('/sw.js')
         .then((reg) => {
-          console.log('[SW] Service Worker registered');
+          logger.log('[SW] Service Worker registered');
 
           // Check for updates immediately on page load
           reg.update();
@@ -22,19 +23,19 @@ export default function ServiceWorkerRegistration() {
           // Listen for updates
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
-            console.log('[SW] Update found, installing...');
+            logger.log('[SW] Update found, installing...');
 
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed') {
                   if (navigator.serviceWorker.controller) {
                     // New service worker available - auto-activate it
-                    console.log('[SW] New version ready, auto-activating...');
+                    logger.log('[SW] New version ready, auto-activating...');
                     setUpdating(true);
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                   } else {
                     // First install
-                    console.log('[SW] Service worker installed for the first time');
+                    logger.log('[SW] Service worker installed for the first time');
                   }
                 }
               });
@@ -62,14 +63,14 @@ export default function ServiceWorkerRegistration() {
 
           // Check for updates when coming back online
           const handleOnline = () => {
-            console.log('[SW] Back online, checking for updates...');
+            logger.log('[SW] Back online, checking for updates...');
             reg.update().catch(() => {});
           };
           window.addEventListener('online', handleOnline);
 
           // If there's already a waiting service worker, activate it immediately
           if (reg.waiting) {
-            console.log('[SW] Update already waiting, auto-activating...');
+            logger.log('[SW] Update already waiting, auto-activating...');
             setUpdating(true);
             reg.waiting.postMessage({ type: 'SKIP_WAITING' });
           }
@@ -83,7 +84,7 @@ export default function ServiceWorkerRegistration() {
           };
         })
         .catch((error) => {
-          console.error('[SW] Registration failed:', error);
+          logger.error('[SW] Registration failed:', error);
         });
 
       // Listen for controller change (when new SW takes over)
@@ -91,7 +92,7 @@ export default function ServiceWorkerRegistration() {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
           refreshing = true;
-          console.log('[SW] New service worker activated, reloading page...');
+          logger.log('[SW] New service worker activated, reloading page...');
           // Brief delay to show updating message, then reload
           setTimeout(() => {
             window.location.reload();
@@ -102,7 +103,7 @@ export default function ServiceWorkerRegistration() {
       // Listen for messages from service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'SW_UPDATED') {
-          console.log('[SW] Received update notification:', event.data.version);
+          logger.log('[SW] Received update notification:', event.data.version);
         }
       });
     }

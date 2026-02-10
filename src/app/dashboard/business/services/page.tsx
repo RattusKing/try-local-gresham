@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from 'react'
 import { Service } from '@/lib/types'
 import './services.css'
+import { logger } from '@/lib/logger';
 
 export default function BusinessServices() {
   const { user } = useAuth()
@@ -54,7 +55,7 @@ export default function BusinessServices() {
       const availabilitySnap = await getDocs(availabilityQuery)
       setHasAvailability(!availabilitySnap.empty)
     } catch (err: any) {
-      console.error('Error checking availability:', err)
+      logger.error('Error checking availability:', err)
     }
   }
 

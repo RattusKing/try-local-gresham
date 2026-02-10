@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { SPONSORED_BANNER_PRICING } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
       displayPrice: pricing.displayPrice,
     })
   } catch (error: any) {
-    console.error('Error creating sponsored payment intent:', error)
+    logger.error('Error creating sponsored payment intent:', error)
 
     if (error.type === 'StripeInvalidRequestError') {
       return NextResponse.json(
@@ -168,7 +169,7 @@ export async function PUT(req: NextRequest) {
       endDate: endDate.toISOString(),
     })
   } catch (error: any) {
-    console.error('Error confirming sponsored payment:', error)
+    logger.error('Error confirming sponsored payment:', error)
     return NextResponse.json(
       { error: 'Failed to confirm payment' },
       { status: 500 }

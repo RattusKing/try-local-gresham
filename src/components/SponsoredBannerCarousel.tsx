@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase/config'
 import { SponsoredBanner } from '@/lib/types'
 import Link from 'next/link'
 import Image from 'next/image'
+import { logger } from '@/lib/logger';
 
 interface SponsoredBannerWithBusiness extends SponsoredBanner {
   businessTags?: string[]
@@ -87,7 +88,7 @@ export default function SponsoredBannerCarousel() {
       const shuffled = activeBanners.sort(() => Math.random() - 0.5)
       setBanners(shuffled)
     } catch (error) {
-      console.error('Error loading sponsored banners:', error)
+      logger.error('Error loading sponsored banners:', error)
     }
   }
 

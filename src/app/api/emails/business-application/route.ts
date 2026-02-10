@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendBusinessApplicationReceived } from '@/lib/email/service'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
   } catch (error) {
-    console.error('Error in business application email API:', error)
+    logger.error('Error in business application email API:', error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

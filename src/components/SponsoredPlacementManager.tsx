@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { collection, query, where, getDocs, addDoc, Timestamp, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
 import { Business, SponsoredBanner, SPONSORED_BANNER_PRICING, SponsoredBannerDuration } from '@/lib/types'
+import { logger } from '@/lib/logger';
 
 interface SponsoredPlacementManagerProps {
   business: Business
@@ -56,7 +57,7 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
 
       setBanners(loadedBanners)
     } catch (err: any) {
-      console.error('Error loading sponsored banners:', err)
+      logger.error('Error loading sponsored banners:', err)
       setError('Failed to load sponsored placements')
     } finally {
       setLoading(false)
@@ -113,7 +114,7 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
             duration: `${pricing.days} days`,
           },
         }),
-      }).catch((err) => console.error('Admin notification error:', err))
+      }).catch((err) => logger.error('Admin notification error:', err))
 
       setSuccess('Your sponsored placement request has been submitted! You will receive a notification once approved, and payment will be processed automatically.')
       setShowApplyForm(false)
@@ -121,7 +122,7 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
       setSelectedDuration('7')
       await loadBanners()
     } catch (err: any) {
-      console.error('Error applying for sponsored placement:', err)
+      logger.error('Error applying for sponsored placement:', err)
       setError('Failed to submit application. Please try again.')
     } finally {
       setApplying(false)
@@ -156,7 +157,7 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
       // In production, you'd want to use Stripe Elements here
       window.location.href = `/checkout/sponsored?banner=${banner.id}&pi=${data.paymentIntentId}&cs=${data.clientSecret}`
     } catch (err: any) {
-      console.error('Payment error:', err)
+      logger.error('Payment error:', err)
       setError(err.message || 'Failed to process payment')
     } finally {
       setProcessingPayment(null)

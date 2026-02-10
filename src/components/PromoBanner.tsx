@@ -6,6 +6,7 @@ import { collection, query, where, orderBy, getDocs } from 'firebase/firestore'
 import { PromoBanner as PromoBannerType, BannerLocation } from '@/lib/types'
 import Link from 'next/link'
 import './PromoBanner.css'
+import { logger } from '@/lib/logger';
 
 interface PromoBannerProps {
   location: BannerLocation
@@ -67,7 +68,7 @@ export default function PromoBanner({ location }: PromoBannerProps) {
 
       setBanners(loadedBanners)
     } catch (error) {
-      console.error('Error loading banners:', error)
+      logger.error('Error loading banners:', error)
     }
   }
 

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
 import { PushNotificationPayload } from '@/lib/types'
+import { logger } from '@/lib/logger'
+import { SITE_URL } from '@/lib/site-config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
       expiredRemoved: result.expiredEndpoints.length,
     })
   } catch (error: any) {
-    console.error('Push send error:', error)
+    logger.error('Push send error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to send notification' },
       { status: 500 }
@@ -103,8 +105,6 @@ export async function sendOrderNotification(
   customerId: string,
   total?: number
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://try-local.com'
-
   const templates: Record<string, { userId: string; userType: 'customer' | 'business_owner'; targetBusinessId?: string; payload: PushNotificationPayload }> = {
     new_order: {
       userType: 'business_owner',
@@ -113,7 +113,7 @@ export async function sendOrderNotification(
       payload: {
         title: 'New Order Received!',
         body: `New order #${orderId.slice(-6)} for $${(total || 0).toFixed(2)}`,
-        url: `${baseUrl}/dashboard/business/orders`,
+        url: `${SITE_URL}/dashboard/business/orders`,
         tag: `order-${orderId}`,
       }
     },
@@ -123,7 +123,7 @@ export async function sendOrderNotification(
       payload: {
         title: 'Order Confirmed!',
         body: `${businessName} has accepted your order #${orderId.slice(-6)}`,
-        url: `${baseUrl}/dashboard/customer/orders`,
+        url: `${SITE_URL}/dashboard/customer/orders`,
         tag: `order-${orderId}`,
       }
     },
@@ -133,7 +133,7 @@ export async function sendOrderNotification(
       payload: {
         title: 'Order Ready!',
         body: `Your order from ${businessName} is ready for pickup!`,
-        url: `${baseUrl}/dashboard/customer/orders`,
+        url: `${SITE_URL}/dashboard/customer/orders`,
         tag: `order-${orderId}`,
       }
     },
@@ -143,7 +143,7 @@ export async function sendOrderNotification(
       payload: {
         title: 'Order Completed',
         body: `Your order from ${businessName} has been completed. Thank you!`,
-        url: `${baseUrl}/dashboard/customer/orders`,
+        url: `${SITE_URL}/dashboard/customer/orders`,
         tag: `order-${orderId}`,
       }
     },
@@ -153,7 +153,7 @@ export async function sendOrderNotification(
       payload: {
         title: 'Order Cancelled',
         body: `Your order #${orderId.slice(-6)} from ${businessName} was cancelled`,
-        url: `${baseUrl}/dashboard/customer/orders`,
+        url: `${SITE_URL}/dashboard/customer/orders`,
         tag: `order-${orderId}`,
       }
     }

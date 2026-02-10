@@ -4,6 +4,7 @@ import { orderConfirmationSchema, validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (pushError) {
         // Log but don't fail the request if push fails
-        console.error('Push notification failed:', pushError)
+        logger.error('Push notification failed:', pushError)
       }
     }
 
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error in order confirmation email API:', error)
+      logger.error('Error in order confirmation email API:', error)
     }
 
     // Return validation errors to client

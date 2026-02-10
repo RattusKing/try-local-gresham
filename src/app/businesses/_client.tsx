@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
 import type { Business } from '@/lib/types'
+import { logger } from '@/lib/logger';
 
 export default function BusinessesPage() {
   const { user } = useAuth()
@@ -48,7 +49,7 @@ export default function BusinessesPage() {
       data.forEach((b) => b.tags.forEach((t) => cats.add(t)))
       setCategories(Array.from(cats).sort())
     } catch (error) {
-      console.error('Error loading businesses:', error)
+      logger.error('Error loading businesses:', error)
     } finally {
       setLoading(false)
     }
@@ -68,7 +69,7 @@ export default function BusinessesPage() {
       const favoriteIds = new Set(snapshot.docs.map((doc) => doc.data().itemId))
       setFavoritedBusinessIds(favoriteIds)
     } catch (error) {
-      console.error('Error loading favorites:', error)
+      logger.error('Error loading favorites:', error)
     }
   }, [db, user])
 
@@ -125,7 +126,7 @@ export default function BusinessesPage() {
         setFavoritedBusinessIds(newFavorites)
       }
     } catch (error) {
-      console.error('Error updating favorite:', error)
+      logger.error('Error updating favorite:', error)
       alert('Failed to update favorite. Please try again.')
     }
   }

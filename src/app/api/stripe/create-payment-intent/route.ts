@@ -3,6 +3,7 @@ import { stripe, calculatePlatformFee } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { canAcceptPayments } from '@/lib/subscription'
 import { Business } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
       platformFee: platformFeeAmount,
     })
   } catch (error: any) {
-    console.error('Error creating payment intent:', error)
+    logger.error('Error creating payment intent:', error)
 
     // Handle specific Stripe errors
     if (error.type === 'StripeInvalidRequestError') {

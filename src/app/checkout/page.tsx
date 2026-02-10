@@ -13,6 +13,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import StripeCheckoutForm from '@/components/stripe/StripeCheckoutForm'
 import './checkout.css'
+import { logger } from '@/lib/logger';
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -131,7 +132,7 @@ export default function CheckoutPage() {
       setDiscountError('')
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error applying discount code:', err)
+        logger.error('Error applying discount code:', err)
       }
       setDiscountError('Error applying discount code. Please try again.')
     } finally {
@@ -334,13 +335,13 @@ export default function CheckoutPage() {
               }),
             }).catch((err) => {
               if (process.env.NODE_ENV === 'development') {
-                console.error('Email notification error:', err)
+                logger.error('Email notification error:', err)
               }
             })
           }
         } catch (emailError) {
           if (process.env.NODE_ENV === 'development') {
-            console.error('Error sending email notifications:', emailError)
+            logger.error('Error sending email notifications:', emailError)
           }
         }
 
@@ -358,7 +359,7 @@ export default function CheckoutPage() {
           })
         } catch (discountErr) {
           if (process.env.NODE_ENV === 'development') {
-            console.error('Error updating discount code usage:', discountErr)
+            logger.error('Error updating discount code usage:', discountErr)
           }
         }
       }
@@ -368,7 +369,7 @@ export default function CheckoutPage() {
       router.push('/checkout/success')
     } catch (err: any) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error creating order:', err)
+        logger.error('Error creating order:', err)
       }
 
       if (err.message && err.message.includes('Insufficient inventory:')) {

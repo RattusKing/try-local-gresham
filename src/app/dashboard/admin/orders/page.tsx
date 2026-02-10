@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
 import { Order, OrderStatus } from '@/lib/types'
+import { logger } from '@/lib/logger';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -18,7 +19,7 @@ export default function AdminOrders() {
 
   async function loadOrders() {
     if (!db) {
-      console.error('Firebase not initialized')
+      logger.error('Firebase not initialized')
       setLoading(false)
       return
     }
@@ -35,7 +36,7 @@ export default function AdminOrders() {
       })) as Order[]
       setOrders(ordersData)
     } catch (error) {
-      console.error('Error loading orders:', error)
+      logger.error('Error loading orders:', error)
     } finally {
       setLoading(false)
     }
@@ -63,7 +64,7 @@ export default function AdminOrders() {
       setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
       alert('Order status updated successfully!')
     } catch (error) {
-      console.error('Error updating order status:', error)
+      logger.error('Error updating order status:', error)
       alert('Failed to update order status. Please try again.')
     } finally {
       setUpdatingOrderId(null)

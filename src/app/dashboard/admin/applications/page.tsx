@@ -7,7 +7,9 @@ import { db } from '@/lib/firebase/config'
 import { collection, query, getDocs, doc, deleteDoc, addDoc, setDoc, getDoc, orderBy } from 'firebase/firestore'
 import { motion } from 'framer-motion'
 import StatusBadge from '@/components/StatusBadge'
+import { SITE_URL } from '@/lib/site-config'
 import '../admin.css'
+import { logger } from '@/lib/logger';
 
 interface BusinessApplication {
   id: string
@@ -67,7 +69,7 @@ export default function BusinessApplicationsPage() {
 
       setApplications(appsList.filter((app) => app.status === 'pending'))
     } catch (err: any) {
-      console.error('Error loading applications:', err)
+      logger.error('Error loading applications:', err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -148,9 +150,9 @@ export default function BusinessApplicationsPage() {
           businessEmail: application.email,
           businessName: application.businessName,
           ownerName: application.ownerName,
-          dashboardUrl: 'https://try-local.com/dashboard/business',
+          dashboardUrl: `${SITE_URL}/dashboard/business`,
         }),
-      }).catch((err) => console.error('Email error:', err))
+      }).catch((err) => logger.error('Email error:', err))
 
       // Delete the application
       await deleteDoc(doc(db, 'business_applications', application.id))
@@ -160,7 +162,7 @@ export default function BusinessApplicationsPage() {
 
       alert('Business approved successfully!')
     } catch (err: any) {
-      console.error('Error approving application:', err)
+      logger.error('Error approving application:', err)
       alert('Failed to approve application: ' + err.message)
     } finally {
       setProcessing(null)
@@ -189,7 +191,7 @@ export default function BusinessApplicationsPage() {
             ownerName: application.ownerName,
             reason,
           }),
-        }).catch((err) => console.error('Email error:', err))
+        }).catch((err) => logger.error('Email error:', err))
       }
 
       // Delete the application
@@ -200,7 +202,7 @@ export default function BusinessApplicationsPage() {
 
       alert('Application rejected')
     } catch (err: any) {
-      console.error('Error rejecting application:', err)
+      logger.error('Error rejecting application:', err)
       alert('Failed to reject application: ' + err.message)
     } finally {
       setProcessing(null)

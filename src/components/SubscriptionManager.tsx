@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Business, SubscriptionStatus, SubscriptionTier, SUBSCRIPTION_TIERS } from '@/lib/types'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { checkSubscriptionRequired } from '@/lib/subscription'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 import './SubscriptionManager.css'
 
 interface SubscriptionManagerProps {
@@ -209,7 +210,7 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
 
           <p className="subscription-note">
             Cancel anytime. No long-term commitments. <br />
-            <em>Non-profit organization? <a href="mailto:support@try-local.com">Contact us</a> for free access.</em>
+            <em>Non-profit organization? <a href={`mailto:${CONTACT_EMAILS.support}`}>Contact us</a> for free access.</em>
           </p>
         </div>
       ) : (

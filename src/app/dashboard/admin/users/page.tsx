@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
+import { logger } from '@/lib/logger';
 
 interface User {
   uid: string
@@ -27,7 +28,7 @@ export default function AdminUsers() {
 
   async function loadUsers() {
     if (!db) {
-      console.error('Firebase not initialized')
+      logger.error('Firebase not initialized')
       setLoading(false)
       return
     }
@@ -42,7 +43,7 @@ export default function AdminUsers() {
       })) as User[]
       setUsers(usersData)
     } catch (error) {
-      console.error('Error loading users:', error)
+      logger.error('Error loading users:', error)
     } finally {
       setLoading(false)
     }
@@ -70,7 +71,7 @@ export default function AdminUsers() {
       setUsers(users.map(u => u.uid === userId ? { ...u, role: newRole } : u))
       alert('User role updated successfully!')
     } catch (error) {
-      console.error('Error updating user role:', error)
+      logger.error('Error updating user role:', error)
       alert('Failed to update user role. Please try again.')
     } finally {
       setUpdatingUserId(null)
@@ -104,7 +105,7 @@ export default function AdminUsers() {
       setUsers(users.filter(u => u.uid !== userId))
       alert('User deleted successfully!')
     } catch (error) {
-      console.error('Error deleting user:', error)
+      logger.error('Error deleting user:', error)
       alert('Failed to delete user. Please try again.')
     } finally {
       setUpdatingUserId(null)

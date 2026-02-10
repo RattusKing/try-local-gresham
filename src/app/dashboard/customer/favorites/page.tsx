@@ -9,6 +9,7 @@ import { Favorite } from '@/lib/types'
 import DashboardNav from '@/components/DashboardNav'
 import Link from 'next/link'
 import './favorites.css'
+import { logger } from '@/lib/logger';
 
 export default function FavoritesPage() {
   const { user } = useAuth()
@@ -45,7 +46,7 @@ export default function FavoritesPage() {
       loadedFavorites.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       setFavorites(loadedFavorites)
     } catch (error) {
-      console.error('Error loading favorites:', error)
+      logger.error('Error loading favorites:', error)
     } finally {
       setLoading(false)
     }
@@ -58,7 +59,7 @@ export default function FavoritesPage() {
       await deleteDoc(doc(db, 'favorites', favoriteId))
       setFavorites(favorites.filter((f) => f.id !== favoriteId))
     } catch (error) {
-      console.error('Error removing favorite:', error)
+      logger.error('Error removing favorite:', error)
       alert('Failed to remove favorite')
     }
   }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { contactFormSchema, validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
+import { SITE_URL, CONTACT_EMAILS } from '@/lib/site-config'
 
 // Initialize Resend only if API key is available (for build-time safety)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Check if Resend is configured
     if (!resend) {
-      console.error('RESEND_API_KEY is not configured')
+      logger.error('RESEND_API_KEY is not configured')
       return NextResponse.json(
         { success: false, error: 'Email service is not configured' },
         { status: 503 }
@@ -41,8 +43,8 @@ export async function POST(request: NextRequest) {
 
     // Send contact form email to support team
     const result = await resend.emails.send({
-      from: 'Try Local Gresham <noreply@try-local.com>',
-      to: process.env.CONTACT_EMAIL || 'support@try-local.com',
+      from: CONTACT_EMAILS.noreply,
+      to: CONTACT_EMAILS.support,
       replyTo: email,
       subject: `Contact Form: ${subject}`,
       html: `
@@ -76,8 +78,7 @@ export async function POST(request: NextRequest) {
 
     // Notify admins via push notification
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://try-local.com'
-      await fetch(`${baseUrl}/api/notify/admin`, {
+      await fetch(`${SITE_URL}/api/notify/admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -86,14 +87,14 @@ export async function POST(request: NextRequest) {
         }),
       })
     } catch (notifyErr) {
-      console.error('Failed to send admin notification:', notifyErr)
+      logger.error('Failed to send admin notification:', notifyErr)
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error in contact form API:', error)
+      logger.error('Error in contact form API:', error)
     }
 
     // Return validation errors to client

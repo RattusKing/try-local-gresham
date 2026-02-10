@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 import './help.css'
 
 interface FAQItem {
@@ -31,7 +32,7 @@ const faqs: FAQItem[] = [
   {
     category: 'customer',
     question: 'How do refunds work?',
-    answer: 'Refund policies are set by individual businesses. If you have an issue with an order, contact the business first. If unresolved, email support@try-local.com and we\'ll help mediate. See our Refund Policy page for details.'
+    answer: `Refund policies are set by individual businesses. If you have an issue with an order, contact the business first. If unresolved, email ${CONTACT_EMAILS.support} and we'll help mediate. See our Refund Policy page for details.`
   },
   {
     category: 'customer',
@@ -115,7 +116,7 @@ const faqs: FAQItem[] = [
   {
     category: 'general',
     question: 'How do I contact support?',
-    answer: 'Email support@try-local.com or use the Contact form. We typically respond within 1-2 business days (Monday-Friday, 9am-5pm PST).'
+    answer: `Email ${CONTACT_EMAILS.support} or use the Contact form. We typically respond within 1-2 business days (Monday-Friday, 9am-5pm PST).`
   },
   {
     category: 'general',
@@ -326,7 +327,7 @@ export default function HelpPage() {
               <div className="support-option">
                 <h3>📧 Email Support</h3>
                 <p>Get help via email</p>
-                <a href="mailto:support@try-local.com" className="btn btn-primary">
+                <a href={`mailto:${CONTACT_EMAILS.support}`} className="btn btn-primary">
                   Email Us
                 </a>
               </div>

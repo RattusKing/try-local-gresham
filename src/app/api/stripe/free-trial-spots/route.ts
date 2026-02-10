@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { logger } from '@/lib/logger'
 
 const TOTAL_FREE_TRIAL_SPOTS = 10
 
@@ -23,7 +24,7 @@ export async function GET() {
       hasSpotsAvailable: remainingSpots > 0,
     })
   } catch (error: any) {
-    console.error('Error fetching free trial spots:', error)
+    logger.error('Error fetching free trial spots:', error)
     return NextResponse.json(
       { error: 'Failed to fetch free trial spots' },
       { status: 500 }

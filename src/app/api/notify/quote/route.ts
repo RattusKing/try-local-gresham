@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendNewQuoteRequestNotification } from '@/lib/email/service'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { verifyAuthToken } from '@/lib/auth-helpers'
+import { logger } from '@/lib/logger'
+import { SITE_URL } from '@/lib/site-config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (err) {
-      console.warn('Could not fetch business email:', err)
+      logger.warn('Could not fetch business email:', err)
     }
 
     // 2. Send email notification
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
         })
         results.email = true
       } catch (err) {
-        console.error('Failed to send quote email notification:', err)
+        logger.error('Failed to send quote email notification:', err)
       }
     }
 
@@ -83,8 +85,6 @@ export async function POST(request: NextRequest) {
         .get()
 
       if (!pushSubscriptions.empty) {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://try-local.com'
-
         // Import and use push service
         const { sendPushToMultiple } = await import('@/lib/push/service')
         const subscriptions = pushSubscriptions.docs.map(doc => ({
@@ -100,13 +100,13 @@ export async function POST(request: NextRequest) {
         await sendPushToMultiple(subscriptions, {
           title: `New Quote Request${urgencyLabel}`,
           body: `${customerName} needs ${serviceType}`,
-          url: `${baseUrl}/dashboard/business/quotes`,
+          url: `${SITE_URL}/dashboard/business/quotes`,
           tag: `quote-${Date.now()}`,
         })
         results.push = true
       }
     } catch (err) {
-      console.warn('Failed to send push notification:', err)
+      logger.warn('Failed to send push notification:', err)
     }
 
     return NextResponse.json({
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       notifications: results,
     })
   } catch (error: any) {
-    console.error('Quote notification error:', error)
+    logger.error('Quote notification error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to send notifications' },
       { status: 500 }

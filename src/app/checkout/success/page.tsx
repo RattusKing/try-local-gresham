@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/firebase/auth-context'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { logger } from '@/lib/logger';
 
 function SuccessContent() {
   const router = useRouter()
@@ -31,7 +32,7 @@ function SuccessContent() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!user && !isRedirecting) {
-        console.log('No user found after timeout, redirecting to home')
+        logger.log('No user found after timeout, redirecting to home')
         router.push('/')
       }
     }, 2000) // Wait 2 seconds before redirecting to home

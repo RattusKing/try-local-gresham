@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { db } from '@/lib/firebase/config'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import './DashboardNav.css'
+import { logger } from '@/lib/logger';
 
 interface NavLink {
   href: string
@@ -47,7 +48,7 @@ export default function DashboardNav() {
         const appointmentsSnap = await getDocs(appointmentsQuery)
         setPendingAppointments(appointmentsSnap.size)
       } catch (err) {
-        console.warn('Error fetching notification counts:', err)
+        logger.warn('Error fetching notification counts:', err)
       }
     }
 

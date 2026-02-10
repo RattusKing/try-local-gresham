@@ -8,6 +8,7 @@ import { PromoBanner, BannerLocation } from '@/lib/types'
 import DashboardNav from '@/components/DashboardNav'
 import '../admin.css'
 import './banners.css'
+import { logger } from '@/lib/logger';
 
 export default function BannersManagementPage() {
   const { user } = useAuth()
@@ -58,7 +59,7 @@ export default function BannersManagementPage() {
 
       setBanners(loadedBanners)
     } catch (error) {
-      console.error('Error loading banners:', error)
+      logger.error('Error loading banners:', error)
       alert('Failed to load banners')
     } finally {
       setLoading(false)
@@ -123,7 +124,7 @@ export default function BannersManagementPage() {
       setShowForm(false)
       loadBanners()
     } catch (error) {
-      console.error('Error saving banner:', error)
+      logger.error('Error saving banner:', error)
       alert('Failed to save banner')
     }
   }
@@ -154,7 +155,7 @@ export default function BannersManagementPage() {
       alert('Banner deleted successfully!')
       loadBanners()
     } catch (error) {
-      console.error('Error deleting banner:', error)
+      logger.error('Error deleting banner:', error)
       alert('Failed to delete banner')
     }
   }
@@ -169,7 +170,7 @@ export default function BannersManagementPage() {
       })
       loadBanners()
     } catch (error) {
-      console.error('Error toggling banner status:', error)
+      logger.error('Error toggling banner status:', error)
       alert('Failed to update banner status')
     }
   }

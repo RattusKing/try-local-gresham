@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { logger } from '@/lib/logger';
 
 interface StripeCheckoutFormProps {
   onSuccess: (paymentIntentId: string) => void
@@ -24,9 +25,9 @@ export default function StripeCheckoutForm({
   useEffect(() => {
     if (stripe && elements) {
       setIsReady(true)
-      console.log('Stripe and Elements are ready')
+      logger.log('Stripe and Elements are ready')
     } else {
-      console.log('Waiting for Stripe...', { stripe: !!stripe, elements: !!elements })
+      logger.log('Waiting for Stripe...', { stripe: !!stripe, elements: !!elements })
     }
   }, [stripe, elements])
 

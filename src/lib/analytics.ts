@@ -3,6 +3,7 @@
 import { db } from '@/lib/firebase/config'
 import { collection, addDoc, query, where, getDocs, Timestamp, orderBy, limit } from 'firebase/firestore'
 import { AnalyticsEvent, AnalyticsEventType } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 // Generate a session ID for anonymous tracking
 const getSessionId = (): string => {
@@ -56,10 +57,10 @@ export const trackEvent = async (
       ...event,
       timestamp: Timestamp.fromDate(event.timestamp),
     }).catch((err) => {
-      console.warn('Analytics tracking failed:', err)
+      logger.warn('Analytics tracking failed:', err)
     })
   } catch (err) {
-    console.warn('Analytics tracking error:', err)
+    logger.warn('Analytics tracking error:', err)
   }
 }
 
@@ -105,10 +106,10 @@ export const trackSearchQuery = async (
       sessionId: getSessionId(),
       deviceType: getDeviceType(),
     }).catch((err) => {
-      console.warn('Search tracking failed:', err)
+      logger.warn('Search tracking failed:', err)
     })
   } catch (err) {
-    console.warn('Search tracking error:', err)
+    logger.warn('Search tracking error:', err)
   }
 }
 
@@ -141,7 +142,7 @@ export const fetchPopularSearchQueries = async (
       .sort((a, b) => b.count - a.count)
       .slice(0, limitCount)
   } catch (err) {
-    console.error('Error fetching search queries:', err)
+    logger.error('Error fetching search queries:', err)
     return []
   }
 }
@@ -342,7 +343,7 @@ export const fetchBusinessAnalytics = async (
       deviceBreakdown,
     }
   } catch (err) {
-    console.error('Error fetching analytics:', err)
+    logger.error('Error fetching analytics:', err)
     return getEmptyAnalytics()
   }
 }

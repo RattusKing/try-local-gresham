@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app'
 import { getFirestore, Firestore } from 'firebase-admin/firestore'
+import { logger } from '@/lib/logger'
 
 let adminApp: App | null = null
 let adminDb: Firestore | null = null
@@ -19,20 +20,20 @@ export function initializeAdminApp() {
   try {
     // Check if service account env var exists
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-      console.error('FIREBASE_SERVICE_ACCOUNT environment variable is not set!')
+      logger.error('FIREBASE_SERVICE_ACCOUNT environment variable is not set!')
       throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is missing')
     }
 
-    console.log('Attempting to initialize Firebase Admin SDK...')
+    logger.log('Attempting to initialize Firebase Admin SDK...')
 
     // For local development and production on platforms that support service account JSON
     let serviceAccount
     try {
       serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      console.log('Service account JSON parsed successfully')
-      console.log('Project ID from service account:', serviceAccount.project_id)
+      logger.log('Service account JSON parsed successfully')
+      logger.log('Project ID from service account:', serviceAccount.project_id)
     } catch (parseError) {
-      console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:', parseError)
+      logger.error('Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:', parseError)
       throw new Error('Invalid JSON in FIREBASE_SERVICE_ACCOUNT environment variable')
     }
 
@@ -43,10 +44,10 @@ export function initializeAdminApp() {
 
     adminDb = getFirestore(adminApp)
 
-    console.log('Firebase Admin initialized successfully')
+    logger.log('Firebase Admin initialized successfully')
     return { adminApp, adminDb }
   } catch (error) {
-    console.error('Error initializing Firebase Admin:', error)
+    logger.error('Error initializing Firebase Admin:', error)
     throw error
   }
 }

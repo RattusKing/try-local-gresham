@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { fetchBusinessAnalytics, AnalyticsData } from '@/lib/analytics'
 import { Appointment, Order } from '@/lib/types'
 import './analytics.css'
+import { logger } from '@/lib/logger';
 
 export default function BusinessAnalytics() {
   const { user } = useAuth()
@@ -68,7 +69,7 @@ export default function BusinessAnalytics() {
       setOrders(ordersList.slice(0, 10))
 
     } catch (err: unknown) {
-      console.error('Error loading analytics:', err)
+      logger.error('Error loading analytics:', err)
     } finally {
       setLoading(false)
     }

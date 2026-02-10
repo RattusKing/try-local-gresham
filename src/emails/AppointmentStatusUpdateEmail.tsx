@@ -9,6 +9,7 @@ import {
   Text,
   Button,
 } from '@react-email/components'
+import { SITE_URL } from '@/lib/site-config'
 
 interface AppointmentStatusUpdateEmailProps {
   customerName: string
@@ -126,7 +127,7 @@ export default function AppointmentStatusUpdateEmail({
                 Please arrive on time for your appointment. If you need to cancel or reschedule, please do so at least 24 hours in advance.
               </Text>
               <Section style={buttonSection}>
-                <Button style={button} href="https://try-local.com/dashboard/customer/appointments">
+                <Button style={button} href={`${SITE_URL}/dashboard/customer/appointments`}>
                   View My Appointments
                 </Button>
               </Section>

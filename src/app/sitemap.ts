@@ -3,6 +3,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore'
 import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { SITE_URL } from '@/lib/site-config'
+import { logger } from '@/lib/logger'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -77,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticPages, ...businessPages]
   } catch (error) {
-    console.error('Error fetching businesses for sitemap:', error)
+    logger.error('Error fetching businesses for sitemap:', error)
     // Return static pages only if there's an error
     return staticPages
   }

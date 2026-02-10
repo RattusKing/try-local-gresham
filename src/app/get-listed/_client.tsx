@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuth } from '@/lib/firebase/auth-context'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 export default function GetListedPage() {
   const router = useRouter()
@@ -527,7 +528,7 @@ export default function GetListedPage() {
               <div style={{ padding: '1.5rem', background: 'white', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)' }}>
                 <h3 style={{ marginBottom: '0.75rem', fontSize: '1.125rem' }}>What if I need help?</h3>
                 <p style={{ color: 'var(--muted)' }}>
-                  Our team is here to help! Contact us at support@try-local.com with any questions about the application process.
+                  Our team is here to help! Contact us at {CONTACT_EMAILS.support} with any questions about the application process.
                 </p>
               </div>
             </div>

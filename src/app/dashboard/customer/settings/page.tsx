@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import NotificationSettings from '@/components/NotificationSettings'
 import Link from 'next/link'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 export default function CustomerSettings() {
   const { user, loading } = useAuth()
@@ -51,8 +52,8 @@ export default function CustomerSettings() {
         <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', color: '#111827' }}>Need Help?</h3>
         <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>
           If you have questions about notifications or your account, contact us at{' '}
-          <a href="mailto:support@try-local.com" style={{ color: 'var(--primary)' }}>
-            support@try-local.com
+          <a href={`mailto:${CONTACT_EMAILS.support}`} style={{ color: 'var(--primary)' }}>
+            {CONTACT_EMAILS.support}
           </a>
         </p>
       </div>

@@ -21,6 +21,7 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from './config'
 import type { UserProfile, UserRole, AuthUser } from '@/lib/types'
+import { logger } from '@/lib/logger';
 
 interface AuthContextType {
   user: AuthUser | null
@@ -77,9 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               updatedAt: serverTimestamp(),
             })
             profile = newProfile as UserProfile
-            console.log('Auto-created user profile for:', firebaseUser.uid)
+            logger.log('Auto-created user profile for:', firebaseUser.uid)
           } catch (err) {
-            console.error('Failed to auto-create user profile:', err)
+            logger.error('Failed to auto-create user profile:', err)
           }
         }
 
@@ -120,9 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Send email verification
     try {
       await sendEmailVerification(userCredential.user)
-      console.log('Verification email sent successfully')
+      logger.log('Verification email sent successfully')
     } catch (error) {
-      console.error('Failed to send verification email:', error)
+      logger.error('Failed to send verification email:', error)
       // Don't fail signup if verification email fails
     }
 

@@ -6,6 +6,7 @@ import {
 import { validateSchema } from '@/lib/validation'
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const appointmentConfirmationSchema = z.object({
   customerEmail: z.string().email(),
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error in appointment confirmation API:', error)
+      logger.error('Error in appointment confirmation API:', error)
     }
 
     // Return validation errors to client

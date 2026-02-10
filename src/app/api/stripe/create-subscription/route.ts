@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe, getSubscriptionPriceId } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { SubscriptionTier } from '@/lib/types'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -120,7 +121,7 @@ export async function POST(req: NextRequest) {
       tier: tier,
     })
   } catch (error: any) {
-    console.error('Error creating subscription checkout:', error)
+    logger.error('Error creating subscription checkout:', error)
 
     // Handle specific Stripe errors
     if (error.type === 'StripeInvalidRequestError') {

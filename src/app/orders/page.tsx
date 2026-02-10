@@ -8,6 +8,7 @@ import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 import { Order } from '@/lib/types'
 import { motion } from 'framer-motion'
 import './orders.css'
+import { logger } from '@/lib/logger';
 
 export default function OrdersPage() {
   const router = useRouter()
@@ -51,7 +52,7 @@ export default function OrdersPage() {
 
       setOrders(ordersList)
     } catch (err: any) {
-      console.error('Error loading orders:', err)
+      logger.error('Error loading orders:', err)
       setError(err.message)
     } finally {
       setLoading(false)
