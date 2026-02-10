@@ -20,6 +20,8 @@ export default function SponsoredBannersAdmin() {
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null)
+  const [showReactivateModal, setShowReactivateModal] = useState<SponsoredBanner | null>(null)
+  const [reactivateDays, setReactivateDays] = useState(7)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [creating, setCreating] = useState(false)
   const [newBanner, setNewBanner] = useState({
@@ -155,6 +157,37 @@ export default function SponsoredBannersAdmin() {
         status: 'expired',
         updatedAt: new Date(),
       })
+      await loadBanners()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
+  const handleReactivate = async (banner: SponsoredBanner) => {
+    if (!db) return
+
+    try {
+      setProcessingId(banner.id)
+      setError('')
+
+      const startDate = new Date()
+      const endDate = new Date()
+      endDate.setDate(endDate.getDate() + reactivateDays)
+
+      const bannerRef = doc(db, 'sponsoredBanners', banner.id)
+      await updateDoc(bannerRef, {
+        status: 'active',
+        startDate,
+        endDate,
+        durationDays: reactivateDays,
+        updatedAt: new Date(),
+      })
+
+      setSuccess(`Banner reactivated for ${reactivateDays} days!`)
+      setShowReactivateModal(null)
+      setReactivateDays(7)
       await loadBanners()
     } catch (err: any) {
       setError(err.message)
@@ -465,7 +498,7 @@ export default function SponsoredBannersAdmin() {
                     {processingId === banner.id ? 'Activating...' : '💳 Mark as Paid & Activate'}
                   </button>
                 )}
-                {banner.status === 'active' && (
+                {banner.status === 'active' && banner.endDate > new Date() && (
                   <button
                     className="btn-unapprove"
                     onClick={() => handleExpire(banner.id)}
@@ -473,6 +506,18 @@ export default function SponsoredBannersAdmin() {
                     style={{ flex: 1 }}
                   >
                     End Early
+                  </button>
+                )}
+                {(banner.status === 'expired' ||
+                  banner.status === 'cancelled' ||
+                  (banner.status === 'active' && banner.endDate <= new Date())) && (
+                  <button
+                    className="btn-approve"
+                    onClick={() => setShowReactivateModal(banner)}
+                    disabled={processingId === banner.id}
+                    style={{ flex: 1 }}
+                  >
+                    Reactivate
                   </button>
                 )}
                 <button
@@ -588,6 +633,77 @@ export default function SponsoredBannersAdmin() {
                   {creating ? 'Creating...' : 'Create Banner'}
                 </button>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Reactivate Modal */}
+      {showReactivateModal && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              zIndex: 1000,
+            }}
+            onClick={() => {
+              setShowReactivateModal(null)
+              setReactivateDays(7)
+            }}
+          />
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '2rem',
+            borderRadius: 'var(--radius)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            zIndex: 1001,
+            width: '90%',
+            maxWidth: '400px',
+          }}>
+            <h3 style={{ marginTop: 0 }}>Reactivate Banner</h3>
+            <p style={{ color: 'var(--muted)' }}>
+              Reactivate <strong>{showReactivateModal.businessName}</strong> for how many days?
+            </p>
+            <select
+              value={reactivateDays}
+              onChange={(e) => setReactivateDays(Number(e.target.value))}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '2px solid #e5e7eb',
+                marginBottom: '1rem',
+              }}
+            >
+              <option value={7}>7 days</option>
+              <option value={14}>14 days</option>
+              <option value={30}>30 days</option>
+            </select>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                onClick={() => {
+                  setShowReactivateModal(null)
+                  setReactivateDays(7)
+                }}
+                className="btn btn-outline"
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleReactivate(showReactivateModal)}
+                className="btn btn-primary"
+                style={{ flex: 1 }}
+                disabled={processingId === showReactivateModal.id}
+              >
+                {processingId === showReactivateModal.id ? 'Reactivating...' : 'Reactivate'}
+              </button>
             </div>
           </div>
         </>
