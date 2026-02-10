@@ -165,6 +165,42 @@ export default function SponsoredBannersAdmin() {
 
   // Test banner creation removed for production
 
+  const handleCreateBanner = async () => {
+    if (!db || !user) return
+
+    try {
+      setCreating(true)
+      setError('')
+
+      const bannerData = {
+        businessId: user.uid,
+        businessName: newBanner.businessName || 'Test Business',
+        businessCover: '',
+        headline: newBanner.headline || 'Check out our amazing deals!',
+        status: 'active',
+        durationDays: newBanner.durationDays,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + newBanner.durationDays * 24 * 60 * 60 * 1000),
+        isPaid: true,
+        amountPaid: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        approvedBy: user.uid,
+        approvedAt: new Date(),
+      }
+
+      await addDoc(collection(db, 'sponsoredBanners'), bannerData)
+      setSuccess('Banner created successfully!')
+      setShowCreateModal(false)
+      setNewBanner({ businessName: '', headline: '', durationDays: 7 })
+      await loadBanners()
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
   const handleDelete = async (bannerId: string) => {
     if (!db) return
     if (!confirm('Are you sure you want to permanently delete this banner?')) return
@@ -268,7 +304,12 @@ export default function SponsoredBannersAdmin() {
       <div className="admin-dashboard-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <h1 style={{ margin: 0 }}>Sponsored Banner Management</h1>
-          {/* Test banner creation removed for production */}
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            + Create Banner
+          </button>
         </div>
         <p style={{ color: 'var(--muted)', marginTop: '0.5rem', marginBottom: '1rem' }}>
           Sponsored banners appear in a scrolling carousel on the homepage. Businesses pay to be featured.
@@ -456,7 +497,101 @@ export default function SponsoredBannersAdmin() {
         )}
       </div>
 
-      {/* Test banner modal removed for production */}
+      {/* Create Banner Modal */}
+      {showCreateModal && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.5)',
+              zIndex: 1000,
+            }}
+            onClick={() => setShowCreateModal(false)}
+          />
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'white',
+            padding: '2rem',
+            borderRadius: 'var(--radius)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            zIndex: 1001,
+            width: '90%',
+            maxWidth: '500px',
+          }}>
+            <h3 style={{ marginTop: 0 }}>Create Sponsored Banner</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Business Name</label>
+                <input
+                  type="text"
+                  value={newBanner.businessName}
+                  onChange={(e) => setNewBanner({ ...newBanner, businessName: e.target.value })}
+                  placeholder="Business name"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '2px solid #e5e7eb',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Headline</label>
+                <input
+                  type="text"
+                  value={newBanner.headline}
+                  onChange={(e) => setNewBanner({ ...newBanner, headline: e.target.value })}
+                  placeholder="Banner headline"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '2px solid #e5e7eb',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Duration (days)</label>
+                <select
+                  value={newBanner.durationDays}
+                  onChange={(e) => setNewBanner({ ...newBanner, durationDays: Number(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '2px solid #e5e7eb',
+                  }}
+                >
+                  <option value={7}>7 days</option>
+                  <option value={14}>14 days</option>
+                  <option value={30}>30 days</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="btn btn-outline"
+                  style={{ flex: 1 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateBanner}
+                  className="btn btn-primary"
+                  style={{ flex: 1 }}
+                  disabled={creating || !newBanner.businessName}
+                >
+                  {creating ? 'Creating...' : 'Create Banner'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Rejection Modal */}
       {showRejectModal && (
