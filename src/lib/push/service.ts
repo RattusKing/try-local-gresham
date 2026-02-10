@@ -136,5 +136,5 @@ export const NotificationTemplates = {
 }
 
 export function getVapidPublicKey(): string {
-  return VAPID_PUBLIC_KEY
+  return VAPID_PUBLIC_KEY || ''
 }
