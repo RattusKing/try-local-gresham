@@ -22,11 +22,7 @@ export async function POST(req: NextRequest) {
     } catch (adminError: any) {
       console.error('Failed to initialize Firebase Admin:', adminError)
       return NextResponse.json(
-        {
-          error: 'Failed to initialize Firebase Admin SDK',
-          details: adminError.message,
-          stack: adminError.stack
-        },
+        { error: 'Internal server configuration error' },
         { status: 500 }
       )
     }
@@ -100,11 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      {
-        error: errorMessage,
-        details: error.message || 'Unknown error',
-        type: error.type || 'Unknown'
-      },
+      { error: errorMessage },
       { status: 500 }
     )
   }

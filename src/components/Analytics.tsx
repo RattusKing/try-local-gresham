@@ -3,8 +3,11 @@
 import Script from 'next/script'
 
 export default function Analytics() {
-  // Replace with your actual Google Analytics ID
-  const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID
+
+  if (!GA_ID) {
+    return null
+  }
 
   return (
     <>

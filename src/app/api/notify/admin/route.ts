@@ -2,9 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
 import { sendEmail } from '@/lib/email/service'
+import { verifyAuthToken } from '@/lib/auth-helpers'
+
+function escapeHtml(str: string): string {
+  if (!str) return ''
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await verifyAuthToken(request)
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { type, data } = body
 
@@ -107,18 +123,18 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
     case 'new_business_application':
       return {
         pushTitle: 'New Business Application',
-        pushBody: `${data.businessName} has applied to join Try Local`,
-        emailSubject: `New Business Application: ${data.businessName}`,
+        pushBody: `${escapeHtml(data.businessName)} has applied to join Try Local`,
+        emailSubject: `New Business Application: ${escapeHtml(data.businessName)}`,
         emailHtml: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #f97316;">New Business Application</h2>
             <p>A new business has applied to join Try Local:</p>
             <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-              <p><strong>Business Name:</strong> ${data.businessName}</p>
-              <p><strong>Owner:</strong> ${data.ownerName}</p>
-              <p><strong>Email:</strong> ${data.email}</p>
-              <p><strong>Category:</strong> ${data.category}</p>
-              <p><strong>Neighborhood:</strong> ${data.neighborhood}</p>
+              <p><strong>Business Name:</strong> ${escapeHtml(data.businessName)}</p>
+              <p><strong>Owner:</strong> ${escapeHtml(data.ownerName)}</p>
+              <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+              <p><strong>Category:</strong> ${escapeHtml(data.category)}</p>
+              <p><strong>Neighborhood:</strong> ${escapeHtml(data.neighborhood)}</p>
             </div>
             <a href="${baseUrl}/dashboard/admin/applications"
                style="display: inline-block; background: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 1rem;">
@@ -133,16 +149,16 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
     case 'new_sponsored_banner_request':
       return {
         pushTitle: 'New Sponsored Banner Request',
-        pushBody: `${data.businessName} requested a sponsored banner`,
-        emailSubject: `New Sponsored Banner Request: ${data.businessName}`,
+        pushBody: `${escapeHtml(data.businessName)} requested a sponsored banner`,
+        emailSubject: `New Sponsored Banner Request: ${escapeHtml(data.businessName)}`,
         emailHtml: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #f97316;">New Sponsored Banner Request</h2>
             <p>A business has requested a sponsored banner placement:</p>
             <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-              <p><strong>Business:</strong> ${data.businessName}</p>
-              <p><strong>Headline:</strong> ${data.headline || 'Not specified'}</p>
-              <p><strong>Duration:</strong> ${data.duration || 'Not specified'}</p>
+              <p><strong>Business:</strong> ${escapeHtml(data.businessName)}</p>
+              <p><strong>Headline:</strong> ${escapeHtml(data.headline || 'Not specified')}</p>
+              <p><strong>Duration:</strong> ${escapeHtml(data.duration || 'Not specified')}</p>
             </div>
             <a href="${baseUrl}/dashboard/admin/sponsored"
                style="display: inline-block; background: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 1rem;">
@@ -157,18 +173,18 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
     case 'new_contact_message':
       return {
         pushTitle: 'New Contact Message',
-        pushBody: `${data.name} sent a message via contact form`,
-        emailSubject: `New Contact Message from ${data.name}`,
+        pushBody: `${escapeHtml(data.name)} sent a message via contact form`,
+        emailSubject: `New Contact Message from ${escapeHtml(data.name)}`,
         emailHtml: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #f97316;">New Contact Message</h2>
             <p>Someone sent a message via the contact form:</p>
             <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-              <p><strong>From:</strong> ${data.name}</p>
-              <p><strong>Email:</strong> ${data.email}</p>
-              <p><strong>Subject:</strong> ${data.subject || 'No subject'}</p>
+              <p><strong>From:</strong> ${escapeHtml(data.name)}</p>
+              <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+              <p><strong>Subject:</strong> ${escapeHtml(data.subject || 'No subject')}</p>
               <p><strong>Message:</strong></p>
-              <p style="white-space: pre-wrap;">${data.message}</p>
+              <p style="white-space: pre-wrap;">${escapeHtml(data.message)}</p>
             </div>
           </div>
         `,

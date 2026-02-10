@@ -31,8 +31,8 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Anyone can read user profiles (needed for public profiles, profile photos, and role lookups)
-      allow read: if true;
+      // Signed-in users can read user profiles (needed for public profiles and role lookups)
+      allow read: if isSignedIn();
 
       // Users can create their own profile during signup
       allow create: if isSignedIn() && isOwner(userId);
@@ -210,8 +210,8 @@ service cloud.firestore {
 
     // Favorites collection
     match /favorites/{favoriteId} {
-      // Anyone can read favorites (needed for public profiles)
-      allow read: if true;
+      // Signed-in users can read favorites (needed for public profiles)
+      allow read: if isSignedIn();
 
       // Users can create their own favorites
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
@@ -304,8 +304,8 @@ service cloud.firestore {
       allow read: if isSignedIn() &&
                      (resource.data.businessId == request.auth.uid || isAdmin());
 
-      // Anyone can create analytics events (anonymous tracking allowed)
-      allow create: if true;
+      // Signed-in users can create analytics events
+      allow create: if isSignedIn();
 
       // No updates or deletes allowed (analytics are immutable)
       allow update, delete: if false;
@@ -318,8 +318,8 @@ service cloud.firestore {
       allow read: if isSignedIn() &&
                      (resource.data.businessId == request.auth.uid || isAdmin());
 
-      // Anyone can create quote requests (customers submitting inquiries)
-      allow create: if true;
+      // Signed-in users can create quote requests
+      allow create: if isSignedIn();
 
       // Business owners can update quote requests for their business (status, notes, quote amount)
       // Admins can update any quote request
@@ -337,8 +337,8 @@ service cloud.firestore {
       // Only admins can read search queries (for analytics)
       allow read: if isAdmin();
 
-      // Anyone can create search queries (anonymous tracking)
-      allow create: if true;
+      // Signed-in users can create search queries
+      allow create: if isSignedIn();
 
       // No updates or deletes allowed
       allow update, delete: if false;

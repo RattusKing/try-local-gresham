@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendNewQuoteRequestNotification } from '@/lib/email/service'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { verifyAuthToken } from '@/lib/auth-helpers'
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await verifyAuthToken(request)
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const {
       businessId,
