@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       requirements: account.requirements,
     })
   } catch (error) {
-    console.error('Error retrieving account status:', error)
+    logger.error('Error retrieving account status:', error)
     return NextResponse.json(
       { error: 'Failed to retrieve account status' },
       { status: 500 }

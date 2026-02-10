@@ -1,18 +1,20 @@
 import webpush from 'web-push'
 import { PushNotificationPayload } from '@/lib/types'
+import { logger } from '@/lib/logger'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 // VAPID keys for web push - REQUIRED for push notifications
 // Generate with: npx web-push generate-vapid-keys
 // Then set NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in your .env
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:hello@try-local.com'
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || `mailto:${CONTACT_EMAILS.hello}`
 
 // Configure web-push with VAPID details (only if keys are configured)
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 } else if (process.env.NODE_ENV === 'production') {
-  console.warn('VAPID keys not configured - push notifications will be disabled. Set NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.')
+  logger.warn('VAPID keys not configured - push notifications will be disabled. Set NEXT_PUBLIC_VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.')
 }
 
 export interface WebPushSubscription {
@@ -28,7 +30,7 @@ export async function sendPushNotification(
   payload: PushNotificationPayload
 ): Promise<{ success: boolean; error?: string }> {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.warn('VAPID keys not configured - push notifications disabled')
+    logger.warn('VAPID keys not configured - push notifications disabled')
     return { success: false, error: 'VAPID keys not configured' }
   }
 
@@ -46,7 +48,7 @@ export async function sendPushNotification(
     await webpush.sendNotification(subscription, pushPayload)
     return { success: true }
   } catch (error: any) {
-    console.error('Push notification failed:', error)
+    logger.error('Push notification failed:', error)
 
     // Handle expired/invalid subscriptions
     if (error.statusCode === 410 || error.statusCode === 404) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getVapidPublicKey } from '@/lib/push/service'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       subscriptionId: docRef.id
     })
   } catch (error: any) {
-    console.error('Push subscription error:', error)
+    logger.error('Push subscription error:', error)
     return NextResponse.json(
       { error: 'Failed to save subscription' },
       { status: 500 }
@@ -104,7 +105,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Subscription removed' })
   } catch (error: any) {
-    console.error('Push unsubscribe error:', error)
+    logger.error('Push unsubscribe error:', error)
     return NextResponse.json(
       { error: 'Failed to remove subscription' },
       { status: 500 }

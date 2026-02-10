@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export type NotificationPermissionState = 'default' | 'granted' | 'denied' | 'unsupported';
 
@@ -140,7 +141,7 @@ export function useNotifications(): UseNotificationsReturn {
     businessId?: string
   ): Promise<boolean> => {
     if (!platform.supportsPush || permission !== 'granted') {
-      console.warn('Push not supported or permission not granted');
+      logger.warn('Push not supported or permission not granted');
       return false;
     }
 
@@ -148,13 +149,13 @@ export function useNotifications(): UseNotificationsReturn {
       // Get VAPID public key from server
       const keyResponse = await fetch('/api/push/subscribe');
       if (!keyResponse.ok) {
-        console.error('Failed to get VAPID public key');
+        logger.error('Failed to get VAPID public key');
         return false;
       }
       const { publicKey } = await keyResponse.json();
 
       if (!publicKey) {
-        console.error('VAPID public key not configured');
+        logger.error('VAPID public key not configured');
         return false;
       }
 
@@ -186,7 +187,7 @@ export function useNotifications(): UseNotificationsReturn {
       setIsSubscribed(true);
       return true;
     } catch (error) {
-      console.error('Failed to subscribe to push:', error);
+      logger.error('Failed to subscribe to push:', error);
       return false;
     }
   }, [platform, permission]);
@@ -214,7 +215,7 @@ export function useNotifications(): UseNotificationsReturn {
       setIsSubscribed(false);
       return true;
     } catch (error) {
-      console.error('Failed to unsubscribe from push:', error);
+      logger.error('Failed to unsubscribe from push:', error);
       return false;
     }
   }, []);

@@ -19,7 +19,9 @@ import { LocalBusinessSchema, ProductSchema, BreadcrumbSchema } from '@/componen
 import AppointmentBookingModal from '@/components/AppointmentBookingModal'
 import QuoteRequestForm from '@/components/QuoteRequestForm'
 import Head from 'next/head'
+import { SITE_URL } from '@/lib/site-config'
 import './business-profile.css'
+import { logger } from '@/lib/logger';
 
 export default function BusinessProfilePage() {
   const params = useParams()
@@ -65,7 +67,7 @@ export default function BusinessProfilePage() {
       const favoriteIds = new Set(snapshot.docs.map((doc) => doc.data().itemId))
       setFavoritedProductIds(favoriteIds)
     } catch (error) {
-      console.error('Error loading product favorites:', error)
+      logger.error('Error loading product favorites:', error)
     }
   }, [db, user])
 
@@ -135,7 +137,7 @@ export default function BusinessProfilePage() {
 
       setProducts(productsList)
     } catch (err: any) {
-      console.error('Error loading products:', err)
+      logger.error('Error loading products:', err)
     }
   }
 
@@ -156,7 +158,7 @@ export default function BusinessProfilePage() {
 
       setServices(servicesList)
     } catch (err: any) {
-      console.error('Error loading services:', err)
+      logger.error('Error loading services:', err)
     }
   }
 
@@ -198,7 +200,7 @@ export default function BusinessProfilePage() {
         }
       }
     } catch (err: any) {
-      console.error('Error loading reviews:', err)
+      logger.error('Error loading reviews:', err)
     }
   }
 
@@ -372,7 +374,7 @@ export default function BusinessProfilePage() {
         })
       }
     } catch (err: any) {
-      console.error('Error updating business rating:', err)
+      logger.error('Error updating business rating:', err)
     }
   }
 
@@ -440,7 +442,7 @@ export default function BusinessProfilePage() {
         setFavoritedProductIds(newFavorites)
       }
     } catch (error) {
-      console.error('Error updating product favorite:', error)
+      logger.error('Error updating product favorite:', error)
       alert('Failed to update favorite. Please try again.')
     }
   }
@@ -482,7 +484,7 @@ export default function BusinessProfilePage() {
         <meta property="og:title" content={`${business.name} | Try Local Gresham`} />
         <meta property="og:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
         <meta property="og:image" content={business.cover || '/assets/gresham.jpg'} />
-        <meta property="og:url" content={`https://try-local.com/business/${business.id}`} />
+        <meta property="og:url" content={`${SITE_URL}/business/${business.id}`} />
         <meta property="og:type" content="business.business" />
         <meta property="business:contact_data:street_address" content={business.neighborhood || 'Gresham'} />
         <meta property="business:contact_data:locality" content="Gresham" />
@@ -495,7 +497,7 @@ export default function BusinessProfilePage() {
         <meta name="twitter:description" content={business.description || `${business.name} - Local business in Gresham, Oregon`} />
         <meta name="twitter:image" content={business.cover || '/assets/gresham.jpg'} />
 
-        <link rel="canonical" content={`https://try-local.com/business/${business.id}`} />
+        <link rel="canonical" content={`${SITE_URL}/business/${business.id}`} />
       </Head>
 
       <PromoBanner location="business_pages" />

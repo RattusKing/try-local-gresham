@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { logger } from '@/lib/logger';
 
 export default function DashboardError({
   error,
@@ -12,7 +13,7 @@ export default function DashboardError({
 }) {
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Dashboard error:', error)
+      logger.error('Dashboard error:', error)
     }
   }, [error])
 

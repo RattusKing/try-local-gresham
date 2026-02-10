@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { db } from '@/lib/firebase/config'
 import { doc, getDoc } from 'firebase/firestore'
 import { Business } from '@/lib/types'
+import { logger } from '@/lib/logger';
 
 export default function StripeOnboardingPage() {
   const router = useRouter()
@@ -51,7 +52,7 @@ export default function StripeOnboardingPage() {
         setAccountStatus(businessData.stripeAccountStatus || null)
       }
     } catch (err) {
-      console.error('Error loading business:', err)
+      logger.error('Error loading business:', err)
     }
   }
 
@@ -79,7 +80,7 @@ export default function StripeOnboardingPage() {
         await loadBusinessData()
       }
     } catch (err) {
-      console.error('Error checking account status:', err)
+      logger.error('Error checking account status:', err)
     } finally {
       setLoading(false)
     }

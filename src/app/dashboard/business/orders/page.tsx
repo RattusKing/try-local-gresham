@@ -9,6 +9,7 @@ import { collection, query, where, getDocs, doc, updateDoc, orderBy } from 'fire
 import { Order, OrderStatus } from '@/lib/types'
 import { motion } from 'framer-motion'
 import './orders.css'
+import { logger } from '@/lib/logger';
 
 export default function BusinessOrdersPage() {
   const router = useRouter()
@@ -45,7 +46,7 @@ export default function BusinessOrdersPage() {
       // Load orders for this business
       await loadOrders(bizId)
     } catch (err: any) {
-      console.error('Error loading business and orders:', err)
+      logger.error('Error loading business and orders:', err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -91,7 +92,7 @@ export default function BusinessOrdersPage() {
 
       setOrders(ordersList)
     } catch (err: any) {
-      console.error('Error loading orders:', err)
+      logger.error('Error loading orders:', err)
       setError(err.message)
     }
   }
@@ -122,7 +123,7 @@ export default function BusinessOrdersPage() {
               pickupAddress = businessData.address || ''
             }
           } catch (err) {
-            console.error('Error fetching business address:', err)
+            logger.error('Error fetching business address:', err)
           }
         }
 
@@ -141,7 +142,7 @@ export default function BusinessOrdersPage() {
             deliveryAddress: order.deliveryAddress,
             pickupAddress,
           }),
-        }).catch((err) => console.error('Email notification error:', err))
+        }).catch((err) => logger.error('Email notification error:', err))
       }
 
       // Reload orders
@@ -149,7 +150,7 @@ export default function BusinessOrdersPage() {
         await loadOrders(businessId)
       }
     } catch (err: any) {
-      console.error('Error updating order status:', err)
+      logger.error('Error updating order status:', err)
       alert('Failed to update order status: ' + err.message)
     }
   }

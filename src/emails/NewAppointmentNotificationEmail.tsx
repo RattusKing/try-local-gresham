@@ -9,6 +9,7 @@ import {
   Text,
   Button,
 } from '@react-email/components'
+import { SITE_URL } from '@/lib/site-config'
 
 interface NewAppointmentNotificationEmailProps {
   businessName: string
@@ -37,7 +38,7 @@ export default function NewAppointmentNotificationEmail({
   duration,
   price,
   notes,
-  dashboardUrl = 'https://try-local.com/dashboard/business/appointments',
+  dashboardUrl = `${SITE_URL}/dashboard/business/appointments`,
 }: NewAppointmentNotificationEmailProps) {
   return (
     <Html>

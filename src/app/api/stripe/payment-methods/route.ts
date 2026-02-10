@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { logger } from '@/lib/logger'
 
 export async function GET(req: NextRequest) {
   try {
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
       })),
     })
   } catch (error: any) {
-    console.error('Error fetching payment methods:', error)
+    logger.error('Error fetching payment methods:', error)
     return NextResponse.json(
       { error: 'Failed to fetch payment methods' },
       { status: 500 }
@@ -95,7 +96,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Error deleting payment method:', error)
+    logger.error('Error deleting payment method:', error)
     return NextResponse.json(
       { error: 'Failed to delete payment method' },
       { status: 500 }

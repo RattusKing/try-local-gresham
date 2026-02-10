@@ -3,6 +3,8 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
 import { sendEmail } from '@/lib/email/service'
 import { verifyAuthToken } from '@/lib/auth-helpers'
+import { logger } from '@/lib/logger'
+import { SITE_URL } from '@/lib/site-config'
 
 function escapeHtml(str: string): string {
   if (!str) return ''
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
           })
           results.email = true
         } catch (err) {
-          console.error('Failed to send admin email:', err)
+          logger.error('Failed to send admin email:', err)
         }
       }
     }
@@ -94,12 +96,12 @@ export async function POST(request: NextRequest) {
         results.push = true
       }
     } catch (err) {
-      console.error('Failed to send admin push notifications:', err)
+      logger.error('Failed to send admin push notifications:', err)
     }
 
     return NextResponse.json({ success: true, notifications: results })
   } catch (error: any) {
-    console.error('Admin notification error:', error)
+    logger.error('Admin notification error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to send admin notifications' },
       { status: 500 }
@@ -117,8 +119,6 @@ interface NotificationContent {
 }
 
 function getNotificationContent(type: string, data: any): NotificationContent | null {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://try-local.com'
-
   switch (type) {
     case 'new_business_application':
       return {
@@ -136,13 +136,13 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
               <p><strong>Category:</strong> ${escapeHtml(data.category)}</p>
               <p><strong>Neighborhood:</strong> ${escapeHtml(data.neighborhood)}</p>
             </div>
-            <a href="${baseUrl}/dashboard/admin/applications"
+            <a href="${SITE_URL}/dashboard/admin/applications"
                style="display: inline-block; background: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 1rem;">
               Review Application
             </a>
           </div>
         `,
-        url: `${baseUrl}/dashboard/admin/applications`,
+        url: `${SITE_URL}/dashboard/admin/applications`,
         tag: 'admin-application',
       }
 
@@ -160,13 +160,13 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
               <p><strong>Headline:</strong> ${escapeHtml(data.headline || 'Not specified')}</p>
               <p><strong>Duration:</strong> ${escapeHtml(data.duration || 'Not specified')}</p>
             </div>
-            <a href="${baseUrl}/dashboard/admin/sponsored"
+            <a href="${SITE_URL}/dashboard/admin/sponsored"
                style="display: inline-block; background: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 1rem;">
               Review Request
             </a>
           </div>
         `,
-        url: `${baseUrl}/dashboard/admin/sponsored`,
+        url: `${SITE_URL}/dashboard/admin/sponsored`,
         tag: 'admin-sponsored',
       }
 
@@ -188,7 +188,7 @@ function getNotificationContent(type: string, data: any): NotificationContent | 
             </div>
           </div>
         `,
-        url: `${baseUrl}/dashboard/admin`,
+        url: `${SITE_URL}/dashboard/admin`,
         tag: 'admin-contact',
       }
 

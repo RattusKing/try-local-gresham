@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { CartItem } from './types'
+import { logger } from '@/lib/logger';
 
 interface CartContextType {
   items: CartItem[]
@@ -54,7 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         // Cart data is corrupted, clear it
         if (process.env.NODE_ENV === 'development') {
-          console.error('Error loading cart, clearing corrupted data:', error)
+          logger.error('Error loading cart, clearing corrupted data:', error)
         }
         localStorage.removeItem('cart')
         setItems([])
@@ -75,7 +76,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Check if cart data is too large
         if (json.length > MAX_CART_SIZE) {
           if (process.env.NODE_ENV === 'development') {
-            console.error('Cart data exceeds size limit')
+            logger.error('Cart data exceeds size limit')
           }
           return
         }
@@ -84,7 +85,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         // localStorage quota exceeded or other error
         if (process.env.NODE_ENV === 'development') {
-          console.error('Error saving cart:', error)
+          logger.error('Error saving cart:', error)
         }
       }
     }
@@ -107,7 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Check if adding would exceed limit
         if (currentTotalItems + quantity > MAX_CART_ITEMS) {
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
+            logger.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
           }
           return currentItems
         }
@@ -122,7 +123,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Check if adding new item would exceed limit
         if (currentTotalItems + quantity > MAX_CART_ITEMS) {
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
+            logger.warn(`Cart limit of ${MAX_CART_ITEMS} items reached`)
           }
           return currentItems
         }

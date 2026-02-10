@@ -2,6 +2,7 @@
 
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 
 export default function TermsPage() {
   return (
@@ -196,7 +197,7 @@ export default function TermsPage() {
             Questions about these Terms? Contact us at:
           </p>
           <p style={{ lineHeight: '1.8' }}>
-            <strong>Email:</strong> legal@try-local.com
+            <strong>Email:</strong> {CONTACT_EMAILS.legal}
             <br />
             <strong>Address:</strong> Gresham, Oregon
           </p>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,11 +17,11 @@ export async function POST(req: NextRequest) {
     // Get admin database with detailed error handling
     let adminDb
     try {
-      console.log('About to call getAdminDb()...')
+      logger.log('About to call getAdminDb()...')
       adminDb = getAdminDb()
-      console.log('getAdminDb() succeeded')
+      logger.log('getAdminDb() succeeded')
     } catch (adminError: any) {
-      console.error('Failed to initialize Firebase Admin:', adminError)
+      logger.error('Failed to initialize Firebase Admin:', adminError)
       return NextResponse.json(
         { error: 'Internal server configuration error' },
         { status: 500 }
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
       message: 'Stripe Connect account created successfully',
     })
   } catch (error: any) {
-    console.error('Error creating Stripe Connect account:', error)
+    logger.error('Error creating Stripe Connect account:', error)
 
     // Provide detailed error messages
     let errorMessage = 'Failed to create Stripe Connect account'

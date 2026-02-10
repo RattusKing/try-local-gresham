@@ -8,6 +8,7 @@ import PWAInstallAfterSignup from '@/components/PWAInstallAfterSignup'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { SITE_URL } from '@/lib/site-config'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -25,11 +26,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Try Local' }],
   creator: 'Try Local',
   publisher: 'Try Local',
-  metadataBase: new URL('https://try-local.com'),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     title: 'Try Local — Gresham, Oregon',
     description: 'Shop Gresham. Support your neighbors. Find coffee, boutiques, services, and more.',
-    url: 'https://try-local.com',
+    url: SITE_URL,
     siteName: 'Try Local Gresham',
     images: [
       {

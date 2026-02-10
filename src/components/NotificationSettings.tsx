@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/firebase/auth-context'
 import { useNotifications } from '@/hooks/useNotifications'
 import { db } from '@/lib/firebase/config'
 import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { logger } from '@/lib/logger';
 
 interface NotificationSettingsProps {
   showTitle?: boolean
@@ -40,7 +41,7 @@ export default function NotificationSettings({ showTitle = true }: NotificationS
           setEmailNotifications(data.emailNotifications !== false) // Default to true
         }
       } catch (err) {
-        console.error('Failed to load notification preferences:', err)
+        logger.error('Failed to load notification preferences:', err)
       }
     }
     loadPreferences()
@@ -109,7 +110,7 @@ export default function NotificationSettings({ showTitle = true }: NotificationS
               badge: '/icon-192x192.png',
               tag: 'test-notification',
             })
-          }).catch(err => console.error('Test notification failed:', err))
+          }).catch(err => logger.error('Test notification failed:', err))
         }
 
         setTimeout(() => setSuccess(''), 3000)

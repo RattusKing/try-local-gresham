@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { logger } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       url: session.url,
     })
   } catch (error: any) {
-    console.error('Error creating portal session:', error)
+    logger.error('Error creating portal session:', error)
 
     // Handle specific Stripe errors
     if (error.type === 'StripeInvalidRequestError') {

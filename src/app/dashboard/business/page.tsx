@@ -14,6 +14,7 @@ import BusinessPreview from '@/components/BusinessPreview'
 import SponsoredPlacementManager from '@/components/SponsoredPlacementManager'
 import TagSelector from '@/components/TagSelector'
 import './business.css'
+import { logger } from '@/lib/logger';
 
 export default function BusinessDashboard() {
   const { user } = useAuth()
@@ -121,7 +122,7 @@ export default function BusinessDashboard() {
           setSuccess('Profile updated successfully!')
         }
 
-        console.log('Updated existing business:', user.uid, 'Status:', currentStatus)
+        logger.log('Updated existing business:', user.uid, 'Status:', currentStatus)
       } else {
         // Document doesn't exist - CREATE NEW (requires approval)
         // This only happens for brand new businesses
@@ -135,7 +136,7 @@ export default function BusinessDashboard() {
           'Business profile created! Waiting for admin approval.'
         )
 
-        console.log('Created new business:', user.uid)
+        logger.log('Created new business:', user.uid)
       }
 
       await loadBusiness()

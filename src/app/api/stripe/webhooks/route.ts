@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
 import Stripe from 'stripe'
+import { logger } from '@/lib/logger'
 
 // Disable body parsing for webhooks
 export const dynamic = 'force-dynamic'
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
     if (!webhookSecret) {
-      console.error('STRIPE_WEBHOOK_SECRET is not set')
+      logger.error('STRIPE_WEBHOOK_SECRET is not set')
       return NextResponse.json(
         { error: 'Webhook secret not configured' },
         { status: 500 }
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message)
+      logger.error('Webhook signature verification failed:', err.message)
       return NextResponse.json(
         { error: `Webhook Error: ${err.message}` },
         { status: 400 }
@@ -85,12 +86,12 @@ export async function POST(req: NextRequest) {
         break
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        logger.log(`Unhandled event type: ${event.type}`)
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Error processing webhook:', error)
+    logger.error('Error processing webhook:', error)
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment succeeded:', paymentIntent.id)
+  logger.log('Payment succeeded:', paymentIntent.id)
 
   const orderId = paymentIntent.metadata.orderId
 
@@ -113,15 +114,15 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
         stripeChargeId: paymentIntent.latest_charge,
         updatedAt: new Date(),
       })
-      console.log(`Order ${orderId} payment status updated to completed`)
+      logger.log(`Order ${orderId} payment status updated to completed`)
     } catch (error) {
-      console.error('Error updating order payment status:', error)
+      logger.error('Error updating order payment status:', error)
     }
   }
 }
 
 async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment failed:', paymentIntent.id)
+  logger.log('Payment failed:', paymentIntent.id)
 
   const orderId = paymentIntent.metadata.orderId
 
@@ -134,15 +135,15 @@ async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
         stripePaymentIntentId: paymentIntent.id,
         updatedAt: new Date(),
       })
-      console.log(`Order ${orderId} payment status updated to failed`)
+      logger.log(`Order ${orderId} payment status updated to failed`)
     } catch (error) {
-      console.error('Error updating order payment status:', error)
+      logger.error('Error updating order payment status:', error)
     }
   }
 }
 
 async function handleAccountUpdated(account: Stripe.Account) {
-  console.log('Account updated:', account.id)
+  logger.log('Account updated:', account.id)
 
   const businessId = account.metadata?.businessId
 
@@ -171,25 +172,25 @@ async function handleAccountUpdated(account: Stripe.Account) {
           updatedAt: new Date(),
         })
 
-        console.log(`Business ${businessId} Stripe account status updated to ${accountStatus}`)
+        logger.log(`Business ${businessId} Stripe account status updated to ${accountStatus}`)
       }
     } catch (error) {
-      console.error('Error updating business account status:', error)
+      logger.error('Error updating business account status:', error)
     }
   }
 }
 
 async function handleChargeRefunded(charge: Stripe.Charge) {
-  console.log('Charge refunded:', charge.id)
+  logger.log('Charge refunded:', charge.id)
 
   // Find order by charge ID
   // Note: This is simplified. In production, you'd want to query by stripeChargeId
   // For now, we'll just log it
-  console.log('Refund processed for charge:', charge.id)
+  logger.log('Refund processed for charge:', charge.id)
 }
 
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-  console.log('Checkout session completed:', session.id)
+  logger.log('Checkout session completed:', session.id)
 
   // If this is a subscription checkout
   if (session.mode === 'subscription' && session.subscription) {
@@ -206,16 +207,16 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           updatedAt: new Date(),
         })
 
-        console.log(`Business ${businessId} subscription session completed`)
+        logger.log(`Business ${businessId} subscription session completed`)
       } catch (error) {
-        console.error('Error updating business with subscription:', error)
+        logger.error('Error updating business with subscription:', error)
       }
     }
   }
 }
 
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
-  console.log('Subscription created:', subscription.id)
+  logger.log('Subscription created:', subscription.id)
 
   const businessId = subscription.metadata?.businessId
   const hasFirstMonthFree = subscription.metadata?.hasFirstMonthFree === 'true'
@@ -241,15 +242,15 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
         updatedAt: new Date(),
       })
 
-      console.log(`Business ${businessId} subscription created with status: ${subscription.status}, tier: ${tier}`)
+      logger.log(`Business ${businessId} subscription created with status: ${subscription.status}, tier: ${tier}`)
     } catch (error) {
-      console.error('Error creating subscription record:', error)
+      logger.error('Error creating subscription record:', error)
     }
   }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  console.log('Subscription updated:', subscription.id)
+  logger.log('Subscription updated:', subscription.id)
 
   const businessId = subscription.metadata?.businessId
 
@@ -268,15 +269,15 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         updatedAt: new Date(),
       })
 
-      console.log(`Business ${businessId} subscription updated to status: ${subscription.status}`)
+      logger.log(`Business ${businessId} subscription updated to status: ${subscription.status}`)
     } catch (error) {
-      console.error('Error updating subscription:', error)
+      logger.error('Error updating subscription:', error)
     }
   }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  console.log('Subscription deleted:', subscription.id)
+  logger.log('Subscription deleted:', subscription.id)
 
   const businessId = subscription.metadata?.businessId
 
@@ -291,15 +292,15 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
         updatedAt: new Date(),
       })
 
-      console.log(`Business ${businessId} subscription canceled`)
+      logger.log(`Business ${businessId} subscription canceled`)
     } catch (error) {
-      console.error('Error deleting subscription:', error)
+      logger.error('Error deleting subscription:', error)
     }
   }
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  console.log('Invoice payment succeeded:', invoice.id)
+  logger.log('Invoice payment succeeded:', invoice.id)
 
   // Type assertion for invoice properties
   const inv = invoice as any
@@ -322,16 +323,16 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
           updatedAt: new Date(),
         })
 
-        console.log(`Business ${businessId} invoice paid, subscription active`)
+        logger.log(`Business ${businessId} invoice paid, subscription active`)
       } catch (error) {
-        console.error('Error updating subscription payment status:', error)
+        logger.error('Error updating subscription payment status:', error)
       }
     }
   }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  console.log('Invoice payment failed:', invoice.id)
+  logger.log('Invoice payment failed:', invoice.id)
 
   // Type assertion for invoice properties
   const inv = invoice as any
@@ -350,9 +351,9 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
           updatedAt: new Date(),
         })
 
-        console.log(`Business ${businessId} invoice payment failed, subscription past due`)
+        logger.log(`Business ${businessId} invoice payment failed, subscription past due`)
       } catch (error) {
-        console.error('Error updating subscription payment failure:', error)
+        logger.error('Error updating subscription payment failure:', error)
       }
     }
   }

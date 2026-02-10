@@ -9,6 +9,7 @@ import {
   Text,
   Button,
 } from '@react-email/components'
+import { SITE_URL } from '@/lib/site-config'
 
 interface AppointmentConfirmationEmailProps {
   customerName: string
@@ -76,7 +77,7 @@ export default function AppointmentConfirmationEmail({
           </Section>
 
           <Section style={buttonSection}>
-            <Button style={button} href="https://try-local.com/dashboard/customer/appointments">
+            <Button style={button} href={`${SITE_URL}/dashboard/customer/appointments`}>
               View My Appointments
             </Button>
           </Section>

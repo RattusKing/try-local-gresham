@@ -7,10 +7,12 @@ import { motion } from 'framer-motion'
 import { db } from '@/lib/firebase/config'
 import { collection, addDoc } from 'firebase/firestore'
 import { useAuth } from '@/lib/firebase/auth-context'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
 import '../../components/BusinessApplicationModal.css'
+import { logger } from '@/lib/logger';
 
 export default function ApplyPage() {
   const router = useRouter()
@@ -76,7 +78,7 @@ export default function ApplyPage() {
             businessName: formData.businessName,
             ownerName: formData.ownerName,
           }),
-        }).catch((err) => console.error('Email error:', err))
+        }).catch((err) => logger.error('Email error:', err))
       }
 
       // Notify admins of new application
@@ -93,7 +95,7 @@ export default function ApplyPage() {
             neighborhood: formData.neighborhood,
           },
         }),
-      }).catch((err) => console.error('Admin notification error:', err))
+      }).catch((err) => logger.error('Admin notification error:', err))
 
       setSuccess(true)
 
@@ -102,7 +104,7 @@ export default function ApplyPage() {
         router.push('/')
       }, 3000)
     } catch (err: any) {
-      console.error('Error submitting application:', err)
+      logger.error('Error submitting application:', err)
       setError(err.message || 'Failed to submit application')
     } finally {
       setSubmitting(false)
@@ -176,7 +178,7 @@ export default function ApplyPage() {
                 </ol>
               </div>
               <p className="success-note" style={{ color: 'var(--muted)' }}>
-                Questions? Feel free to reach out at <strong>support@try-local.com</strong>
+                Questions? Feel free to reach out at <strong>{CONTACT_EMAILS.support}</strong>
               </p>
               <p style={{ marginTop: '2rem', fontSize: '0.875rem', color: 'var(--muted)' }}>
                 Redirecting to home page...
@@ -442,7 +444,7 @@ export default function ApplyPage() {
                     </div>
                     <div className="pricing-promo">
                       <span className="promo-badge">Special Launch Offer</span>
-                      <p>First 10 businesses get their first month free! 7-day grace period to get set up. Non-profit? <a href="mailto:support@try-local.com" style={{ color: 'var(--secondary-dark)' }}>Contact us</a> for free access.</p>
+                      <p>First 10 businesses get their first month free! 7-day grace period to get set up. Non-profit? <a href={`mailto:${CONTACT_EMAILS.support}`} style={{ color: 'var(--secondary-dark)' }}>Contact us</a> for free access.</p>
                     </div>
                   </div>
 

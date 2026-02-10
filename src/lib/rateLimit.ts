@@ -5,6 +5,7 @@
  */
 
 import { kv } from '@vercel/kv'
+import { logger } from '@/lib/logger'
 
 interface RateLimitRecord {
   count: number
@@ -107,7 +108,7 @@ async function checkRateLimitRedis(
       resetTime: record.resetTime,
     }
   } catch (error) {
-    console.error('Redis rate limit error, failing closed:', error)
+    logger.error('Redis rate limit error, failing closed:', error)
     // On Redis error, deny the request (fail closed) to prevent abuse
     return {
       success: false,

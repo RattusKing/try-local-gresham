@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { db } from '@/lib/firebase/config'
 import { collection, addDoc } from 'firebase/firestore'
+import { CONTACT_EMAILS } from '@/lib/site-config'
 import { useAuth } from '@/lib/firebase/auth-context'
 import './BusinessApplicationModal.css'
+import { logger } from '@/lib/logger';
 
 interface BusinessApplicationModalProps {
   isOpen: boolean
@@ -53,7 +55,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
           })
         })
         .catch(err => {
-          console.error('Error fetching free trial spots:', err)
+          logger.error('Error fetching free trial spots:', err)
           setFreeTrialSpots({
             remainingSpots: 0,
             hasSpotsAvailable: false,
@@ -104,7 +106,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
             businessName: formData.businessName,
             ownerName: formData.ownerName,
           }),
-        }).catch((err) => console.error('Email error:', err))
+        }).catch((err) => logger.error('Email error:', err))
       }
 
       // Notify admins of new application
@@ -121,7 +123,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
             neighborhood: formData.neighborhood,
           },
         }),
-      }).catch((err) => console.error('Admin notification error:', err))
+      }).catch((err) => logger.error('Admin notification error:', err))
 
       setSuccess(true)
       setTimeout(() => {
@@ -141,7 +143,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
         })
       }, 3000)
     } catch (err: any) {
-      console.error('Error submitting application:', err)
+      logger.error('Error submitting application:', err)
       setError(err.message || 'Failed to submit application')
     } finally {
       setSubmitting(false)
@@ -205,7 +207,7 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
               </ol>
             </div>
             <p className="success-note">
-              Questions? Feel free to reach out at <strong>support@try-local.com</strong>
+              Questions? Feel free to reach out at <strong>{CONTACT_EMAILS.support}</strong>
             </p>
           </div>
         </div>
