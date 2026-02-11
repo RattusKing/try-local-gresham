@@ -64,20 +64,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Auto-create profile if user is authenticated but has no Firestore document
         if (!userDoc.exists()) {
           try {
-            const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+            // Note: Firestore does not accept undefined values — use null for absent fields
+            const newProfile = {
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || undefined,
-              photoURL: firebaseUser.photoURL || undefined,
-              coverPhotoURL: undefined,
-              role: 'customer',
-            }
-            await setDoc(userDocRef, {
-              ...newProfile,
+              displayName: firebaseUser.displayName || null,
+              photoURL: firebaseUser.photoURL || null,
+              coverPhotoURL: null,
+              role: 'customer' as const,
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
-            })
-            profile = newProfile as UserProfile
+            }
+            await setDoc(userDocRef, newProfile)
+            profile = newProfile as unknown as UserProfile
             logger.log('Auto-created user profile for:', firebaseUser.uid)
           } catch (err) {
             logger.error('Failed to auto-create user profile:', err)
@@ -128,17 +127,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Create user profile in Firestore
-    const userProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+    // Note: Firestore does not accept undefined values — use null for absent fields
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
       uid: userCredential.user.uid,
       email: userCredential.user.email!,
-      displayName: displayName || undefined,
-      photoURL: undefined,
-      coverPhotoURL: undefined,
+      displayName: displayName || null,
+      photoURL: null,
+      coverPhotoURL: null,
       role,
-    }
-
-    await setDoc(doc(db, 'users', userCredential.user.uid), {
-      ...userProfile,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     })
@@ -167,17 +163,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!userDoc.exists()) {
       // Create new user profile
-      const userProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> = {
+      // Note: Firestore does not accept undefined values — use null for absent fields
+      await setDoc(doc(db, 'users', result.user.uid), {
         uid: result.user.uid,
         email: result.user.email!,
-        displayName: result.user.displayName || undefined,
-        photoURL: result.user.photoURL || undefined,
-        coverPhotoURL: undefined,
-        role: 'customer', // Default role
-      }
-
-      await setDoc(doc(db, 'users', result.user.uid), {
-        ...userProfile,
+        displayName: result.user.displayName || null,
+        photoURL: result.user.photoURL || null,
+        coverPhotoURL: null,
+        role: 'customer',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })
