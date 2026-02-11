@@ -280,7 +280,7 @@ export default function BusinessProfilePage() {
       if (reviewPhotos.length > 0 && storage) {
         setUploadingPhotos(true)
         for (const photo of reviewPhotos) {
-          const photoRef = ref(storage, `reviews/${business.id}/${user.uid}/${Date.now()}_${photo.name}`)
+          const photoRef = ref(storage, `reviews/${user.uid}/${business.id}/${Date.now()}_${photo.name}`)
           await uploadBytes(photoRef, photo)
           const url = await getDownloadURL(photoRef)
           uploadedPhotoUrls.push(url)
