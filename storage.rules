@@ -55,6 +55,19 @@ service firebase.storage {
       allow update, delete: if isOwner(userId) || isAdmin();
     }
 
+    // Review images: reviews/{userId}/{businessId}/{filename}
+    match /reviews/{userId}/{businessId}/{filename} {
+      // Anyone can read (public review images)
+      allow read: if true;
+
+      // Users can upload review images to their own folder
+      allow create: if isOwner(userId) && isSignedIn() && isValidImage();
+
+      // Users can update/delete their own review images
+      // Admins can delete any review image
+      allow update, delete: if isOwner(userId) || isAdmin();
+    }
+
     // User profile pictures: users/{userId}/{filename}
     // Includes profile photos and cover/background photos
     match /users/{userId}/{filename} {
