@@ -26,9 +26,9 @@
 }
 
 .filter-btn.active {
-  background: var(--primary-green);
+  background: #10b981;
   color: white;
-  border-color: var(--primary-green);
+  border-color: #10b981;
 }
 
 .appointments-list {

@@ -1,5 +1,5 @@
 .appointments-count {
-  background: var(--primary-green);
+  background: #10b981;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
@@ -35,9 +35,9 @@
 }
 
 .filter-btn.active {
-  background: var(--primary-green);
+  background: #10b981;
   color: white;
-  border-color: var(--primary-green);
+  border-color: #10b981;
 }
 
 .appointments-list {
