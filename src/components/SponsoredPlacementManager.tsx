@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { collection, query, where, getDocs, addDoc, Timestamp, orderBy } from 'firebase/firestore'
-import { db } from '@/lib/firebase/config'
+import { db, auth } from '@/lib/firebase/config'
 import { Business, SponsoredBanner, SPONSORED_BANNER_PRICING, SponsoredBannerDuration } from '@/lib/types'
 import { logger } from '@/lib/logger';
 
@@ -103,18 +103,24 @@ export default function SponsoredPlacementManager({ business }: SponsoredPlaceme
       await addDoc(collection(db, 'sponsoredBanners'), bannerData)
 
       // Notify admins of new sponsored banner request
-      fetch('/api/notify/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'new_sponsored_banner_request',
-          data: {
-            businessName: business.name,
-            headline: headline.trim() || 'No headline',
-            duration: `${pricing.days} days`,
+      const token = await auth?.currentUser?.getIdToken()
+      if (token) {
+        fetch('/api/notify/admin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
           },
-        }),
-      }).catch((err) => logger.error('Admin notification error:', err))
+          body: JSON.stringify({
+            type: 'new_sponsored_banner_request',
+            data: {
+              businessName: business.name,
+              headline: headline.trim() || 'No headline',
+              duration: `${pricing.days} days`,
+            },
+          }),
+        }).catch((err) => logger.error('Admin notification error:', err))
+      }
 
       setSuccess('Your sponsored placement request has been submitted! You will receive a notification once approved, and payment will be processed automatically.')
       setShowApplyForm(false)

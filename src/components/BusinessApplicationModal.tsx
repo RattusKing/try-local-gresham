@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { db } from '@/lib/firebase/config'
+import { db, auth } from '@/lib/firebase/config'
 import { collection, addDoc } from 'firebase/firestore'
 import { CONTACT_EMAILS } from '@/lib/site-config'
 import { useAuth } from '@/lib/firebase/auth-context'
@@ -110,20 +110,26 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
       }
 
       // Notify admins of new application
-      fetch('/api/notify/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'new_business_application',
-          data: {
-            businessName: formData.businessName,
-            ownerName: formData.ownerName,
-            email: formData.email,
-            category: formData.category,
-            neighborhood: formData.neighborhood,
+      const token = await auth?.currentUser?.getIdToken()
+      if (token) {
+        fetch('/api/notify/admin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
           },
-        }),
-      }).catch((err) => logger.error('Admin notification error:', err))
+          body: JSON.stringify({
+            type: 'new_business_application',
+            data: {
+              businessName: formData.businessName,
+              ownerName: formData.ownerName,
+              email: formData.email,
+              category: formData.category,
+              neighborhood: formData.neighborhood,
+            },
+          }),
+        }).catch((err) => logger.error('Admin notification error:', err))
+      }
 
       setSuccess(true)
       setTimeout(() => {
