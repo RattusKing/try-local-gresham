@@ -129,7 +129,7 @@ export default function SponsoredBannerCarousel() {
   const content = (
     <div className="sp-banner-inner" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Background image - uses header/cover from live business profile */}
-      <div className="sp-banner-bg" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+      <div className="sp-banner-bg" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden', zIndex: 0 }}>
         {headerImage ? (
           <Image
             src={headerImage}
@@ -141,11 +141,11 @@ export default function SponsoredBannerCarousel() {
         ) : (
           <div className="sp-banner-bg-fallback" />
         )}
-        <div className="sp-banner-overlay" />
+        <div className="sp-banner-overlay" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, background: 'linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%)' }} />
       </div>
 
       {/* Content row */}
-      <div className="sp-banner-content">
+      <div className="sp-banner-content" style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', gap: '1rem', padding: '0 1.5rem', width: '100%' }}>
         {/* Logo - uses business profile picture */}
         {logoImage && (
           <div className="sp-banner-logo" style={{ position: 'relative', width: '56px', height: '56px', overflow: 'hidden', flexShrink: 0 }}>
@@ -160,30 +160,30 @@ export default function SponsoredBannerCarousel() {
         )}
 
         {/* Text */}
-        <div className="sp-banner-text">
-          <div className="sp-banner-label">
+        <div className="sp-banner-text" style={{ flex: 1, minWidth: 0 }}>
+          <div className="sp-banner-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#fbbf24', marginBottom: '0.2rem' }}>
             <svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
             </svg>
             Featured
           </div>
-          <h3 className="sp-banner-name">{banner.businessName}</h3>
+          <h3 className="sp-banner-name" style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>{banner.businessName}</h3>
           {banner.headline && (
-            <p className="sp-banner-headline">{banner.headline}</p>
+            <p className="sp-banner-headline" style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{banner.headline}</p>
           )}
         </div>
 
         {/* CTA */}
-        <div className="sp-banner-cta-area">
+        <div className="sp-banner-cta-area" style={{ flexShrink: 0 }}>
           {!isTest ? (
-            <span className="sp-banner-cta">
+            <span className="sp-banner-cta" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#78350f', fontSize: '0.8rem', fontWeight: 700, padding: '0.5rem 1rem', borderRadius: '100px' }}>
               Visit
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </span>
           ) : (
-            <span className="sp-banner-preview">Preview</span>
+            <span className="sp-banner-preview" style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>Preview</span>
           )}
         </div>
       </div>
