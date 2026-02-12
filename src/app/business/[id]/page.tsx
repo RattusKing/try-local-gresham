@@ -725,7 +725,7 @@ export default function BusinessProfilePage() {
                 <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--secondary-dark)' }}>Services</h3>
                 <div className="products-display">
                   {services.map((service) => (
-                    <div key={service.id} className="product-item">
+                    <div key={service.id} className="product-item no-image">
                       <div className="product-item-content">
                         <div className="product-item-header">
                           <h4>{service.name}</h4>
@@ -764,7 +764,7 @@ export default function BusinessProfilePage() {
                 <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--secondary-dark)' }}>Products</h3>
                 <div className="products-display">
                   {products.map((product) => (
-                  <div key={product.id} className="product-item">
+                  <div key={product.id} className={`product-item${!product.image ? ' no-image' : ''}`}>
                     {product.image && (
                       <div style={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
                         <Image
