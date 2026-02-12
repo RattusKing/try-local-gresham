@@ -127,9 +127,9 @@ export default function SponsoredBannerCarousel() {
   const logoImage = banner.businessLogo
 
   const content = (
-    <div className="sp-banner-inner">
+    <div className="sp-banner-inner" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Background image - uses header/cover from live business profile */}
-      <div className="sp-banner-bg">
+      <div className="sp-banner-bg" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
         {headerImage ? (
           <Image
             src={headerImage}
@@ -147,10 +147,10 @@ export default function SponsoredBannerCarousel() {
       {/* Content row */}
       <div className="sp-banner-content">
         {/* Logo - uses business profile picture */}
-        {(logoImage || headerImage) && (
-          <div className="sp-banner-logo">
+        {logoImage && (
+          <div className="sp-banner-logo" style={{ position: 'relative', width: '56px', height: '56px', overflow: 'hidden', flexShrink: 0 }}>
             <Image
-              src={logoImage || headerImage || ''}
+              src={logoImage}
               alt={`${banner.businessName} logo`}
               fill
               style={{ objectFit: 'cover' }}
@@ -292,6 +292,7 @@ export default function SponsoredBannerCarousel() {
           position: absolute;
           inset: 0;
           z-index: 0;
+          overflow: hidden;
         }
 
         .sp-banner-bg :global(img) {

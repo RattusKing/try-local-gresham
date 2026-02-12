@@ -179,12 +179,12 @@
 }
 
 .btn-approve {
-  background: var(--primary-green);
+  background: #10b981;
   color: white;
 }
 
 .btn-approve:hover {
-  background: #0f8a0c;
+  background: #059669;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
