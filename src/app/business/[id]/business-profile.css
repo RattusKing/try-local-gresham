@@ -249,6 +249,10 @@
   transition: background 0.2s;
 }
 
+.product-item.no-image {
+  grid-template-columns: 1fr;
+}
+
 .product-item:hover {
   background: #f3f4f6;
 }
@@ -650,6 +654,10 @@
 }
 
 @media (max-width: 640px) {
+  .product-item {
+    grid-template-columns: 1fr;
+  }
+
   .business-banner {
     height: 180px;
   }
