@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe/config'
 import { getAdminDb } from '@/lib/firebase/admin'
 import Stripe from 'stripe'
 import { logger } from '@/lib/logger'
+import { sendAdminNotification } from '@/lib/notifications/admin'
 
 // Disable body parsing for webhooks
 export const dynamic = 'force-dynamic'
@@ -243,6 +244,20 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
       })
 
       logger.log(`Business ${businessId} subscription created with status: ${subscription.status}, tier: ${tier}`)
+
+      // Notify admins of new subscription
+      try {
+        const businessDoc = await businessRef.get()
+        const businessName = businessDoc.exists ? businessDoc.data()?.name || 'Unknown Business' : 'Unknown Business'
+        await sendAdminNotification('new_subscription', {
+          businessName,
+          tier,
+          status: subscription.status,
+          hasFirstMonthFree: hasFirstMonthFree,
+        })
+      } catch (notifyErr) {
+        logger.error('Failed to send admin subscription notification:', notifyErr)
+      }
     } catch (error) {
       logger.error('Error creating subscription record:', error)
     }
