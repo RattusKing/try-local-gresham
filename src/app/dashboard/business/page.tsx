@@ -2,9 +2,10 @@
 
 import { useAuth } from '@/lib/firebase/auth-context'
 import { db, storage } from '@/lib/firebase/config'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, getDocFromServer, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Business } from '@/lib/types'
 import StatusBadge from '@/components/StatusBadge'
@@ -17,6 +18,19 @@ import './business.css'
 import { logger } from '@/lib/logger';
 
 export default function BusinessDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="dashboard-loading">
+        <div className="spinner"></div>
+        <p>Loading business profile...</p>
+      </div>
+    }>
+      <BusinessDashboardContent />
+    </Suspense>
+  )
+}
+
+function BusinessDashboardContent() {
   const { user } = useAuth()
   const [business, setBusiness] = useState<Business | null>(null)
   const [loading, setLoading] = useState(true)
@@ -43,13 +57,15 @@ export default function BusinessDashboard() {
     instagram: '',
   })
 
-  const loadBusiness = useCallback(async () => {
+  const loadBusiness = useCallback(async (options?: { fromServer?: boolean }) => {
     if (!user || !db) return
 
     try {
       setLoading(true)
       const businessRef = doc(db, 'businesses', user.uid)
-      const businessSnap = await getDoc(businessRef)
+      const businessSnap = options?.fromServer
+        ? await getDocFromServer(businessRef)
+        : await getDoc(businessRef)
 
       if (businessSnap.exists()) {
         const data = businessSnap.data() as Business
@@ -78,6 +94,51 @@ export default function BusinessDashboard() {
   useEffect(() => {
     loadBusiness()
   }, [loadBusiness])
+
+  // Detect return from Stripe checkout and poll for updated subscription status
+  const searchParams = useSearchParams()
+  const hasPolledRef = useRef(false)
+
+  useEffect(() => {
+    const subscriptionParam = searchParams.get('subscription')
+    if (subscriptionParam !== 'success' || hasPolledRef.current) return
+    hasPolledRef.current = true
+
+    // The Stripe webhook may take a few seconds to update Firestore.
+    // Poll a few times so the user sees their active subscription.
+    let attempts = 0
+    const maxAttempts = 8
+    const pollInterval = 2000 // 2 seconds
+
+    const poll = async () => {
+      attempts++
+
+      // Re-read the business doc from server (bypass cache) to check if subscription landed
+      if (!user || !db) return
+      const businessRef = doc(db, 'businesses', user.uid)
+      const snap = await getDocFromServer(businessRef)
+      if (snap.exists()) {
+        const data = snap.data()
+        if (data.subscriptionStatus === 'active' || data.subscriptionStatus === 'trialing') {
+          // Reload business into component state with fresh server data
+          await loadBusiness({ fromServer: true })
+          setSuccess('Subscription activated successfully! Welcome aboard!')
+          return // Done polling
+        }
+      }
+
+      if (attempts < maxAttempts) {
+        setTimeout(poll, pollInterval)
+      } else {
+        // Webhook hasn't arrived yet — still show a helpful message
+        setSuccess('Payment received! Your subscription is being activated — please refresh in a moment if it hasn\'t updated yet.')
+      }
+    }
+
+    // Start polling after a short initial delay to give the webhook a head start
+    const timer = setTimeout(poll, 1500)
+    return () => clearTimeout(timer)
+  }, [searchParams, user, db, loadBusiness])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
