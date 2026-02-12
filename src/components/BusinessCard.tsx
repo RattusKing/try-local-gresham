@@ -86,7 +86,7 @@ export default function BusinessCard({
             Website
           </a>
         </div>
-        <div className="meta">
+        <div className="meta meta-tags">
           🔖{' '}
           {business.tags.map((tag) => (
             <span key={tag} className="tag">
