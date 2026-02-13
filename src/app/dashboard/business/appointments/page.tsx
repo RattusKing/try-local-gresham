@@ -63,26 +63,29 @@ export default function BusinessAppointments() {
     loadAppointments()
   }, [user, loadAppointments])
 
-  const sendStatusEmail = (appointment: Appointment, newStatus: AppointmentStatus) => {
-    // Map Firestore status to API status format (no_show -> no-show)
-    const apiStatus = newStatus === 'no_show' ? 'no-show' : newStatus
-    if (!['confirmed', 'cancelled', 'completed', 'no-show'].includes(apiStatus)) return
+  const sendStatusNotification = (appointment: Appointment, newStatus: AppointmentStatus) => {
+    // Only notify for statuses the customer cares about
+    if (!['confirmed', 'cancelled', 'completed'].includes(newStatus)) return
 
-    fetch('/api/emails/appointment-status', {
+    fetch('/api/notify/appointment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        customerEmail: appointment.customerEmail,
-        customerName: appointment.customerName,
+        type: newStatus,
         appointmentId: appointment.id,
+        businessId: appointment.businessId,
         businessName: appointment.businessName,
+        customerId: appointment.customerId,
+        customerName: appointment.customerName,
+        customerEmail: appointment.customerEmail,
         serviceName: appointment.serviceName,
-        status: apiStatus,
         scheduledDate: appointment.scheduledDate,
         scheduledTime: appointment.scheduledTime,
+        duration: appointment.duration,
+        price: appointment.price,
       }),
     }).catch(() => {
-      // Email failure shouldn't block the status update
+      // Notification failure shouldn't block the status update
     })
   }
 
@@ -99,7 +102,7 @@ export default function BusinessAppointments() {
       // Send status notification email to customer (fire-and-forget)
       const appointment = appointments.find((a) => a.id === appointmentId)
       if (appointment) {
-        sendStatusEmail(appointment, status)
+        sendStatusNotification(appointment, status)
       }
 
       setSuccess('Appointment status updated!')
@@ -141,7 +144,7 @@ export default function BusinessAppointments() {
       // Send cancellation email to customer (fire-and-forget)
       const appointment = appointments.find((a) => a.id === appointmentId)
       if (appointment) {
-        sendStatusEmail(appointment, 'cancelled')
+        sendStatusNotification(appointment, 'cancelled')
       }
 
       setSuccess('Appointment cancelled')

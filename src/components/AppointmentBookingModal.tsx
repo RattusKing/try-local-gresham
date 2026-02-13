@@ -147,29 +147,29 @@ export default function AppointmentBookingModal({
 
       const docRef = await addDoc(collection(db, 'appointments'), appointmentData)
 
-      // Send confirmation emails (fire-and-forget — don't block the user)
-      if (business.email) {
-        fetch('/api/emails/appointment-confirmation', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customerEmail: user.email || '',
-            customerName: user.displayName || user.email || 'Customer',
-            businessEmail: business.email,
-            businessName: business.name,
-            appointmentId: docRef.id,
-            serviceName: selectedService.name,
-            scheduledDate,
-            scheduledTime: selectedTime,
-            duration: selectedService.duration,
-            price: selectedService.price,
-            customerPhone: customerPhone || undefined,
-            notes: notes || undefined,
-          }),
-        }).catch(() => {
-          // Email failure shouldn't block the booking
-        })
-      }
+      // Send email + push notifications (fire-and-forget — don't block the user)
+      fetch('/api/notify/appointment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_booking',
+          appointmentId: docRef.id,
+          businessId: business.id,
+          businessName: business.name,
+          customerId: user.uid,
+          customerName: user.displayName || user.email || 'Customer',
+          customerEmail: user.email || '',
+          customerPhone: customerPhone || undefined,
+          serviceName: selectedService.name,
+          scheduledDate,
+          scheduledTime: selectedTime,
+          duration: selectedService.duration,
+          price: selectedService.price,
+          notes: notes || undefined,
+        }),
+      }).catch(() => {
+        // Notification failure shouldn't block the booking
+      })
 
       // Track analytics event (fire-and-forget)
       trackEvent(business.id, 'appointment_request', {
