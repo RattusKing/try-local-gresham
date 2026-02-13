@@ -70,6 +70,49 @@ export default function CustomerAppointments() {
         status: 'cancelled',
         updatedAt: new Date(),
       })
+
+      // Send notifications (fire-and-forget):
+      // 1. Cancellation confirmation email to customer
+      // 2. Push notification to business owner
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment) {
+        // Customer gets cancellation email
+        fetch('/api/emails/appointment-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: appointment.customerEmail,
+            customerName: appointment.customerName,
+            appointmentId: appointment.id,
+            businessName: appointment.businessName,
+            serviceName: appointment.serviceName,
+            status: 'cancelled',
+            scheduledDate: appointment.scheduledDate,
+            scheduledTime: appointment.scheduledTime,
+          }),
+        }).catch(() => {})
+
+        // Business gets push notification
+        fetch('/api/notify/appointment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'customer_cancelled',
+            appointmentId: appointment.id,
+            businessId: appointment.businessId,
+            businessName: appointment.businessName,
+            customerId: appointment.customerId,
+            customerName: appointment.customerName,
+            customerEmail: appointment.customerEmail,
+            serviceName: appointment.serviceName,
+            scheduledDate: appointment.scheduledDate,
+            scheduledTime: appointment.scheduledTime,
+            duration: appointment.duration,
+            price: appointment.price,
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess('Appointment cancelled successfully')
       await loadAppointments()
     } catch (err: any) {

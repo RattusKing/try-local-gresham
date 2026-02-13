@@ -135,6 +135,27 @@ export const NotificationTemplates = {
     url: '/dashboard/customer/appointments',
     tag: `appointment-confirmed`,
   }),
+
+  appointmentCancelled: (businessName: string, serviceName: string, date: string, time: string) => ({
+    title: 'Appointment Cancelled',
+    body: `Your ${serviceName} with ${businessName} on ${date} at ${time} has been cancelled`,
+    url: '/dashboard/customer/appointments',
+    tag: `appointment-cancelled`,
+  }),
+
+  appointmentCompleted: (businessName: string, serviceName: string) => ({
+    title: 'Appointment Completed',
+    body: `Your ${serviceName} with ${businessName} has been completed. Thank you!`,
+    url: '/dashboard/customer/appointments',
+    tag: `appointment-completed`,
+  }),
+
+  appointmentCancelledByCustomer: (customerName: string, serviceName: string, date: string, time: string) => ({
+    title: 'Appointment Cancelled by Customer',
+    body: `${customerName} cancelled their ${serviceName} on ${date} at ${time}`,
+    url: '/dashboard/business/appointments',
+    tag: `appointment-customer-cancel`,
+  }),
 }
 
 export function getVapidPublicKey(): string {

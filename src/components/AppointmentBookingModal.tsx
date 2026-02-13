@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore'
 import { Service, BusinessAvailability, Appointment, Business, DayOfWeek } from '@/lib/types'
 import { getAvailableTimeSlots, formatTime, getNextDays } from '@/lib/appointments'
+import { trackEvent } from '@/lib/analytics'
 import './AppointmentBookingModal.css'
 
 interface AppointmentBookingModalProps {
@@ -41,6 +42,7 @@ export default function AppointmentBookingModal({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [notes, setNotes] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
   const [availableSlots, setAvailableSlots] = useState<string[]>([])
 
   useEffect(() => {
@@ -122,6 +124,8 @@ export default function AppointmentBookingModal({
       setBooking(true)
       setError('')
 
+      const scheduledDate = selectedDate.toISOString().split('T')[0]
+
       const appointmentData = {
         serviceId: selectedService.id,
         serviceName: selectedService.name,
@@ -130,8 +134,8 @@ export default function AppointmentBookingModal({
         customerId: user.uid,
         customerName: user.displayName || user.email || 'Customer',
         customerEmail: user.email || '',
-        customerPhone: '',
-        scheduledDate: selectedDate.toISOString().split('T')[0],
+        customerPhone: customerPhone || '',
+        scheduledDate,
         scheduledTime: selectedTime,
         duration: selectedService.duration,
         price: selectedService.price,
@@ -141,7 +145,36 @@ export default function AppointmentBookingModal({
         updatedAt: new Date(),
       }
 
-      await addDoc(collection(db, 'appointments'), appointmentData)
+      const docRef = await addDoc(collection(db, 'appointments'), appointmentData)
+
+      // Send email + push notifications (fire-and-forget — don't block the user)
+      fetch('/api/notify/appointment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_booking',
+          appointmentId: docRef.id,
+          businessId: business.id,
+          businessName: business.name,
+          customerId: user.uid,
+          customerName: user.displayName || user.email || 'Customer',
+          customerEmail: user.email || '',
+          customerPhone: customerPhone || undefined,
+          serviceName: selectedService.name,
+          scheduledDate,
+          scheduledTime: selectedTime,
+          duration: selectedService.duration,
+          price: selectedService.price,
+          notes: notes || undefined,
+        }),
+      }).catch(() => {
+        // Notification failure shouldn't block the booking
+      })
+
+      // Track analytics event (fire-and-forget)
+      trackEvent(business.id, 'appointment_request', {
+        userId: user.uid,
+      }).catch(() => {})
 
       if (onSuccess) {
         onSuccess()
@@ -167,6 +200,37 @@ export default function AppointmentBookingModal({
     )
   }
 
+  // Prompt user to sign in if not authenticated
+  if (!user) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>Book Appointment</h2>
+            <button className="modal-close" onClick={onClose}>×</button>
+          </div>
+          <div className="modal-body">
+            <div style={{ textAlign: 'center', padding: '2rem' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>
+                Sign in to book an appointment
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
+                You need to be signed in to book appointments. Create a free account or sign in to continue.
+              </p>
+              <a
+                href="/login"
+                className="btn btn-primary"
+                style={{ display: 'inline-block', textDecoration: 'none' }}
+              >
+                Sign In / Create Account
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!availability || !availability.acceptingAppointments) {
     const isOwner = business && user?.uid === business.ownerId
     return (
@@ -180,7 +244,7 @@ export default function AppointmentBookingModal({
             {isOwner ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>
                 <p style={{ marginBottom: '1rem', fontSize: '1.125rem' }}>
-                  ⚙️ Appointments Not Enabled
+                  Appointments Not Enabled
                 </p>
                 <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>
                   {!availability
@@ -198,10 +262,10 @@ export default function AppointmentBookingModal({
             ) : (
               <div style={{ textAlign: 'center', padding: '2rem' }}>
                 <p style={{ marginBottom: '1rem', fontSize: '1.125rem', color: 'var(--muted)' }}>
-                  📅 Appointments Coming Soon
+                  Appointments Coming Soon
                 </p>
                 <p style={{ color: 'var(--muted)' }}>
-                  This business hasn't enabled appointment bookings yet. Please check back later or contact them directly.
+                  This business hasn&apos;t enabled appointment bookings yet. Please check back later or contact them directly.
                 </p>
               </div>
             )}
@@ -300,16 +364,39 @@ export default function AppointmentBookingModal({
             </div>
           )}
 
-          {/* Step 4: Add Notes (Optional) */}
+          {/* Step 4: Contact & Notes */}
           {selectedService && selectedDate && selectedTime && (
             <div className="booking-step">
-              <h3>4. Add Notes (Optional)</h3>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Any special requests or information for the business..."
-                rows={3}
-              />
+              <h3>4. Your Details</h3>
+              <div style={{ marginBottom: '0.75rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
+                  Phone Number (optional)
+                </label>
+                <input
+                  type="tel"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="(503) 555-0123"
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem 0.75rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
+                  Notes (optional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Any special requests or information for the business..."
+                  rows={3}
+                />
+              </div>
             </div>
           )}
         </div>

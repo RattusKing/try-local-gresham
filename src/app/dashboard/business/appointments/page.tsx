@@ -63,6 +63,32 @@ export default function BusinessAppointments() {
     loadAppointments()
   }, [user, loadAppointments])
 
+  const sendStatusNotification = (appointment: Appointment, newStatus: AppointmentStatus) => {
+    // Only notify for statuses the customer cares about
+    if (!['confirmed', 'cancelled', 'completed'].includes(newStatus)) return
+
+    fetch('/api/notify/appointment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: newStatus,
+        appointmentId: appointment.id,
+        businessId: appointment.businessId,
+        businessName: appointment.businessName,
+        customerId: appointment.customerId,
+        customerName: appointment.customerName,
+        customerEmail: appointment.customerEmail,
+        serviceName: appointment.serviceName,
+        scheduledDate: appointment.scheduledDate,
+        scheduledTime: appointment.scheduledTime,
+        duration: appointment.duration,
+        price: appointment.price,
+      }),
+    }).catch(() => {
+      // Notification failure shouldn't block the status update
+    })
+  }
+
   const updateStatus = async (appointmentId: string, status: AppointmentStatus) => {
     if (!db) return
 
@@ -72,6 +98,13 @@ export default function BusinessAppointments() {
         status,
         updatedAt: new Date(),
       })
+
+      // Send status notification email to customer (fire-and-forget)
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment) {
+        sendStatusNotification(appointment, status)
+      }
+
       setSuccess('Appointment status updated!')
       await loadAppointments()
     } catch (err: any) {
@@ -107,6 +140,13 @@ export default function BusinessAppointments() {
         status: 'cancelled' as AppointmentStatus,
         updatedAt: new Date(),
       })
+
+      // Send cancellation email to customer (fire-and-forget)
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment) {
+        sendStatusNotification(appointment, 'cancelled')
+      }
+
       setSuccess('Appointment cancelled')
       await loadAppointments()
     } catch (err: any) {
