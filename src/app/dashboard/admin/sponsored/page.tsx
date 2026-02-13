@@ -83,6 +83,24 @@ export default function SponsoredBannersAdmin() {
         updatedAt: new Date(),
       })
 
+      // Notify business owner (fire-and-forget)
+      const approvedBanner = banners.find((b) => b.id === bannerId)
+      if (approvedBanner) {
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: approvedBanner.businessId,
+            payload: {
+              title: 'Sponsored Banner Approved!',
+              body: `Your sponsored banner for ${approvedBanner.businessName} has been approved.`,
+              url: '/dashboard/business',
+              tag: `banner-approved-${bannerId}`,
+            },
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess('Banner approved! Payment will be processed and the banner will go live.')
       await loadBanners()
     } catch (err: any) {
@@ -105,6 +123,24 @@ export default function SponsoredBannersAdmin() {
         rejectionReason: rejectionReason || 'No reason provided',
         updatedAt: new Date(),
       })
+
+      // Notify business owner (fire-and-forget)
+      const rejectedBanner = banners.find((b) => b.id === bannerId)
+      if (rejectedBanner) {
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: rejectedBanner.businessId,
+            payload: {
+              title: 'Sponsored Banner Update',
+              body: `Your sponsored banner request for ${rejectedBanner.businessName} was not approved.`,
+              url: '/dashboard/business',
+              tag: `banner-rejected-${bannerId}`,
+            },
+          }),
+        }).catch(() => {})
+      }
 
       setSuccess('Banner rejected.')
       setShowRejectModal(null)

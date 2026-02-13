@@ -311,6 +311,22 @@ export default function BusinessProfilePage() {
           createdAt: new Date(),
         })
         setReviewSuccess('Review submitted successfully!')
+
+        // Notify business owner about new review (fire-and-forget)
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            businessId: business.id,
+            userType: 'business_owner',
+            payload: {
+              title: 'New Review!',
+              body: `${user.displayName || 'A customer'} left a ${reviewForm.rating}-star review`,
+              url: `${SITE_URL}/business/${business.id}`,
+              tag: `review-${business.id}`,
+            },
+          }),
+        }).catch(() => {})
       }
 
       // Clear photo state

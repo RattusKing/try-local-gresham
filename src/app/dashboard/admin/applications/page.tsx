@@ -142,7 +142,7 @@ export default function BusinessApplicationsPage() {
 
       await setDoc(userRef, updateData, { merge: true })
 
-      // Send approval email
+      // Send approval email (fire-and-forget)
       fetch('/api/emails/business-approved', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,6 +153,23 @@ export default function BusinessApplicationsPage() {
           dashboardUrl: `${SITE_URL}/dashboard/business`,
         }),
       }).catch((err) => logger.error('Email error:', err))
+
+      // Send push notification to business owner (fire-and-forget)
+      if (application.userId) {
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: application.userId,
+            payload: {
+              title: 'Business Approved!',
+              body: `${application.businessName} has been approved! Set up your business dashboard now.`,
+              url: `${SITE_URL}/dashboard/business`,
+              tag: `app-approved-${application.id}`,
+            },
+          }),
+        }).catch((err) => logger.error('Push error:', err))
+      }
 
       // Delete the application
       await deleteDoc(doc(db, 'business_applications', application.id))
@@ -192,6 +209,23 @@ export default function BusinessApplicationsPage() {
             reason,
           }),
         }).catch((err) => logger.error('Email error:', err))
+      }
+
+      // Send push notification to business owner (fire-and-forget)
+      if (application.userId) {
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: application.userId,
+            payload: {
+              title: 'Application Update',
+              body: `Your application for ${application.businessName} has been reviewed. Check your email for details.`,
+              url: `${SITE_URL}/get-listed`,
+              tag: `app-rejected-${application.id}`,
+            },
+          }),
+        }).catch((err) => logger.error('Push error:', err))
       }
 
       // Delete the application
