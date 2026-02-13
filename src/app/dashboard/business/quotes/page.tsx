@@ -72,6 +72,37 @@ export default function BusinessQuoteRequests() {
         status,
         updatedAt: new Date(),
       })
+
+      // Notify customer via push when quote status changes (fire-and-forget)
+      const quote = quotes.find((q) => q.id === quoteId)
+      if (quote?.customerId) {
+        const pushMessages: Partial<Record<QuoteRequestStatus, { title: string; body: string }>> = {
+          contacted: {
+            title: 'Quote Request Update',
+            body: `${quote.businessName} has reviewed your quote request for ${quote.serviceType}`,
+          },
+          won: {
+            title: 'Quote Accepted!',
+            body: `Great news! Your quote request for ${quote.serviceType} with ${quote.businessName} has been accepted`,
+          },
+        }
+        const msg = pushMessages[status]
+        if (msg) {
+          fetch('/api/push/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: quote.customerId,
+              payload: {
+                ...msg,
+                url: '/dashboard/customer',
+                tag: `quote-${quoteId}`,
+              },
+            }),
+          }).catch(() => {})
+        }
+      }
+
       setSuccess('Quote status updated!')
       setTimeout(() => setSuccess(''), 3000)
       await loadQuotes()
@@ -116,6 +147,24 @@ export default function BusinessQuoteRequests() {
         status: 'quoted',
         updatedAt: new Date(),
       })
+      // Notify customer that a quote was provided (fire-and-forget)
+      const quotedQuote = quotes.find((q) => q.id === quoteId)
+      if (quotedQuote?.customerId) {
+        fetch('/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: quotedQuote.customerId,
+            payload: {
+              title: 'You Received a Quote!',
+              body: `${quotedQuote.businessName} quoted $${amount.toFixed(2)} for ${quotedQuote.serviceType}`,
+              url: '/dashboard/customer',
+              tag: `quote-${quoteId}`,
+            },
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess('Quote amount saved!')
       setTimeout(() => setSuccess(''), 3000)
       setEditingQuote(null)

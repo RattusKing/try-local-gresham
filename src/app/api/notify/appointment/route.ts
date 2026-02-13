@@ -3,6 +3,7 @@ import {
   sendAppointmentConfirmation,
   sendNewAppointmentNotification,
   sendAppointmentStatusUpdate,
+  sendEmail,
 } from '@/lib/email/service'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { sendPushToMultiple, WebPushSubscription } from '@/lib/push/service'
@@ -210,6 +211,36 @@ export async function POST(request: NextRequest) {
         logger.warn(`Failed to send ${type} push:`, err)
       }
     } else if (type === 'customer_cancelled') {
+      // Email: notify business that customer cancelled
+      const businessEmail = await getBusinessEmail()
+      if (businessEmail) {
+        try {
+          await sendEmail({
+            to: businessEmail,
+            subject: `Appointment Cancelled - ${customerName}`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Appointment Cancelled by Customer</h2>
+                <p><strong>${customerName}</strong> has cancelled their appointment:</p>
+                <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                  <p style="margin: 0.25rem 0;"><strong>Service:</strong> ${serviceName}</p>
+                  <p style="margin: 0.25rem 0;"><strong>Date:</strong> ${scheduledDate}</p>
+                  <p style="margin: 0.25rem 0;"><strong>Time:</strong> ${scheduledTime}</p>
+                  <p style="margin: 0.25rem 0;"><strong>Customer Email:</strong> ${customerEmail || 'N/A'}</p>
+                </div>
+                <a href="${SITE_URL}/dashboard/business/appointments"
+                   style="display: inline-block; background: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 1rem;">
+                  View Appointments
+                </a>
+              </div>
+            `,
+          })
+          results.email = true
+        } catch (err) {
+          logger.warn('Failed to send customer-cancel email to business:', err)
+        }
+      }
+
       // Push: notify business that customer cancelled
       try {
         const subs = await getSubscriptions(businessId)
