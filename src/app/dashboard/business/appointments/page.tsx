@@ -63,6 +63,29 @@ export default function BusinessAppointments() {
     loadAppointments()
   }, [user, loadAppointments])
 
+  const sendStatusEmail = (appointment: Appointment, newStatus: AppointmentStatus) => {
+    // Map Firestore status to API status format (no_show -> no-show)
+    const apiStatus = newStatus === 'no_show' ? 'no-show' : newStatus
+    if (!['confirmed', 'cancelled', 'completed', 'no-show'].includes(apiStatus)) return
+
+    fetch('/api/emails/appointment-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerEmail: appointment.customerEmail,
+        customerName: appointment.customerName,
+        appointmentId: appointment.id,
+        businessName: appointment.businessName,
+        serviceName: appointment.serviceName,
+        status: apiStatus,
+        scheduledDate: appointment.scheduledDate,
+        scheduledTime: appointment.scheduledTime,
+      }),
+    }).catch(() => {
+      // Email failure shouldn't block the status update
+    })
+  }
+
   const updateStatus = async (appointmentId: string, status: AppointmentStatus) => {
     if (!db) return
 
@@ -72,6 +95,13 @@ export default function BusinessAppointments() {
         status,
         updatedAt: new Date(),
       })
+
+      // Send status notification email to customer (fire-and-forget)
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment) {
+        sendStatusEmail(appointment, status)
+      }
+
       setSuccess('Appointment status updated!')
       await loadAppointments()
     } catch (err: any) {
@@ -107,6 +137,13 @@ export default function BusinessAppointments() {
         status: 'cancelled' as AppointmentStatus,
         updatedAt: new Date(),
       })
+
+      // Send cancellation email to customer (fire-and-forget)
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment) {
+        sendStatusEmail(appointment, 'cancelled')
+      }
+
       setSuccess('Appointment cancelled')
       await loadAppointments()
     } catch (err: any) {

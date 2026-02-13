@@ -70,6 +70,26 @@ export default function CustomerAppointments() {
         status: 'cancelled',
         updatedAt: new Date(),
       })
+
+      // Send cancellation confirmation email to customer (fire-and-forget)
+      const appointment = appointments.find((a) => a.id === appointmentId)
+      if (appointment && appointment.customerEmail) {
+        fetch('/api/emails/appointment-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: appointment.customerEmail,
+            customerName: appointment.customerName,
+            appointmentId: appointment.id,
+            businessName: appointment.businessName,
+            serviceName: appointment.serviceName,
+            status: 'cancelled',
+            scheduledDate: appointment.scheduledDate,
+            scheduledTime: appointment.scheduledTime,
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess('Appointment cancelled successfully')
       await loadAppointments()
     } catch (err: any) {
