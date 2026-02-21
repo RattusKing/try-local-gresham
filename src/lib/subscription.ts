@@ -1,8 +1,5 @@
 import { Business } from './types'
 
-// Grace period: 7 days after approval before subscription is required
-const GRACE_PERIOD_DAYS = 7
-
 export interface SubscriptionCheckResult {
   requiresSubscription: boolean
   reason?: string
@@ -19,8 +16,8 @@ export interface SubscriptionCheckResult {
  * Businesses are exempt from subscription requirements if:
  * 1. They are grandfathered (early adopters marked as exempt)
  * 2. They are a verified non-profit organization
- * 3. They are within the 7-day grace period after approval
- * 4. They have an active or trialing subscription
+ * 3. They have an active or trialing subscription
+ * 4. They are an approved business (full access, no subscription required)
  *
  * @param business The business to check
  * @returns SubscriptionCheckResult with details about subscription status
@@ -75,33 +72,10 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
     }
   }
 
-  // 4. Check grace period (7 days after approval)
-  if (business.approvedAt) {
-    const approvalDate = business.approvedAt instanceof Date
-      ? business.approvedAt
-      : new Date(business.approvedAt)
-
-    const now = new Date()
-    const daysSinceApproval = Math.floor(
-      (now.getTime() - approvalDate.getTime()) / (1000 * 60 * 60 * 24)
-    )
-    const daysRemaining = GRACE_PERIOD_DAYS - daysSinceApproval
-
-    if (daysRemaining > 0) {
-      return {
-        requiresSubscription: false,
-        daysRemaining,
-        inGracePeriod: true,
-        isGrandfathered: false,
-        isNonProfit: false,
-        hasActiveSubscription: false,
-      }
-    }
-
-    // Grace period expired
+  // 4. Check if approved - all approved businesses have full access
+  if (business.approvedAt || business.status === 'approved') {
     return {
-      requiresSubscription: true,
-      reason: 'Grace period expired. Please subscribe to continue using the platform.',
+      requiresSubscription: false,
       isGrandfathered: false,
       isNonProfit: false,
       hasActiveSubscription: false,
@@ -109,21 +83,7 @@ export function checkSubscriptionRequired(business: Business | null): Subscripti
     }
   }
 
-  // 5. No approval date - check if status is approved (legacy case)
-  // If approved but no approvedAt date, give them benefit of grace period from now
-  if (business.status === 'approved') {
-    return {
-      requiresSubscription: false,
-      reason: 'Please subscribe to continue using the platform after the grace period.',
-      daysRemaining: GRACE_PERIOD_DAYS,
-      inGracePeriod: true,
-      isGrandfathered: false,
-      isNonProfit: false,
-      hasActiveSubscription: false,
-    }
-  }
-
-  // 6. Not approved yet - no subscription required during application phase
+  // 5. Not approved yet - no subscription required during application phase
   return {
     requiresSubscription: false,
     reason: 'Subscription will be required after approval',
@@ -187,10 +147,6 @@ export function getSubscriptionMessage(result: SubscriptionCheckResult): string 
 
   if (result.hasActiveSubscription) {
     return "Your subscription is active. Thank you for supporting local Gresham businesses!"
-  }
-
-  if (result.inGracePeriod && result.daysRemaining) {
-    return `You have ${result.daysRemaining} day${result.daysRemaining === 1 ? '' : 's'} remaining in your grace period. Subscribe now to continue using the platform.`
   }
 
   if (result.requiresSubscription) {
