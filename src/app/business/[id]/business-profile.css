@@ -673,7 +673,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin-top: -60px;
+    margin-top: 0; /* container starts at banner bottom — picture handles the overlap */
     padding: 0 1rem 1rem;
   }
 
@@ -681,10 +681,11 @@
     width: 100px;
     height: 100px;
     min-width: 100px;
+    margin-top: -60px; /* only the picture overlaps the banner, not the whole container */
   }
 
   .business-profile-details {
-    padding-top: 0; /* column layout — text falls below the picture naturally */
+    padding-top: 0.5rem; /* breathing room below the picture (or below the banner when no logo) */
     padding-bottom: 0;
   }
 
