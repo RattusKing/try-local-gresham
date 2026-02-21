@@ -150,15 +150,11 @@ export default function AdminDashboard() {
       return <span className="badge badge-info">🎉 Free Trial</span>
     }
 
-    if (subCheck.inGracePeriod) {
-      return <span className="badge badge-warning">⏰ Grace Period ({subCheck.daysRemaining} days left)</span>
-    }
-
     if (subCheck.requiresSubscription) {
       return <span className="badge badge-danger">❌ Subscription Required</span>
     }
 
-    return <span className="badge badge-secondary">❓ Unknown</span>
+    return <span className="badge badge-info">✓ Free Access</span>
   }
 
   const formatDate = (date?: Date | any) => {
