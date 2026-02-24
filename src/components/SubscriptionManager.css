@@ -52,10 +52,10 @@
 
 .subscription-tiers {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-bottom: 32px;
-  max-width: 700px;
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -371,11 +371,23 @@
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .subscription-tiers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .subscription-manager {
     padding: 16px;
   }
 
+  .subscription-tiers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
   .subscription-tiers {
     grid-template-columns: 1fr;
   }
