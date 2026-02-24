@@ -329,13 +329,21 @@ export default function ApplyPage() {
                         required
                       >
                         <option value="">Select category</option>
-                        <option value="Food & Beverage">Food & Beverage</option>
-                        <option value="Retail">Retail</option>
-                        <option value="Services">Services</option>
+                        <option value="Food & Dining">Food & Dining</option>
+                        <option value="Shopping & Retail">Shopping & Retail</option>
                         <option value="Health & Wellness">Health & Wellness</option>
-                        <option value="Arts & Entertainment">Arts & Entertainment</option>
-                        <option value="Home & Garden">Home & Garden</option>
+                        <option value="Beauty & Personal Care">Beauty & Personal Care</option>
                         <option value="Professional Services">Professional Services</option>
+                        <option value="Home Services">Home Services</option>
+                        <option value="Automotive">Automotive</option>
+                        <option value="Pets & Animals">Pets & Animals</option>
+                        <option value="Entertainment & Recreation">Entertainment & Recreation</option>
+                        <option value="Education & Learning">Education & Learning</option>
+                        <option value="Events & Celebrations">Events & Celebrations</option>
+                        <option value="Family & Kids">Family & Kids</option>
+                        <option value="Community & Nonprofit">Community & Nonprofit</option>
+                        <option value="Outdoors & Nature">Outdoors & Nature</option>
+                        <option value="Travel & Lodging">Travel & Lodging</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
