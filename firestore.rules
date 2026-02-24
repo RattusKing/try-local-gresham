@@ -62,9 +62,11 @@ service cloud.firestore {
                        isAdmin();
 
       // Business owners can update their own business BUT cannot change approval status
+      // (role is only set to business_owner after admin approval, so we use isSignedIn()
+      //  here instead of isBusinessOwner() — same reasoning as the read rule above)
       // Admins can update any business (including approval status)
       allow update: if isAdmin() ||
-                       (isBusinessOwner() &&
+                       (isSignedIn() &&
                         resource.data.ownerId == request.auth.uid &&
                         request.resource.data.status == resource.data.status);
 
