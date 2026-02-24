@@ -330,13 +330,21 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
                   required
                 >
                   <option value="">Select category</option>
-                  <option value="Food & Beverage">Food & Beverage</option>
-                  <option value="Retail">Retail</option>
-                  <option value="Services">Services</option>
+                  <option value="Food & Dining">Food & Dining</option>
+                  <option value="Shopping & Retail">Shopping & Retail</option>
                   <option value="Health & Wellness">Health & Wellness</option>
-                  <option value="Arts & Entertainment">Arts & Entertainment</option>
-                  <option value="Home & Garden">Home & Garden</option>
+                  <option value="Beauty & Personal Care">Beauty & Personal Care</option>
                   <option value="Professional Services">Professional Services</option>
+                  <option value="Home Services">Home Services</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Pets & Animals">Pets & Animals</option>
+                  <option value="Entertainment & Recreation">Entertainment & Recreation</option>
+                  <option value="Education & Learning">Education & Learning</option>
+                  <option value="Events & Celebrations">Events & Celebrations</option>
+                  <option value="Family & Kids">Family & Kids</option>
+                  <option value="Community & Nonprofit">Community & Nonprofit</option>
+                  <option value="Outdoors & Nature">Outdoors & Nature</option>
+                  <option value="Travel & Lodging">Travel & Lodging</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
@@ -379,21 +387,73 @@ export default function BusinessApplicationModal({ isOpen, onClose }: BusinessAp
             <div className="pricing-section">
               <h3>Simple, Transparent Pricing</h3>
               <div className="pricing-cards">
-                <div className="pricing-card featured">
-                  <div className="pricing-badge">Most Popular</div>
-                  <h4>Standard Plan</h4>
+                {/* Basic Monthly */}
+                <div className="pricing-card">
+                  <h4>Basic Monthly</h4>
+                  <div className="pricing-amount">
+                    <span className="currency">$</span>
+                    <span className="price">15</span>
+                    <span className="period">/month</span>
+                  </div>
+                  <ul className="pricing-features">
+                    <li>✓ Directory listing</li>
+                    <li>✓ Customer reviews & ratings</li>
+                  </ul>
+                </div>
+
+                {/* Basic Annual */}
+                <div className="pricing-card">
+                  <h4>Basic Annual</h4>
+                  <div className="pricing-amount">
+                    <span className="currency">$</span>
+                    <span className="price">165</span>
+                    <span className="period">/year</span>
+                  </div>
+                  <div className="pricing-savings">Save $15/year</div>
+                  <ul className="pricing-features">
+                    <li>✓ Directory listing</li>
+                    <li>✓ Customer reviews & ratings</li>
+                  </ul>
+                </div>
+
+                {/* Monthly Plan */}
+                <div className="pricing-card">
+                  <h4>Monthly Plan</h4>
                   <div className="pricing-amount">
                     <span className="currency">$</span>
                     <span className="price">39</span>
                     <span className="period">/month</span>
                   </div>
                   <ul className="pricing-features">
-                    <li>Unlimited product & service listings</li>
-                    <li>Online ordering & appointment booking</li>
-                    <li>Business analytics & insights</li>
-                    <li>Customer reviews & ratings</li>
-                    <li>Featured in local directory</li>
-                    <li>Payment processing via Stripe</li>
+                    <li>✓ Unlimited product & service listings</li>
+                    <li>✓ Online ordering & appointment booking</li>
+                    <li>✓ Business analytics & insights</li>
+                    <li>✓ Customer reviews & ratings</li>
+                    <li>✓ Featured in local directory</li>
+                    <li>✓ Payment processing via Stripe</li>
+                  </ul>
+                  <div className="pricing-fee">
+                    <strong>Transaction Fee:</strong> 2% per sale
+                  </div>
+                </div>
+
+                {/* Annual Plan */}
+                <div className="pricing-card featured">
+                  <div className="pricing-badge">Best Value</div>
+                  <h4>Annual Plan</h4>
+                  <div className="pricing-amount">
+                    <span className="currency">$</span>
+                    <span className="price">430</span>
+                    <span className="period">/year</span>
+                  </div>
+                  <div className="pricing-savings">Save $38/year</div>
+                  <ul className="pricing-features">
+                    <li>✓ Unlimited product & service listings</li>
+                    <li>✓ Online ordering & appointment booking</li>
+                    <li>✓ Business analytics & insights</li>
+                    <li>✓ Customer reviews & ratings</li>
+                    <li>✓ Featured in local directory</li>
+                    <li>✓ Payment processing via Stripe</li>
                   </ul>
                   <div className="pricing-fee">
                     <strong>Transaction Fee:</strong> 2% per sale
