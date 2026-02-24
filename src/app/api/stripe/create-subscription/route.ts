@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate tier
-    const validTiers: SubscriptionTier[] = ['monthly', 'yearly', 'nonprofit']
+    const validTiers: SubscriptionTier[] = ['monthly', 'yearly', 'nonprofit', 'basic_monthly', 'basic_yearly']
     if (!validTiers.includes(tier as SubscriptionTier)) {
       return NextResponse.json(
         { error: `Invalid subscription tier. Must be one of: ${validTiers.join(', ')}` },
