@@ -48,12 +48,15 @@ service cloud.firestore {
     // Businesses collection
     match /businesses/{businessId} {
       // Everyone can read approved businesses
+      // Any signed-in user can read their own business regardless of role
+      // (role is only set to business_owner after admin approval, so we can't
+      //  require it here or the owner can't view their own pending listing)
       allow read: if resource.data.status == 'approved' || isAdmin() ||
-                     (isBusinessOwner() && resource.data.ownerId == request.auth.uid);
+                     (isSignedIn() && resource.data.ownerId == request.auth.uid);
 
-      // Business owners can create their own business (requires admin approval)
+      // Any signed-in user can submit their own business for approval (status must be pending)
       // Admins can create businesses for others (during approval process)
-      allow create: if (isBusinessOwner() &&
+      allow create: if (isSignedIn() &&
                        request.resource.data.ownerId == request.auth.uid &&
                        request.resource.data.status == 'pending') ||
                        isAdmin();
