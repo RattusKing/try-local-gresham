@@ -296,15 +296,31 @@ export interface CSVImportError {
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'incomplete' | 'trialing' | 'unpaid'
 
-export type SubscriptionTier = 'monthly' | 'yearly' | 'nonprofit'
+export type SubscriptionTier = 'monthly' | 'yearly' | 'nonprofit' | 'basic_monthly' | 'basic_yearly'
 
 // Subscription pricing (in cents)
 export const SUBSCRIPTION_PRICE_MONTHLY = 3900 // $39.00/month
 export const SUBSCRIPTION_PRICE_YEARLY = 43000 // $430.00/year (saves $38/year vs monthly)
 export const SUBSCRIPTION_PRICE_NONPROFIT = 0 // Free for non-profits
+export const SUBSCRIPTION_PRICE_BASIC_MONTHLY = 1500 // $15.00/month - basic directory listing
+export const SUBSCRIPTION_PRICE_BASIC_YEARLY = 16500 // $165.00/year - basic directory listing
 
 // Subscription metadata
 export const SUBSCRIPTION_TIERS = {
+  basic_monthly: {
+    price: SUBSCRIPTION_PRICE_BASIC_MONTHLY,
+    interval: 'month' as const,
+    displayName: 'Basic Monthly',
+    description: '$15/month',
+    savings: null,
+  },
+  basic_yearly: {
+    price: SUBSCRIPTION_PRICE_BASIC_YEARLY,
+    interval: 'year' as const,
+    displayName: 'Basic Annual',
+    description: '$165/year',
+    savings: 'Save $15/year',
+  },
   monthly: {
     price: SUBSCRIPTION_PRICE_MONTHLY,
     interval: 'month' as const,
