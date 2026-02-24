@@ -388,7 +388,47 @@ export default function ApplyPage() {
                     <p style={{ textAlign: 'center', color: 'var(--muted)', marginBottom: '1.5rem', fontSize: '0.9375rem' }}>
                       Choose the plan that works best for your business
                     </p>
-                    <div className="pricing-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+                    <div className="pricing-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
+                      {/* Basic Monthly */}
+                      <div className="pricing-card">
+                        <h4>Basic Monthly</h4>
+                        <div className="pricing-amount">
+                          <span className="currency">$</span>
+                          <span className="price">15</span>
+                          <span className="period">/month</span>
+                        </div>
+                        <ul className="pricing-features" style={{ fontSize: '0.9375rem' }}>
+                          <li>✓ Directory listing</li>
+                          <li>✓ Customer reviews & ratings</li>
+                        </ul>
+                      </div>
+
+                      {/* Basic Annual */}
+                      <div className="pricing-card">
+                        <h4>Basic Annual</h4>
+                        <div className="pricing-amount">
+                          <span className="currency">$</span>
+                          <span className="price">165</span>
+                          <span className="period">/year</span>
+                        </div>
+                        <div style={{
+                          background: 'rgba(153, 237, 195, 0.2)',
+                          padding: '0.375rem',
+                          borderRadius: '6px',
+                          marginBottom: '1rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          color: 'var(--primary-green)',
+                          textAlign: 'center'
+                        }}>
+                          Save $15/year
+                        </div>
+                        <ul className="pricing-features" style={{ fontSize: '0.9375rem' }}>
+                          <li>✓ Directory listing</li>
+                          <li>✓ Customer reviews & ratings</li>
+                        </ul>
+                      </div>
+
                       {/* Monthly Plan */}
                       <div className="pricing-card">
                         <h4>Monthly Plan</h4>
