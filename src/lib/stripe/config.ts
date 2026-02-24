@@ -14,6 +14,12 @@ export function getSubscriptionPriceId(tier: SubscriptionTier = 'monthly'): stri
   let priceId: string | undefined
 
   switch (tier) {
+    case 'basic_monthly':
+      priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID_BASIC_MONTHLY
+      break
+    case 'basic_yearly':
+      priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID_BASIC_YEARLY
+      break
     case 'monthly':
       priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID_MONTHLY || process.env.STRIPE_SUBSCRIPTION_PRICE_ID
       break

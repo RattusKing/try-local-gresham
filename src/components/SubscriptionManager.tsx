@@ -16,7 +16,7 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('yearly') // Default to yearly (better value)
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('basic_monthly')
 
   const hasActiveSubscription = business.subscriptionStatus === 'active' ||
                                 business.subscriptionStatus === 'trialing'
@@ -143,6 +143,38 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
           <p className="subscription-intro">Choose the plan that works best for your business:</p>
 
           <div className="subscription-tiers">
+            {/* Basic Monthly Plan */}
+            <div
+              className={`subscription-tier ${selectedTier === 'basic_monthly' ? 'selected' : ''}`}
+              onClick={() => setSelectedTier('basic_monthly')}
+            >
+              <div className="tier-header">
+                <h3>Basic Monthly</h3>
+              </div>
+              <div className="tier-price">
+                <span className="price-amount">$15</span>
+                <span className="price-period">/month</span>
+              </div>
+              <div className="tier-billing">Billed monthly</div>
+              <div className="tier-annual-cost">$180/year</div>
+            </div>
+
+            {/* Basic Yearly Plan */}
+            <div
+              className={`subscription-tier ${selectedTier === 'basic_yearly' ? 'selected' : ''}`}
+              onClick={() => setSelectedTier('basic_yearly')}
+            >
+              <div className="tier-header">
+                <h3>Basic Annual</h3>
+              </div>
+              <div className="tier-price">
+                <span className="price-amount">$165</span>
+                <span className="price-period">/year</span>
+              </div>
+              <div className="tier-billing">Billed annually</div>
+              <div className="tier-savings">Save $15/year</div>
+            </div>
+
             {/* Monthly Plan */}
             <div
               className={`subscription-tier ${selectedTier === 'monthly' ? 'selected' : ''}`}
@@ -178,15 +210,18 @@ export default function SubscriptionManager({ business, onSubscriptionUpdate }: 
           </div>
 
           <div className="subscription-features">
-            <h4>All plans include:</h4>
+            <h4>Basic plans include:</h4>
             <ul>
-              <li>✓ Full marketplace listing</li>
+              <li>✓ Directory listing</li>
+              <li>✓ Customer reviews</li>
+            </ul>
+            <h4>Full plans also include:</h4>
+            <ul>
               <li>✓ Product catalog management</li>
               <li>✓ Order management system</li>
               <li>✓ Appointment scheduling</li>
               <li>✓ Analytics dashboard</li>
               <li>✓ Discount code creation</li>
-              <li>✓ Customer reviews</li>
               <li>✓ Direct payment processing</li>
             </ul>
           </div>
