@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react';
 import { logger } from '@/lib/logger';
 
+const SW_RELOAD_KEY = 'sw-last-reload';
+const SW_VERSION_KEY = 'sw-known-version';
+// Only allow one SW-triggered reload per 60 seconds to prevent loops
+const RELOAD_COOLDOWN_MS = 60 * 1000;
+
 export default function ServiceWorkerRegistration() {
   const [updating, setUpdating] = useState(false);
 
@@ -42,10 +47,10 @@ export default function ServiceWorkerRegistration() {
             }
           });
 
-          // Check for updates frequently (every 30 seconds)
+          // Check for updates every 5 minutes (not 30 seconds)
           const updateInterval = setInterval(() => {
             reg.update().catch(() => {});
-          }, 30 * 1000);
+          }, 5 * 60 * 1000);
 
           // Check for updates when page becomes visible
           const handleVisibilityChange = () => {
@@ -54,12 +59,6 @@ export default function ServiceWorkerRegistration() {
             }
           };
           document.addEventListener('visibilitychange', handleVisibilityChange);
-
-          // Check for updates on page focus
-          const handleFocus = () => {
-            reg.update().catch(() => {});
-          };
-          window.addEventListener('focus', handleFocus);
 
           // Check for updates when coming back online
           const handleOnline = () => {
@@ -79,7 +78,6 @@ export default function ServiceWorkerRegistration() {
           return () => {
             clearInterval(updateInterval);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('focus', handleFocus);
             window.removeEventListener('online', handleOnline);
           };
         })
@@ -90,20 +88,40 @@ export default function ServiceWorkerRegistration() {
       // Listen for controller change (when new SW takes over)
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          logger.log('[SW] New service worker activated, reloading page...');
-          // Brief delay to show updating message, then reload
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
+        if (refreshing) return;
+
+        // Reload guard: prevent infinite reload loops
+        const lastReload = sessionStorage.getItem(SW_RELOAD_KEY);
+        const now = Date.now();
+        if (lastReload && now - Number(lastReload) < RELOAD_COOLDOWN_MS) {
+          logger.log('[SW] Skipping reload — already reloaded recently');
+          return;
         }
+
+        refreshing = true;
+        logger.log('[SW] New service worker activated, reloading page...');
+        sessionStorage.setItem(SW_RELOAD_KEY, String(now));
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       });
 
       // Listen for messages from service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data && event.data.type === 'SW_UPDATED') {
-          logger.log('[SW] Received update notification:', event.data.version);
+          const newVersion = event.data.version;
+          const knownVersion = localStorage.getItem(SW_VERSION_KEY);
+          logger.log('[SW] Received update notification:', newVersion);
+
+          // Only treat it as a real update if the version actually changed
+          if (knownVersion === newVersion) {
+            logger.log('[SW] Same version as before, skipping reload');
+            setUpdating(false);
+            return;
+          }
+
+          localStorage.setItem(SW_VERSION_KEY, newVersion);
+          logger.log('[SW] New version confirmed:', newVersion);
         }
       });
     }
