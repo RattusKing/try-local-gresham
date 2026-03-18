@@ -5,7 +5,6 @@ import { useCart } from '@/lib/cart-context'
 import { useState } from 'react'
 import Link from 'next/link'
 import CartModal from './CartModal'
-import { HashLink } from './HashLink'
 
 export default function Header({ onSignIn }: { onSignIn: () => void }) {
   const { user, signOut } = useAuth()
@@ -52,15 +51,15 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
 
         {/* Desktop navigation */}
         <nav className="nav">
-          <HashLink href="/#discover" className="nav-link">
+          <Link href="/#discover" className="nav-link">
             Discover
-          </HashLink>
-          <HashLink href="/#categories" className="nav-link">
+          </Link>
+          <Link href="/#categories" className="nav-link">
             Categories
-          </HashLink>
-          <HashLink href="/apply" className="nav-link">
+          </Link>
+          <Link href="/apply" className="nav-link">
             For Businesses
-          </HashLink>
+          </Link>
 
           <button
             onClick={() => setShowCart(true)}

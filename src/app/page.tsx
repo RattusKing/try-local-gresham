@@ -32,6 +32,14 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'newest'>('name')
   const [favoritedBusinessIds, setFavoritedBusinessIds] = useState<Set<string>>(new Set())
 
+  // For Hash Link Reliability
+  useEffect(() => {
+  const hash = window.location.hash.slice(1)
+  if (hash) {
+    document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })
+  }
+}, [])
+
   // Load data from Firestore
   useEffect(() => {
     loadBusinesses()
