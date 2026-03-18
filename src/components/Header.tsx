@@ -51,12 +51,12 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
 
         {/* Desktop navigation */}
         <nav className="nav">
-          <a href="/#discover" className="nav-link">
+          <Link href="/#discover" className="nav-link">
             Discover
-          </a>
-          <a href="/#categories" className="nav-link">
+          </Link>
+          <Link href="/#categories" className="nav-link">
             Categories
-          </a>
+          </Link>
           <Link href="/apply" className="nav-link">
             For Businesses
           </Link>
