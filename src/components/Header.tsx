@@ -17,7 +17,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
     <header className="site-header">
       <div className="container header-inner">
         <div className="brand">
-          <Link href="/" title="To Home Page" className="flex items-center space-x-4">
+          <Link href="/" title="To Home Page" className="flex items-center space-x-2">
           <div className="brand-mark" aria-hidden="true">
             <img
               src="/logo.jpeg"
