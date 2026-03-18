@@ -17,6 +17,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
     <header className="site-header">
       <div className="container header-inner">
         <div className="brand">
+          <a href="/" title="To Home Page" className="flex items-center space-x-4">
           <div className="brand-mark" aria-hidden="true">
             <img
               src="/logo.jpeg"
@@ -30,6 +31,7 @@ export default function Header({ onSignIn }: { onSignIn: () => void }) {
             />
           </div>
           <span className="brand-name">Try Local</span>
+          </a>
           <span className="brand-subtle">Gresham, OR</span>
         </div>
 
