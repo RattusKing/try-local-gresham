@@ -10,6 +10,7 @@ import { Providers } from './providers'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/lib/site-config'
 import './globals.css'
+import { ScrollHandler } from '@/components/ScrollHandler'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -100,6 +101,7 @@ export default function RootLayout({
           <NotificationPrompt />
           <PWAInstallAfterSignup />
         </Providers>
+        <ScrollHandler/>
       </body>
     </html>
   )
