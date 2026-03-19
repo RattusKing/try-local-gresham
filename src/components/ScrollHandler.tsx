@@ -8,10 +8,12 @@ export function ScrollHandler() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
 
-  useEffect(() => {
-    const id = searchParams.get('scrollTo')
-    if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }, [pathname, searchParams])
+useEffect(() => {
+  const id = searchParams.get('scrollTo')
+  if (id) setTimeout(() => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }, 100)
+}, [pathname, searchParams])
 
   return null
 }
