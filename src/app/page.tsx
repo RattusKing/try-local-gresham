@@ -7,6 +7,7 @@ import BusinessCard from '@/components/BusinessCard'
 import CategoryCard from '@/components/CategoryCard'
 import Footer from '@/components/Footer'
 import AuthModal from '@/components/AuthModal'
+import RandomizerModal from '@/components/RandomizerModal'
 import PromoBanner from '@/components/PromoBanner'
 import SponsoredBannerCarousel from '@/components/SponsoredBannerCarousel'
 import CategoryFilterDropdown from '@/components/CategoryFilterDropdown'
@@ -31,6 +32,7 @@ export default function Home() {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'rating' | 'newest'>('name')
   const [favoritedBusinessIds, setFavoritedBusinessIds] = useState<Set<string>>(new Set())
+  const [isRandomizerOpen, setIsRandomizerOpen] = useState(false)
 
   // Load data from Firestore
   useEffect(() => {
@@ -331,6 +333,43 @@ export default function Home() {
 
         {/* Sponsored Business Carousel */}
         <SponsoredBannerCarousel />
+
+        {/* Randomizer CTA */}
+        {!loading && businesses.some((b) => b.tags.some((t) =>
+          ['Restaurant', 'Cafe', 'Coffee Shop', 'Bakery', 'Deli', 'Food Truck',
+           'Pizza', 'Mexican', 'Asian', 'Italian', 'American', 'Thai', 'Chinese',
+           'Japanese', 'Sushi', 'BBQ', 'Seafood', 'Breakfast', 'Brunch', 'Lunch',
+           'Dinner', 'Fine Dining', 'Casual Dining', 'Fast Food', 'Burgers',
+           'Sandwiches', 'Desserts', 'Vegan', 'Vegetarian'].includes(t)
+        )) && (
+          <div style={{
+            background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
+            borderTop: '1px solid #fed7aa',
+            borderBottom: '1px solid #fed7aa',
+            padding: '1.25rem 1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            flexWrap: 'wrap',
+          }}>
+            <div>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#92400e' }}>
+                🎲 Can't decide where to eat?
+              </p>
+              <p style={{ margin: '0.1rem 0 0', fontSize: '0.85rem', color: '#b45309' }}>
+                Let us randomly pick a local restaurant for you.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsRandomizerOpen(true)}
+              className="btn btn-primary"
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              Surprise Me!
+            </button>
+          </div>
+        )}
 
         <section id="discover" className="section section-alt-light container">
           {/* Active Filters and Result Count */}
@@ -787,6 +826,11 @@ export default function Home() {
       <Footer />
 
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <RandomizerModal
+        isOpen={isRandomizerOpen}
+        onClose={() => setIsRandomizerOpen(false)}
+        businesses={businesses}
+      />
     </>
   )
 }
