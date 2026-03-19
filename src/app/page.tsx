@@ -335,14 +335,7 @@ export default function Home() {
         <SponsoredBannerCarousel />
 
         {/* Randomizer CTA */}
-        {!loading && businesses.some((b) => b.tags.some((t) =>
-          ['Restaurant', 'Cafe', 'Coffee Shop', 'Bakery', 'Deli', 'Food Truck',
-           'Pizza', 'Mexican', 'Asian', 'Italian', 'American', 'Thai', 'Chinese',
-           'Japanese', 'Sushi', 'BBQ', 'Seafood', 'Breakfast', 'Brunch', 'Lunch',
-           'Dinner', 'Fine Dining', 'Casual Dining', 'Fast Food', 'Burgers',
-           'Sandwiches', 'Desserts', 'Vegan', 'Vegetarian'].includes(t)
-        )) && (
-          <div style={{
+        <div style={{
             background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
             borderTop: '1px solid #fed7aa',
             borderBottom: '1px solid #fed7aa',
@@ -369,7 +362,6 @@ export default function Home() {
               Surprise Me!
             </button>
           </div>
-        )}
 
         <section id="discover" className="section section-alt-light container">
           {/* Active Filters and Result Count */}
